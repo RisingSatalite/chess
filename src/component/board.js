@@ -68,6 +68,13 @@ export default function Chess() {
     }else if(board[selectedSquare1][1] === 'P') {
     }else if(board[selectedSquare1][1] === 'Q') {
     }else if(board[selectedSquare1][1] === 'K') {
+      if (connectNeighboring()) {
+        return true;
+      } else {
+        setSelectedSquare1(64);
+        setSelectedSquare2(64);
+        return false;
+      }
     }
     
     setSelectedSquare1(64);
@@ -76,6 +83,8 @@ export default function Chess() {
   };
   
   const horizontallyConnecting = () => {
+    //Get the row or column
+    //Subtracts by 8s to get the row, and what is left is the column
     let square = selectedSquare1;
     let row = 0;
     
@@ -94,6 +103,50 @@ export default function Chess() {
   
     return row === row2 || square === square2;
   };
+
+  const diagonalConnecting = () => {
+    let square = selectedSquare1;
+    let row = 0;
+
+    let square2 = selectedSquare2;
+    let row2 = 0;
+    
+    while (square - 8 > 0) {
+      row += 1;
+      square -= 8;
+    }
+  
+    while (square2 - 8 > 0) {
+      row2 += 1;
+      square2 -= 8;
+    }
+
+    if((row+square)%2==(row2+square2)%2){
+      return false
+    }
+  
+    return row === row2 || square === square2;
+  };
+
+  const connectNeighboring = () => {
+    let square = selectedSquare1;
+    let row = 0;
+
+    let square2 = selectedSquare2;
+    let row2 = 0;
+    
+    while (square - 8 > 0) {
+      row += 1;
+      square -= 8;
+    }
+  
+    while (square2 - 8 > 0) {
+      row2 += 1;
+      square2 -= 8;
+    }
+    
+    return(row+1 >= row2 && row-1 <=row2 && square+1 >= square2 && square-1 <=square2)
+  }
   
   const makeMove = () => {
     const newBoard = [...board];
