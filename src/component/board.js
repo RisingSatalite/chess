@@ -82,6 +82,7 @@ export default function Chess() {
     return false;
   };
   
+  //Make sure the 2 selected squares make a valid rook move
   const horizontallyConnecting = () => {
     //Get the row or column
     //Subtracts by 8s to get the row, and what is left is the column
@@ -128,6 +129,7 @@ export default function Chess() {
     return row === row2 || square === square2;
   };
 
+  //Check if the 2 seclected squares are a valid king move 
   const connectNeighboring = () => {
     let square = selectedSquare1;
     let row = 0;
