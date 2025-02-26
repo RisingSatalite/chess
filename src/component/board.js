@@ -73,6 +73,13 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'P') {
+      if (connectPawn()) {
+        return true;
+      } else {
+        setSelectedSquare1(64);
+        setSelectedSquare2(64);
+        return false;
+      }
     }else if(board[selectedSquare1][1] === 'Q') {
     }else if(board[selectedSquare1][1] === 'K') {
       if (connectNeighboring()) {
@@ -119,6 +126,7 @@ export default function Chess() {
     let square2 = selectedSquare2;
     let row2 = 0;
 
+    //Bishop can only hop to square on the same diangol, meaning only odd or even square, so if both are not, then the bishop can not make that move
     if(square%2 != square2%2){
       return false
     }
@@ -203,6 +211,75 @@ export default function Chess() {
       return true
     }
     return false
+  }
+
+  //See if it is a legal pawn move
+  const connectPawn = () => {
+    if(board[selectedSquare1][1] != 'P'){
+      console.log("Not pawn")
+      return false
+    }
+    console.log('Checking pawn move')
+
+    const type = board[selectedSquare1][0]
+
+    //square and square2 represent column
+    let square = selectedSquare1;
+    let row = 0;
+
+    let square2 = selectedSquare2;
+    let row2 = 0;
+    
+    while (square - 8 > 0) {
+      row += 1;
+      square -= 8;
+    }
+    console.log(square)
+    console.log(row)
+  
+    while (square2 - 8 > 0) {
+      row2 += 1;
+      square2 -= 8;
+    }
+    console.log(square2)
+    console.log(row2)
+
+    const otherSquareType = board[selectedSquare2][0]
+    console.log(otherSquareType)
+
+    if(type == "W"){
+      if((row = row2 - 1) && (square == square2)){
+        if(otherSquareType == undefined){
+          return true
+        }
+      }else if((row = row2 - 1) && (square == square2 + 1)){
+        if(otherSquareType == "B"){
+          return true
+        }
+      }else if((row = row2 - 1) && (square == square2 - 1)){
+        if(otherSquareType == "B"){
+          return true
+        }
+      }
+      return false
+    }else if(type == "B"){
+      if((row = row2 + 1) && (square == square2)){
+        if(otherSquareType == undefined){
+          return true
+        }
+      }else if((row = row2 + 1) && (square == square2 + 1)){
+        if(otherSquareType == "W"){
+          return true
+        }
+      }else if((row = row2 + 1) && (square == square2 - 1)){
+        if(otherSquareType == "W"){
+          return true
+        }
+      }
+      return false
+    }
+    
+    return false//Because no colour type
   }
   
   const makeMove = () => {
