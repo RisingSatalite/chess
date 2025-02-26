@@ -248,30 +248,30 @@ export default function Chess() {
     console.log(otherSquareType)
 
     if(type == "W"){
-      if((row = row2 - 1) && (square == square2)){
+      if((row == row2 - 1) && (square == square2)){
         if(otherSquareType == undefined){
           return true
         }
-      }else if((row = row2 - 1) && (square == square2 + 1)){
+      }else if((row == row2 - 1) && (square == square2 + 1)){
         if(otherSquareType == "B"){
           return true
         }
-      }else if((row = row2 - 1) && (square == square2 - 1)){
+      }else if((row == row2 - 1) && (square == square2 - 1)){
         if(otherSquareType == "B"){
           return true
         }
       }
       return false
-    }else if(type == "B"){
+    }else if(type === "B"){
       if((row = row2 + 1) && (square == square2)){
         if(otherSquareType == undefined){
           return true
         }
-      }else if((row = row2 + 1) && (square == square2 + 1)){
+      }else if((row == row2 + 1) && (square == square2 + 1)){
         if(otherSquareType == "W"){
           return true
         }
-      }else if((row = row2 + 1) && (square == square2 - 1)){
+      }else if((row == row2 + 1) && (square == square2 - 1)){
         if(otherSquareType == "W"){
           return true
         }
