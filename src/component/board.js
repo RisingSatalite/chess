@@ -230,14 +230,14 @@ export default function Chess() {
     let square2 = selectedSquare2;
     let row2 = 0;
     
-    while (square - 8 > 0) {
+    while (square - 8 >= 0) {
       row += 1;
       square -= 8;
     }
     console.log(square)
     console.log(row)
   
-    while (square2 - 8 > 0) {
+    while (square2 - 8 >= 0) {
       row2 += 1;
       square2 -= 8;
     }
@@ -247,31 +247,44 @@ export default function Chess() {
     const otherSquareType = board[selectedSquare2][0]
     console.log(otherSquareType)
 
+    console.log("Calculation")
+    console.log(row == (row2 - 1))
+    console.log(row == (row2 + 1))
+    //return false
+
     if(type == "W"){
-      if((row == row2 - 1) && (square == square2)){
+      if((row == (row2 + 1)) && (square == square2)){
         if(otherSquareType == undefined){
           return true
+        }else{
+          return false
         }
-      }else if((row == row2 - 1) && (square == square2 + 1)){
+      }
+      if((row == (row2 + 1)) && (square == (square2 + 1))){
         if(otherSquareType == "B"){
           return true
         }
-      }else if((row == row2 - 1) && (square == square2 - 1)){
+      }
+      if((row == (row2 + 1)) && (square == (square2 - 1))){
         if(otherSquareType == "B"){
           return true
         }
       }
       return false
     }else if(type === "B"){
-      if((row = row2 + 1) && (square == square2)){
+      if((row = (row2 - 1)) && (square == square2)){
         if(otherSquareType == undefined){
           return true
+        }else{
+          return false
         }
-      }else if((row == row2 + 1) && (square == square2 + 1)){
+      }
+      if((row == (row2 - 1)) && (square == (square2 + 1))){
         if(otherSquareType == "W"){
           return true
         }
-      }else if((row == row2 + 1) && (square == square2 - 1)){
+      }
+      if((row == (row2 - 1)) && (square == (square2 - 1))){
         if(otherSquareType == "W"){
           return true
         }
