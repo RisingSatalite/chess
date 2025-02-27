@@ -270,6 +270,13 @@ export default function Chess() {
           return true
         }
       }
+      if((row == 6)&&(row2==4)&&(square == square2)){
+        if(otherSquareType == undefined){
+          return true
+        }else{
+          return false
+        }
+      }
       return false
     }else if(type === "B"){
       if((row = (row2 - 1)) && (square == square2)){
@@ -287,6 +294,13 @@ export default function Chess() {
       if((row == (row2 - 1)) && (square == (square2 - 1))){
         if(otherSquareType == "W"){
           return true
+        }
+      }
+      if((row == 1)&&(row2==3)&&(square == square2)){
+        if(otherSquareType == undefined){
+          return true
+        }else{
+          return false
         }
       }
       return false
