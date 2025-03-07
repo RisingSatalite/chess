@@ -56,7 +56,7 @@ export default function Chess() {
     console.log(board[selectedSquare1][1]);
     
     if (board[selectedSquare1][1] === 'R') {
-      if (horizontallyConnecting()) {
+      if (horizontallyConnecting() && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -64,7 +64,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'B') {
-      if (connectingBishop()) {
+      if (connectingBishop() && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -72,7 +72,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'N') {
-      if (connectKnight()) {
+      if (connectKnight() && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -88,7 +88,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'Q') {
-      if (connectNeighboring() || connectingBishop()) {
+      if ((connectNeighboring() || connectingBishop()) && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -96,7 +96,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'K') {
-      if (connectNeighboring()) {
+      if ((connectNeighboring() && noFriendlyFire()) /*Add castle here */) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -155,9 +155,9 @@ export default function Chess() {
       return true
     }else if(board[selectedSquare1][0] == "B" && (board[selectedSquare2][0] == "W" || board[selectedSquare2][0] == undefined)){
       return true
-    }else{
-      return false
     }
+    console.log("No friendly fire allowed")
+    return false
   }
 
   const diagonalConnecting = () => {
@@ -340,6 +340,19 @@ export default function Chess() {
     }
     
     return false//Because no colour type
+  }
+
+  const noGhosting = () => {
+    
+  }
+
+  const checkCastle = () => {
+    //Check if king or that rook has already moved
+    //return reset()
+
+    if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
+      console.log("Possible valid castle")
+    }
   }
   
   const makeMove = () => {
