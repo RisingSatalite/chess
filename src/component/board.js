@@ -342,8 +342,94 @@ export default function Chess() {
     return false//Because no colour type
   }
 
-  const noGhosting = () => {
+  const noGhostingHorizontal = () => {
+    //Determine which way then if anything inbetween
+    let square = selectedSquare1
+    let column = selectedSquare1;
+    let row = 0;
+
+    let square2 = selectedSquare1
+    let column2 = selectedSquare2;
+    let row2 = 0;
     
+    //Convert the data, in the row and columns, to chekc which need to be checked
+    while (column - 8 > 0) {
+      row += 1;
+      column -= 8;
+    }
+  
+    while (column2 - 8 > 0) {
+      row2 += 1;
+      column2 -= 8;
+    }
+
+    if(row==row2){
+      if(square < square2){
+        while (true){
+          console.log("Looping")
+          square += 1//Move closer to the other square
+          //If no other piece in the way all the way to the other piece, then valid move
+          if(square == square2){
+            return true
+          }
+          //If inbetween square is a square, then the move is not valid because another piece in the way
+          if(board[square] == ''){
+            return false
+          }
+          if(square > square2){
+            return false
+          }
+        }
+      }else{
+        while (true){
+          console.log("Looping")
+          square -= 1//Move closer to the other square
+          //If no other piece in the way all the way to the other piece, then valid move
+          if(square == square2){
+            return true
+          }
+          //If inbetween square is a square, then the move is not valid because another piece in the way
+          if(board[square] == ''){
+            return false
+          }
+        }
+      }
+    }else{
+      if(square < square2){
+        while (true){
+          console.log("Looping")
+          square += 8//Move closer to the other square, using 8 because checking by moving pass rows
+          //If no other piece in the way all the way to the other piece, then valid move
+          if(square == square2){
+            return true
+          }
+          //If inbetween square is a square, then the move is not valid because another piece in the way
+          if(board[square] == ''){
+            return false
+          }
+          if(square > square2){
+            return false
+          }
+        }
+      }else{
+        while (true){
+          console.log("Looping")
+          square -= 8//Move closer to the other square, using 8 because checking by moving pass rows
+          //If no other piece in the way all the way to the other piece, then valid move
+          if(square == square2){
+            return true
+          }
+          //If inbetween square is a square, then the move is not valid because another piece in the way
+          if(board[square] == ''){
+            return false
+          }
+          if(square < square2){
+            return false
+          }
+        }
+      }
+    }
+    return false
   }
 
   const checkCastle = () => {
