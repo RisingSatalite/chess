@@ -56,7 +56,8 @@ export default function Chess() {
     console.log(board[selectedSquare1][1]);
     
     if (board[selectedSquare1][1] === 'R') {
-      if (horizontallyConnecting() && noFriendlyFire()) {
+      console.log(noGhostingHorizontal())
+      if (horizontallyConnecting() && noFriendlyFire() && noGhostingHorizontal()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -348,7 +349,7 @@ export default function Chess() {
     let column = selectedSquare1;
     let row = 0;
 
-    let square2 = selectedSquare1
+    let square2 = selectedSquare2
     let column2 = selectedSquare2;
     let row2 = 0;
     
@@ -367,29 +368,45 @@ export default function Chess() {
       if(square < square2){
         while (true){
           console.log("Looping")
+          console.log(square)
+          console.log("Square 2 is ", square2)
           square += 1//Move closer to the other square
           //If no other piece in the way all the way to the other piece, then valid move
           if(square == square2){
             return true
           }
           //If inbetween square is a square, then the move is not valid because another piece in the way
-          if(board[square] == ''){
+          console.log(board[square])
+          console.log("")
+          console.log(board[square] != '')
+          if(board[square] != ''){
+            console.log("Piece in the way")
             return false
           }
           if(square > square2){
+            console.log("Squares do not align")
             return false
           }
         }
       }else{
         while (true){
           console.log("Looping")
+          console.log(square)
+          console.log("Square 2 is ", square2)
           square -= 1//Move closer to the other square
           //If no other piece in the way all the way to the other piece, then valid move
           if(square == square2){
             return true
           }
           //If inbetween square is a square, then the move is not valid because another piece in the way
-          if(board[square] == ''){
+          console.log(board[square])
+          console.log("")
+          console.log(board[square] != '')
+          if(board[square] != ''){
+            return false
+          }
+          if(square < square2){
+            console.log("Squares do not align")
             return false
           }
         }
@@ -398,32 +415,44 @@ export default function Chess() {
       if(square < square2){
         while (true){
           console.log("Looping")
+          console.log(square)
+          console.log("Square 2 is ", square2)
           square += 8//Move closer to the other square, using 8 because checking by moving pass rows
           //If no other piece in the way all the way to the other piece, then valid move
           if(square == square2){
             return true
           }
           //If inbetween square is a square, then the move is not valid because another piece in the way
-          if(board[square] == ''){
+          console.log(board[square])
+          console.log("")
+          console.log(board[square] != '')
+          if(board[square] != ''){
             return false
           }
           if(square > square2){
+            console.log("Squares do not align")
             return false
           }
         }
       }else{
         while (true){
           console.log("Looping")
+          console.log("Square 1 is ", square)
+          console.log("Square 2 is ", square2)
           square -= 8//Move closer to the other square, using 8 because checking by moving pass rows
           //If no other piece in the way all the way to the other piece, then valid move
           if(square == square2){
             return true
           }
           //If inbetween square is a square, then the move is not valid because another piece in the way
-          if(board[square] == ''){
+          console.log(board[square])
+          console.log("")
+          console.log(board[square] != '')
+          if(board[square] != ''){
             return false
           }
           if(square < square2){
+            console.log("Squares do not align")
             return false
           }
         }
