@@ -89,7 +89,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'Q') {
-      if ((connectNeighboring() || connectingBishop()) && noFriendlyFire()) {
+      if (((horizontallyConnecting() && noGhostingHorizontal()) || connectingBishop()) && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
