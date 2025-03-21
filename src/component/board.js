@@ -90,7 +90,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'Q') {
-      if (((horizontallyConnecting() && noGhostingHorizontal()) || connectingBishop()) && noFriendlyFire()) {
+      if (((horizontallyConnecting() && noGhostingHorizontal()) || (connectingBishop() && noGhostingDiagonal())) && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -458,128 +458,6 @@ export default function Chess() {
           }
         }
       }
-    }
-    return false
-  }
-
-  const noGhostingVertical = () => {
-    //Determine which way then if anything inbetween
-    let square = selectedSquare1
-    let column = selectedSquare1;
-    let row = 0;
-
-    let square2 = selectedSquare2
-    let column2 = selectedSquare2;
-    let row2 = 0;
-    
-    //Convert the data, in the row and columns, to chekc which need to be checked
-    while (column - 8 > 0) {
-      row += 1;
-      column -= 8;
-    }
-  
-    while (column2 - 8 > 0) {
-      row2 += 1;
-      column2 -= 8;
-    }
-
-    var newSquare = 0
-    if(row > row2 && column > column2){
-      while(true){
-        row -=1
-        column -=1
-        newSquare = ((row*8) + column)
-
-        console.log(newSquare)
-        console.log(square2)
-        console.log(row, row2, column, column2)
-
-        if(row == row2 && column == column2){
-          return true
-        }
-        if(row < row2 && column < column2){
-          return false
-        }
-
-        if(board[square] != ''){
-          console.log(newSquare)
-          console.log(board[square])
-          console.log("Piece in the way")
-          return false
-        }
-      }
-    }else
-    if(row > row2 && column < column2){
-      while(true){
-        row -=1
-        column +=1
-        newSquare = ((row*8) + column)
-
-        console.log(newSquare)
-
-        if(row == row2 && column == column2){
-          return true
-        }
-        if(row < row2 && column > column2){
-          return false
-        }
-
-        if(board[square] != ''){
-          console.log(newSquare)
-          console.log(board[square])
-          console.log("Piece in the way")
-          return false
-        }
-
-       }
-    }else
-    if(row < row2 && column > column2){
-      while(true){
-
-        row +=1
-        column -=1
-        newSquare = ((row*8) + column)
-
-        console.log(newSquare)
-
-        if(row == row2 && column == column2){
-          return true
-        }
-        if(row > row2 && column < column2){
-          return false
-        }
-
-        if(board[square] != ''){
-          console.log(newSquare)
-          console.log(board[square])
-          console.log("Piece in the way")
-          return false
-        }
-       }
-    }else
-    if(row < row2 && column < column2){
-      while(true){
-
-        row +=1
-        column +=1
-        newSquare = ((row*8) + column)
-
-        console.log(newSquare)
-
-        if(row == row2 && column == column2){
-          return true
-        }
-        if(row > row2 && column > column2){
-          return false
-        }
-
-        if(board[square] != ''){
-          console.log(newSquare)
-          console.log(board[square])
-          console.log("Piece in the way")
-          return false
-        }
-       }
     }
     return false
   }
