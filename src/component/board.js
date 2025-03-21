@@ -306,8 +306,17 @@ export default function Chess() {
         }
       }
       if((row == 6)&&(row2==4)&&(square == square2)){
+        console.log("Double jump")
         if(otherSquareType == undefined){
-          return true
+          console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
+          console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)])
+          console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == "")
+          if(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == ""){
+            return true
+          }else{
+            console.log("Piece in the way of pawn")
+            return false
+          }
         }else{
           return false
         }
@@ -332,8 +341,17 @@ export default function Chess() {
         }
       }
       if((row == 1)&&(row2==3)&&(square == square2)){
+        console.log("Double jump")
         if(otherSquareType == undefined){
-          return true
+          selectedSquare2((selectedSquare2 - selectedSquare)/2)
+          console.log(board[selectedSquare2+((selectedSquare2 - selectedSquare1)/2)])
+          console.log(board[selectedSquare2+((selectedSquare2 - selectedSquare1)/2)] == "")
+          if(board[selectedSquare2-((selectedSquare2 + selectedSquare1)/2)] == ""){
+            return true
+          }else{
+            console.log("Piece in the way of pawn")
+            return false
+          }
         }else{
           return false
         }
