@@ -1,5 +1,6 @@
 'use client'
 
+import NoWorkResult_ from "postcss/lib/no-work-result";
 import Square from "./square"
 import { useEffect, useState } from "react";
 
@@ -65,7 +66,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'B') {
-      if (connectingBishop() && noFriendlyFire()) {
+      if ((connectingBishop() && noGhostingDiagonal()) && noFriendlyFire()) {
         return true;
       } else {
         setSelectedSquare1(64);
@@ -460,6 +461,163 @@ export default function Chess() {
     }
     return false
   }
+
+  const noGhostingVertical = () => {
+    //Determine which way then if anything inbetween
+    let square = selectedSquare1
+    let column = selectedSquare1;
+    let row = 0;
+
+    let square2 = selectedSquare2
+    let column2 = selectedSquare2;
+    let row2 = 0;
+    
+    //Convert the data, in the row and columns, to chekc which need to be checked
+    while (column - 8 > 0) {
+      row += 1;
+      column -= 8;
+    }
+  
+    while (column2 - 8 > 0) {
+      row2 += 1;
+      column2 -= 8;
+    }
+
+    var newSquare = 0
+    if(row > row2 && column > column2){
+      while(true){
+        row -=1
+        column -=1
+        newSquare = ((row*8) + column)
+
+        console.log(newSquare)
+        console.log(square2)
+        console.log(row, row2, column, column2)
+
+        if(row == row2 && column == column2){
+          return true
+        }
+        if(row < row2 && column < column2){
+          return false
+        }
+
+        if(board[square] != ''){
+          console.log(newSquare)
+          console.log(board[square])
+          console.log("Piece in the way")
+          return false
+        }
+      }
+    }else
+    if(row > row2 && column < column2){
+      while(true){
+        row -=1
+        column +=1
+        newSquare = ((row*8) + column)
+
+        console.log(newSquare)
+
+        if(row == row2 && column == column2){
+          return true
+        }
+        if(row < row2 && column > column2){
+          return false
+        }
+
+        if(board[square] != ''){
+          console.log(newSquare)
+          console.log(board[square])
+          console.log("Piece in the way")
+          return false
+        }
+
+       }
+    }else
+    if(row < row2 && column > column2){
+      while(true){
+
+        row +=1
+        column -=1
+        newSquare = ((row*8) + column)
+
+        console.log(newSquare)
+
+        if(row == row2 && column == column2){
+          return true
+        }
+        if(row > row2 && column < column2){
+          return false
+        }
+
+        if(board[square] != ''){
+          console.log(newSquare)
+          console.log(board[square])
+          console.log("Piece in the way")
+          return false
+        }
+       }
+    }else
+    if(row < row2 && column < column2){
+      while(true){
+
+        row +=1
+        column +=1
+        newSquare = ((row*8) + column)
+
+        console.log(newSquare)
+
+        if(row == row2 && column == column2){
+          return true
+        }
+        if(row > row2 && column > column2){
+          return false
+        }
+
+        if(board[square] != ''){
+          console.log(newSquare)
+          console.log(board[square])
+          console.log("Piece in the way")
+          return false
+        }
+       }
+    }
+    return false
+  }
+
+  const noGhostingDiagonal = () => {
+    let square1 = selectedSquare1;
+    let square2 = selectedSquare2;
+  
+    let row1 = Math.floor(square1 / 8);
+    let col1 = square1 % 8;
+    let row2 = Math.floor(square2 / 8);
+    let col2 = square2 % 8;
+  
+    // Not a diagonal move
+    if (Math.abs(row2 - row1) !== Math.abs(col2 - col1)) {
+      return false;
+    }
+  
+    let rowStep = row2 > row1 ? 1 : -1;
+    let colStep = col2 > col1 ? 1 : -1;
+  
+    let r = row1 + rowStep;
+    let c = col1 + colStep;
+  
+    while (r !== row2 && c !== col2) {
+      let squareToCheck = r * 8 + c;
+  
+      if (board[squareToCheck] !== '') {
+        console.log("Piece in the way at", squareToCheck);
+        return false;
+      }
+  
+      r += rowStep;
+      c += colStep;
+    }
+  
+    return true;
+  }  
 
   const checkCastle = () => {
     //Check if king or that rook has already moved
