@@ -10,7 +10,7 @@ export default function Square({ prop, onClickFunction, number = 0, selected = 6
     
     return (
         <button onClick={onClickFunction} style={buttonStyle} className="square">
-            {prop}
+            -{prop}
         </button>
     );
 }

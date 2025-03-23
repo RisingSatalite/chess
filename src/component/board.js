@@ -373,12 +373,12 @@ export default function Chess() {
     let row2 = 0;
     
     //Convert the data, in the row and columns, to chekc which need to be checked
-    while (column - 8 > 0) {
+    while (column - 8 >= 0) {
       row += 1;
       column -= 8;
     }
   
-    while (column2 - 8 > 0) {
+    while (column2 - 8 >= 0) {
       row2 += 1;
       column2 -= 8;
     }
