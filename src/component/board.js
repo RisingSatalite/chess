@@ -548,8 +548,11 @@ export default function Chess() {
             {board.slice(rowIndex * 8, rowIndex * 8 + 8).map((item, index) => (
               <Square
                 key={rowIndex * 8 + index}
+                number={rowIndex * 8 + index}
                 onClickFunction={() => selectSquare(rowIndex * 8 + index)}
                 prop={item}
+                selected={selectedSquare1}
+                row={rowIndex}
               />
             ))}
           </div>
