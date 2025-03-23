@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 
 test('leftbottomrook', async ({ page }) => {
   await page.goto('http://localhost:3000/');
-  await page.locator('#content').click();
   await page.getByRole('button', { name: '-WR' }).first().click();
   await expect(page.getByRole('button', { name: '-WR' }).first()).toBeVisible();
 });
