@@ -221,6 +221,11 @@ export default function Chess() {
       square2 -= 8;
     }
 
+    console.log(row)
+    console.log(row2)
+    console.log(square)
+    console.log(square2)
+
     if(row+1 == row2 && square+2 == square2){
       return true
     }
@@ -230,7 +235,7 @@ export default function Chess() {
     if(row+1 == row2 && square-2 == square2){
       return true
     }
-    if(row+1 == row2 && square-2 == square2){
+    if(row-1 == row2 && square-2 == square2){
       return true
     }
     if(row+2 == row2 && square+1 == square2){
