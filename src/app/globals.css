@@ -30,3 +30,10 @@ body {
   border-radius: 1px;
   color: #0a0a0a;
 }
+
+#chess {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 100vh; /* Full viewport height */
+}

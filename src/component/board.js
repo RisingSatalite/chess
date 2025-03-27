@@ -545,7 +545,9 @@ export default function Chess() {
   
 
   return (
-    <div>Chess
+    <div id="chess">
+      <div>
+      Chess
       It is {turn}
       <div>
         {Array.from({ length: Math.ceil(board.length / 8) }, (_, rowIndex) => (
@@ -562,6 +564,7 @@ export default function Chess() {
             ))}
           </div>
         ))}
+      </div>
       </div>
     </div>
   )}
