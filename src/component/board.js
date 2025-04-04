@@ -1,6 +1,5 @@
 'use client'
 
-import NoWorkResult_ from "postcss/lib/no-work-result";
 import Square from "./square"
 import { useEffect, useState } from "react";
 
@@ -82,7 +81,7 @@ export default function Chess() {
         return false;
       }
     }else if(board[selectedSquare1][1] === 'P') {
-      if (connectPawn()) {
+      if (connectPawn()) { //Check if promoting
         return true;
       } else {
         setSelectedSquare1(64);
@@ -107,9 +106,7 @@ export default function Chess() {
       }
     }
     
-    setSelectedSquare1(64);
-    setSelectedSquare2(64);
-    return false;
+    return reset()
   };
 
   const reset = () => {
