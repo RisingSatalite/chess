@@ -40,7 +40,7 @@ export default function Square({ prop, onClickFunction, number = 0, selected = 6
     
     return (
         <button onClick={onClickFunction} style={buttonStyle} className="square">
-            {display === "-" && display}
+            {display === "-" && <Image src="/invisible.png" alt={display} width={pieceWidth} height={pieceHeight} />}
             {display === "WK" && <Image src="/WhiteKing.png" alt={display} width={pieceWidth} height={pieceHeight} />}
             {display === "WQ" && <Image src="/WhiteQueen.png" alt={display} width={pieceWidth} height={pieceHeight} />}
             {display === "WB" && <Image src="/WhiteBishop.png" alt={display} width={pieceWidth} height={pieceHeight} />}
