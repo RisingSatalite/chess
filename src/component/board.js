@@ -528,8 +528,22 @@ export default function Chess() {
   
   const makeMove = () => {
     const newBoard = [...board];
+
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
+
+    let column2 = selectedSquare2;
+    let row2 = 0;
+    while (column2 - 8 >= 0) {
+      row2 += 1;
+      column2 -= 8;
+    }
+    if(newBoard[selectedSquare2] == "WP" && row2 == 0){
+      newBoard[selectedSquare2] = "WQ"
+    }else if(newBoard[selectedSquare2] == "BP" && row2 == 7){
+      newBoard[selectedSquare2] = "BQ"
+    }
+
     setBoard(newBoard);
   
     setSelectedSquare1(64);
