@@ -256,6 +256,11 @@ export default function Chess() {
     return false
   }
 
+  const checkEnpassent = () => {
+    console.log("Enpassent")
+    console.log(enpassent)
+  }
+
   //See if it is a legal pawn move
   const connectPawn = () => {
     if(board[selectedSquare1][1] != 'P'){
@@ -310,9 +315,11 @@ export default function Chess() {
         if(otherSquareType == "B"){
           return true
         }else if(enpassent == selectedSquare2){
-          setEnpassent(-2)
-          const capturedSquare = selectedSquare2 + 8
-          board[capturedSquare] = "" // for white capturing black pawn
+          setEnpassent(-2);
+          const capturedSquare = selectedSquare2 + 8;
+          const newBoard = [...board];
+          newBoard[capturedSquare] = ""; // for white capturing black pawn
+          setBoard(newBoard);
           return true
         }
       }else
@@ -351,8 +358,9 @@ export default function Chess() {
     }else if(type === "B"){
       console.log("A  black pawn moved")
       console.log("Enpassent check")
-      console.log(enpassent)
-      console.log(selectedSquare2)
+      if((row == (row2 - 1)) && (square == square2)){
+        console.log(selectedSquare2)
+      }
       if((row = (row2 - 1)) && (square == square2)){
         if(otherSquareType == undefined){
           return true
@@ -362,11 +370,11 @@ export default function Chess() {
       }else
       if((row == (row2 - 1)) && (square == (square2 + 1))){
         if(otherSquareType == "W"){
-          return true
-        }else if(enpassent == selectedSquare2){
-          setEnpassent(-2)
-          const capturedSquare = selectedSquare2 - 8
-          board[capturedSquare] = "" // for black capturing white pawn
+          setEnpassent(-2);
+          const capturedSquare = selectedSquare2 - 8;
+          const newBoard = [...board];
+          newBoard[capturedSquare] = ""; // for black capturing white pawn
+          setBoard(newBoard);
           return true
         }
       }else
@@ -404,7 +412,7 @@ export default function Chess() {
       return false
     }
     
-    return false//Because no colour type
+    return false//Because no other colour type
   }
 
   const noGhostingHorizontal = () => {
@@ -599,10 +607,22 @@ export default function Chess() {
 
   return (
     <div id="chess">
-      <div>
+      <span>
+        <button onClick={() => setBoard([
+          'BR','BN','BB','BK','BQ','BB','BN','BR',
+          'BP','BP','BP','BP','BP','BP','BP','BP',
+          '','','','','','','','',
+          '','','','','','','','',
+          '','','','','','','','',
+          '','','','','','','','',
+          'WP','WP','WP','WP','WP','WP','WP','WP',
+          'WR','WN','WB','WK','WQ','WB','WN','WR'
+        ])}>Reset</button>
+        <button onClick={() =>checkEnpassent()}>Test</button>
+      </span>
       Chess
       It is {turn}
-      <div>
+      <span>
         {Array.from({ length: Math.ceil(board.length / 8) }, (_, rowIndex) => (
           <div key={rowIndex} className="row">
             {board.slice(rowIndex * 8, rowIndex * 8 + 8).map((item, index) => (
@@ -617,7 +637,6 @@ export default function Chess() {
             ))}
           </div>
         ))}
-      </div>
-      </div>
+      </span>
     </div>
   )}
