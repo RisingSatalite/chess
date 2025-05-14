@@ -29,14 +29,14 @@ export default function Chess() {
       makeMove();
       turnChange();
     } else {
-      reset()
+      ineligableMoveClear()
     }
   }, [selectedSquare2]);
   
   useEffect(() => {
     console.log("Updated selectedSquare1:", selectedSquare1);
   }, [selectedSquare1]);
-  
+
   const selectSquare = (id) => {
     console.log(id);
     console.log(board[id][0]);
@@ -61,19 +61,19 @@ export default function Chess() {
       if (horizontallyConnecting() && noFriendlyFire() && noGhostingHorizontal()) {
         return true;
       } else {
-        return reset()
+        return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'B') {
       if ((connectingBishop() && noGhostingDiagonal()) && noFriendlyFire()) {
         return true;
       } else {
-        return reset()
+        return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'N') {
       if (connectKnight() && noFriendlyFire()) {
         return true;
       } else {
-        return reset()
+        return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'P') {
       if (connectPawn()) { //Check if promoting
@@ -82,28 +82,37 @@ export default function Chess() {
         console.log(enpassentNextMove)
         return true;
       } else {
-        return reset()
+        return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'Q') {
       if (((horizontallyConnecting() && noGhostingHorizontal()) || (connectingBishop() && noGhostingDiagonal())) && noFriendlyFire()) {
         return true;
       } else {
-        return reset()
+        return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
       if ((connectNeighboring() && noFriendlyFire()) /*Add castle here */) {
         return true;
       } else {
-        return reset()
+        return ineligableMoveClear()
       }
     }
     
-    return reset()
+    return ineligableMoveClear()
   };
+
+  //Clear just the selected squarces, but not the enpassent
+  const ineligableMoveClear = () => {
+    setSelectedSquare1(64);
+    setSelectedSquare2(64);
+    return false;
+  }
 
   const reset = () => {
     setSelectedSquare1(64);
     setSelectedSquare2(64);
+    console.log("Can next move be enpassent:")
+    console.log(enpassentNextMove)
     if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
       setEnpassentNextMove(false)
     }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
@@ -287,33 +296,36 @@ export default function Chess() {
     //return false
 
     if(type == "W"){
+      console.log("Enpassent check")
+      console.log(enpassent)
+      console.log(selectedSquare2)
       if((row == (row2 + 1)) && (square == square2)){
         if(otherSquareType == undefined){
           return true
         }else{
           return false
         }
-      }
-      console.log("Enpassent check")
-      console.log(enpassent)
-      console.log(selectedSquare2)
+      }else
       if((row == (row2 + 1)) && (square == (square2 + 1))){
         if(otherSquareType == "B"){
           return true
         }else if(enpassent == selectedSquare2){
           setEnpassent(-2)
+          const capturedSquare = selectedSquare2 + 8
+          board[capturedSquare] = "" // for white capturing black pawn
           return true
         }
-      }
+      }else
       if((row == (row2 + 1)) && (square == (square2 - 1))){
         if(otherSquareType == "B"){
           return true
         }else if(enpassent == selectedSquare2){
           setEnpassent(-2)
-          //Delete the pawn
+          const capturedSquare = selectedSquare2 + 8
+          board[capturedSquare] = "" // for white capturing black pawn
           return true
         }
-      }
+      }else
       if((row == 6)&&(row2==4)&&(square == square2)){
         console.log("Double jump")
         if(otherSquareType == undefined){
@@ -325,6 +337,7 @@ export default function Chess() {
             setEnpassentNextMove(true)
             console.log("Setting enpassent")
             console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
+            console.log(enpassent)
             return true
           }else{
             console.log("Piece in the way of pawn")
@@ -336,43 +349,49 @@ export default function Chess() {
       }
       return false
     }else if(type === "B"){
+      console.log("A  black pawn moved")
+      console.log("Enpassent check")
+      console.log(enpassent)
+      console.log(selectedSquare2)
       if((row = (row2 - 1)) && (square == square2)){
         if(otherSquareType == undefined){
           return true
         }else{
           return false
         }
-      }
-      console.log("Enpassent check")
-      console.log(enpassent)
-      console.log(selectedSquare2)
+      }else
       if((row == (row2 - 1)) && (square == (square2 + 1))){
         if(otherSquareType == "W"){
           return true
         }else if(enpassent == selectedSquare2){
           setEnpassent(-2)
+          const capturedSquare = selectedSquare2 - 8
+          board[capturedSquare] = "" // for black capturing white pawn
           return true
         }
-      }
+      }else
       if((row == (row2 - 1)) && (square == (square2 - 1))){
         if(otherSquareType == "W"){
           return true
         }else if(enpassent == selectedSquare2){
           setEnpassent(-2)
+          const capturedSquare = selectedSquare2 - 8
+          board[capturedSquare] = "" // for black capturing white pawn
           return true
         }
-      }
+      }else
       if((row == 1)&&(row2==3)&&(square == square2)){
         console.log("Double jump")
         if(otherSquareType == undefined){
-          console.log(selectedSquare2-((selectedSquare2 - selectedSquare1)/2))
-          console.log(board[selectedSquare2+((selectedSquare2 - selectedSquare1)/2)])
-          console.log(board[selectedSquare2+((selectedSquare2 - selectedSquare1)/2)] == "")
-          if(board[selectedSquare2-((selectedSquare2 + selectedSquare1)/2)] == ""){
-            setEnpassent(selectedSquare2-((selectedSquare2 + selectedSquare1)/2))
+          console.log("BP double move")
+          console.log(selectedSquare1+((selectedSquare2 - selectedSquare1)/2))
+          console.log(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)])
+          console.log(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)] == "")
+          if(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)] == ""){
+            setEnpassent(selectedSquare1+((selectedSquare2 - selectedSquare1)/2))
             setEnpassentNextMove(true)
             console.log("Setting enpassent")
-            console.log(selectedSquare2-((selectedSquare2 + selectedSquare1)/2))
+            console.log(selectedSquare2-((selectedSquare2 - selectedSquare1)/2))
             return true
           }else{
             console.log("Piece in the way of pawn")
