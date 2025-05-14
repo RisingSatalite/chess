@@ -18,6 +18,8 @@ export default function Chess() {
   const [turn, setTurn] = useState("W");
   const [selectedSquare1, setSelectedSquare1] = useState(64);
   const [selectedSquare2, setSelectedSquare2] = useState(64);
+  const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
+  const [enpassentNextMove, setEnpassentNextMove] = useState(false)//True for next move may be enpassent, but false will not be enpassent
   
   useEffect(() => {
     console.log("Square 2 selected");
@@ -27,8 +29,7 @@ export default function Chess() {
       makeMove();
       turnChange();
     } else {
-      setSelectedSquare1(64);
-      setSelectedSquare2(64);
+      reset()
     }
   }, [selectedSquare2]);
   
@@ -60,49 +61,40 @@ export default function Chess() {
       if (horizontallyConnecting() && noFriendlyFire() && noGhostingHorizontal()) {
         return true;
       } else {
-        setSelectedSquare1(64);
-        setSelectedSquare2(64);
-        return false;
+        return reset()
       }
     }else if(board[selectedSquare1][1] === 'B') {
       if ((connectingBishop() && noGhostingDiagonal()) && noFriendlyFire()) {
         return true;
       } else {
-        setSelectedSquare1(64);
-        setSelectedSquare2(64);
-        return false;
+        return reset()
       }
     }else if(board[selectedSquare1][1] === 'N') {
       if (connectKnight() && noFriendlyFire()) {
         return true;
       } else {
-        setSelectedSquare1(64);
-        setSelectedSquare2(64);
-        return false;
+        return reset()
       }
     }else if(board[selectedSquare1][1] === 'P') {
       if (connectPawn()) { //Check if promoting
+        console.log('Enpassent')
+        console.log(enpassent)
+        console.log(enpassentNextMove)
         return true;
       } else {
-        setSelectedSquare1(64);
-        setSelectedSquare2(64);
-        return false;
+        return reset()
       }
     }else if(board[selectedSquare1][1] === 'Q') {
       if (((horizontallyConnecting() && noGhostingHorizontal()) || (connectingBishop() && noGhostingDiagonal())) && noFriendlyFire()) {
         return true;
       } else {
-        setSelectedSquare1(64);
-        setSelectedSquare2(64);
-        return false;
+        return reset()
       }
     }else if(board[selectedSquare1][1] === 'K') {
       if ((connectNeighboring() && noFriendlyFire()) /*Add castle here */) {
         return true;
       } else {
-        setSelectedSquare1(64);
-        setSelectedSquare2(64);
-        return false;
+        return reset()
       }
     }
     
@@ -112,6 +104,11 @@ export default function Chess() {
   const reset = () => {
     setSelectedSquare1(64);
     setSelectedSquare2(64);
+    if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
+      setEnpassentNextMove(false)
+    }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
+      setEnpassent(-2)
+    }
     return false
   }
   
@@ -297,13 +294,23 @@ export default function Chess() {
           return false
         }
       }
+      console.log("Enpassent check")
+      console.log(enpassent)
+      console.log(selectedSquare2)
       if((row == (row2 + 1)) && (square == (square2 + 1))){
         if(otherSquareType == "B"){
+          return true
+        }else if(enpassent == selectedSquare2){
+          setEnpassent(-2)
           return true
         }
       }
       if((row == (row2 + 1)) && (square == (square2 - 1))){
         if(otherSquareType == "B"){
+          return true
+        }else if(enpassent == selectedSquare2){
+          setEnpassent(-2)
+          //Delete the pawn
           return true
         }
       }
@@ -314,6 +321,10 @@ export default function Chess() {
           console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)])
           console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == "")
           if(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == ""){
+            setEnpassent(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
+            setEnpassentNextMove(true)
+            console.log("Setting enpassent")
+            console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
             return true
           }else{
             console.log("Piece in the way of pawn")
@@ -332,13 +343,22 @@ export default function Chess() {
           return false
         }
       }
+      console.log("Enpassent check")
+      console.log(enpassent)
+      console.log(selectedSquare2)
       if((row == (row2 - 1)) && (square == (square2 + 1))){
         if(otherSquareType == "W"){
+          return true
+        }else if(enpassent == selectedSquare2){
+          setEnpassent(-2)
           return true
         }
       }
       if((row == (row2 - 1)) && (square == (square2 - 1))){
         if(otherSquareType == "W"){
+          return true
+        }else if(enpassent == selectedSquare2){
+          setEnpassent(-2)
           return true
         }
       }
@@ -349,6 +369,10 @@ export default function Chess() {
           console.log(board[selectedSquare2+((selectedSquare2 - selectedSquare1)/2)])
           console.log(board[selectedSquare2+((selectedSquare2 - selectedSquare1)/2)] == "")
           if(board[selectedSquare2-((selectedSquare2 + selectedSquare1)/2)] == ""){
+            setEnpassent(selectedSquare2-((selectedSquare2 + selectedSquare1)/2))
+            setEnpassentNextMove(true)
+            console.log("Setting enpassent")
+            console.log(selectedSquare2-((selectedSquare2 + selectedSquare1)/2))
             return true
           }else{
             console.log("Piece in the way of pawn")
@@ -546,8 +570,7 @@ export default function Chess() {
 
     setBoard(newBoard);
   
-    setSelectedSquare1(64);
-    setSelectedSquare2(64);
+    reset()
   };
   
   const turnChange = () => {
