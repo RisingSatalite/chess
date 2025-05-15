@@ -327,7 +327,6 @@ export default function Chess() {
         //alert("Enpassent possible next move");
         console.log("Enpassent possible next move");
         setEnpassent(middleSquare);
-        setEnpassentNextMove(true);
         return middleSquare;// Set en passant square, it will be evaluated as true and be stored for the next move
       } else {
         console.log("Piece in the way of pawn");
