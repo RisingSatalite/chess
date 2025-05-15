@@ -25,10 +25,18 @@ export default function Chess() {
     //console.log("Square 2 selected");
     if (selectedSquare1 === 64 || selectedSquare2 === 64) {
       return;
-    } else if (checkIfPossibleMove()) {
+    }
+
+    //Pass in a varible incase the move is valid, but an additional square is needed, for castle or enpassent
+    var possibleMove = checkIfPossibleMove();
+    console.log("Possible move: " + possibleMove);
+    if (possibleMove === true) {
       makeMove();
       turnChange();
-    } else {
+    } else if (possibleMove) {
+      makeMove(possibleMove);
+      turnChange();
+    }else {
       ineligableMoveClear()
     }
   }, [selectedSquare2]);
@@ -38,7 +46,7 @@ export default function Chess() {
   }, [selectedSquare1]);
 
   useEffect(() => {
-    alert("Enpassent square set to: " + enpassent);
+    //alert("Enpassent square set to: " + enpassent);
     console.log("Enpassent square set to: " + enpassent);
   }, [enpassent]);
 
@@ -81,9 +89,10 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'P') {
-      if (connectPawn()) { //Check if promoting
+      const pawnMove = connectPawn();
+      if (pawnMove) { //Check if promoting
         console.log('Enpassent square: ' + enpassent)
-        return true;
+        return pawnMove;
       } else {
         return ineligableMoveClear()
       }
@@ -114,8 +123,9 @@ export default function Chess() {
   const reset = () => {
     setSelectedSquare1(64);
     setSelectedSquare2(64);
-    console.log("Can next move be enpassent: " + enpassentNextMove)
-    console.log("Enpassent square: " + enpassent)
+    console.log(board)
+    //console.log("Can next move be enpassent: " + enpassentNextMove)
+    //console.log("Enpassent square: " + enpassent)
     /*
     if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
       setEnpassentNextMove(false)
@@ -304,11 +314,10 @@ export default function Chess() {
       // En passant
       if (selectedSquare2 === enpassent) {
         const capturedSquare = selectedSquare2 + capturedOffset;
-        const newBoard = [...board];
-        newBoard[capturedSquare] = '';
-        setBoard(newBoard);
-        setEnpassent(-2);
-        return true;
+        console.log("Enpassent move");
+        console.log("Captured square: " + capturedSquare);
+        //removePiece(capturedSquare);
+        return capturedSquare;
       }
     }
   
@@ -316,7 +325,7 @@ export default function Chess() {
     if (row1 === startRow && row2 === doubleStepRow && deltaCol === 0 && !targetPiece) {
       const middleSquare = (selectedSquare1 + selectedSquare2) / 2;
       if (board[middleSquare] === '') {
-        alert("Enpassent possible next move");
+        //alert("Enpassent possible next move");
         console.log("Enpassent possible next move");
         setEnpassent(middleSquare);
         setEnpassentNextMove(true);
@@ -492,12 +501,17 @@ export default function Chess() {
     }
   }
   
-  const makeMove = () => {
+  const makeMove = (deleteSquare = -2) => {
     const newBoard = [...board];
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
 
+    if(deleteSquare != -2){
+      newBoard[deleteSquare] = "";
+    }
+
+    //Move the pawn promote to queen if it reaches the end
     let column2 = selectedSquare2;
     let row2 = 0;
     while (column2 - 8 >= 0) {
@@ -514,6 +528,17 @@ export default function Chess() {
   
     reset()
   };
+
+  const removePiece = (id) => {
+    const newBoard = [...board];
+    newBoard[id] = "";
+    console.log("Piece removed at square: " + id)
+    console.log(board)
+    console.log(newBoard)
+    console.log(board[id])
+    console.log(newBoard[id])
+    setBoard(newBoard);
+  }
   
   const turnChange = () => {
     setTurn(turn === "W" ? "B" : "W");
