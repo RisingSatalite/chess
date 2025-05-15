@@ -22,7 +22,7 @@ export default function Chess() {
   const [enpassentNextMove, setEnpassentNextMove] = useState(false)//True for next move may be enpassent, but false will not be enpassent
   
   useEffect(() => {
-    console.log("Square 2 selected");
+    //console.log("Square 2 selected");
     if (selectedSquare1 === 64 || selectedSquare2 === 64) {
       return;
     } else if (checkIfPossibleMove()) {
@@ -34,8 +34,13 @@ export default function Chess() {
   }, [selectedSquare2]);
   
   useEffect(() => {
-    console.log("Updated selectedSquare1:", selectedSquare1);
+    //console.log("Updated selectedSquare1:", selectedSquare1);
   }, [selectedSquare1]);
+
+  useEffect(() => {
+    alert("Enpassent square: " + enpassent);
+    console.log("Enpassent square: " + enpassent);
+  }, [enpassent]);
 
   const selectSquare = (id) => {
     console.log(id);
@@ -77,9 +82,7 @@ export default function Chess() {
       }
     }else if(board[selectedSquare1][1] === 'P') {
       if (connectPawn()) { //Check if promoting
-        console.log('Enpassent')
-        console.log(enpassent)
-        console.log(enpassentNextMove)
+        console.log('Enpassent square: ' + enpassent)
         return true;
       } else {
         return ineligableMoveClear()
@@ -111,8 +114,8 @@ export default function Chess() {
   const reset = () => {
     setSelectedSquare1(64);
     setSelectedSquare2(64);
-    console.log("Can next move be enpassent:")
-    console.log(enpassentNextMove)
+    console.log("Can next move be enpassent: " + enpassentNextMove)
+    console.log("Enpassent square: " + enpassent)
     if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
       setEnpassentNextMove(false)
     }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
@@ -267,7 +270,6 @@ export default function Chess() {
       console.log("Not pawn")
       return false
     }
-    console.log('Checking pawn move')
 
     const type = board[selectedSquare1][0]
 
@@ -282,23 +284,19 @@ export default function Chess() {
       row += 1;
       square -= 8;
     }
-    console.log(square)
-    console.log(row)
   
     while (square2 - 8 >= 0) {
       row2 += 1;
       square2 -= 8;
     }
-    console.log(square2)
-    console.log(row2)
+    //console.log('Checking pawn move')
+    //console.log('Start column' + square)
+    //console.log('Start row' + row)
+    //console.log('End column' + square2)
+    //console.log('End row' + row2)
 
     const otherSquareType = board[selectedSquare2][0]
-    console.log(otherSquareType)
-
-    console.log("Calculation")
-    console.log(row == (row2 - 1))
-    console.log(row == (row2 + 1))
-    //return false
+    //console.log(otherSquareType)
 
     if(type == "W"){
       console.log("Enpassent check")
@@ -334,7 +332,7 @@ export default function Chess() {
         }
       }else
       if((row == 6)&&(row2==4)&&(square == square2)){
-        console.log("Double jump")
+        console.log("Pawn double jump")
         if(otherSquareType == undefined){
           console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
           console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)])
@@ -342,7 +340,9 @@ export default function Chess() {
           if(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == ""){
             setEnpassent(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
             setEnpassentNextMove(true)
-            console.log("Setting enpassent")
+            console.log("Setting enpassent:" + (selectedSquare1-((selectedSquare1 - selectedSquare2)/2)))
+            console.log("Square 2 is: " + selectedSquare2)
+            console.log("Square 1 is: " + selectedSquare1)
             console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
             console.log(enpassent)
             return true
@@ -396,13 +396,15 @@ export default function Chess() {
           console.log(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)])
           console.log(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)] == "")
           if(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)] == ""){
-            setEnpassent(selectedSquare1+((selectedSquare2 - selectedSquare1)/2))
+            setEnpassent(selectedSquare2-((selectedSquare2 - selectedSquare1)/2))
             setEnpassentNextMove(true)
-            console.log("Setting enpassent")
+            console.log("Setting enpassent:" + (selectedSquare2-((selectedSquare2 - selectedSquare1)/2)))
+            console.log("Square 2 is: " + selectedSquare2)
+            console.log("Square 1 is: " + selectedSquare1)
             console.log(selectedSquare2-((selectedSquare2 - selectedSquare1)/2))
             return true
           }else{
-            console.log("Piece in the way of pawn")
+            console.log("Something in the way of pawn")
             return false
           }
         }else{
