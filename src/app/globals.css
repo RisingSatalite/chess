@@ -37,3 +37,9 @@ body {
   align-items: center; /* Center vertically */
   height: 100vh; /* Full viewport height */
 }
+
+.majorButton {
+  background-color:#2a3378;
+  margin: 10px;
+  padding: 5;
+}
