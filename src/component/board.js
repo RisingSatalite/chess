@@ -553,7 +553,7 @@ export default function Chess() {
     <div id="chess">
       <span>
         Chess
-        <button className="majorButton" onClick={() => setBoard([
+        <button className="majorButton" onClick={() =>{ setBoard([
           'BR','BN','BB','BK','BQ','BB','BN','BR',
           'BP','BP','BP','BP','BP','BP','BP','BP',
           '','','','','','','','',
@@ -562,7 +562,9 @@ export default function Chess() {
           '','','','','','','','',
           'WP','WP','WP','WP','WP','WP','WP','WP',
           'WR','WN','WB','WK','WQ','WB','WN','WR'
-        ])}>Reset</button>
+        ]);
+          setTurn("W");
+        }}>Reset</button>
         It is {turn} turn
         {Array.from({ length: Math.ceil(board.length / 8) }, (_, rowIndex) => (
           <div key={rowIndex} className="row">
