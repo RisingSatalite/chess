@@ -19,8 +19,7 @@ export default function Chess() {
   const [selectedSquare1, setSelectedSquare1] = useState(64);
   const [selectedSquare2, setSelectedSquare2] = useState(64);
   const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
-  const [enpassentNextMove, setEnpassentNextMove] = useState(false)//True for next move may be enpassent, but false will not be enpassent
-  
+
   useEffect(() => {
     //console.log("Square 2 selected");
     if (selectedSquare1 === 64 || selectedSquare2 === 64) {
@@ -123,17 +122,17 @@ export default function Chess() {
   const reset = () => {
     setSelectedSquare1(64);
     setSelectedSquare2(64);
-    console.log(board)
-    //console.log("Can next move be enpassent: " + enpassentNextMove)
-    //console.log("Enpassent square: " + enpassent)
+    //console.log(board)
+    //alert("Can next move be enpassent: " + enpassentNextMove)
+    //alert("Enpassent square: " + enpassent)
     /*
     if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
       setEnpassentNextMove(false)
     }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
       setEnpassent(-2)
     }
-    return false
     */
+    return false   
   }
   
   //Make sure the 2 selected squares make a valid rook move
@@ -329,7 +328,7 @@ export default function Chess() {
         console.log("Enpassent possible next move");
         setEnpassent(middleSquare);
         setEnpassentNextMove(true);
-        return true;
+        return middleSquare;// Set en passant square, it will be evaluated as true and be stored for the next move
       } else {
         console.log("Piece in the way of pawn");
         return false;
@@ -339,7 +338,6 @@ export default function Chess() {
     return false;
   };
   
-
   const noGhostingHorizontal = () => {
     //Determine which way then if anything inbetween
     let square = selectedSquare1
@@ -508,7 +506,14 @@ export default function Chess() {
     newBoard[selectedSquare1] = "";
 
     if(deleteSquare != -2){
-      newBoard[deleteSquare] = "";
+      if(newBoard[deleteSquare] == ""){//If the square is empty, then save it for enpassent
+        setEnpassent(deleteSquare);
+      }else{//Otherwise, remove the piece
+        console.log("Piece removed at square: " + deleteSquare)
+        newBoard[deleteSquare] = "";
+      }
+    }else{
+      setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
     }
 
     //Move the pawn promote to queen if it reaches the end
@@ -543,7 +548,6 @@ export default function Chess() {
   const turnChange = () => {
     setTurn(turn === "W" ? "B" : "W");
   };
-  
 
   return (
     <div id="chess">
