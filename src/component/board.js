@@ -260,17 +260,19 @@ export default function Chess() {
   }
 
   const checkEnpassent = () => {
-    console.log("Enpassent")
-    console.log(enpassent)
+    //setEnpassent(9) // Yes the setEnpassent works
+    console.log("Enpassent" + enpassent)
   }
 
   //See if it is a legal pawn move
   const connectPawn = () => {
+    //Check if the selected square is a pawn
     if(board[selectedSquare1][1] != 'P'){
       console.log("Not pawn")
       return false
     }
 
+    //Check if the selected square is a white or black pawn
     const type = board[selectedSquare1][0]
 
     //square and square2 represent column
