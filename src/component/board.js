@@ -366,7 +366,7 @@ export default function Chess() {
       if((row == (row2 - 1)) && (square == square2)){
         console.log(selectedSquare2)
       }
-      if((row = (row2 - 1)) && (square == square2)){
+      if((row == (row2 - 1)) && (square == square2)){
         if(otherSquareType == undefined){
           return true
         }else{
