@@ -11,22 +11,25 @@ export default function Square({ prop, onClickFunction, number = 0, selected = 6
         display = "-"
     }
 
+    var black = "#353535";
+    var white = "#f6f6f6";
+
     if (number === selected) {
         bgColor = "yellow";
-        textColour = "black"
+        textColour = black
     } else if ((number + row) % 2 === 0) {
-        bgColor = "black";
+        bgColor = black;
         if(prop == ""){
-            textColour = "black"
+            textColour = black
         }else{
-            textColour = "white"
+            textColour = white
         }
     } else {
-        bgColor = "white";
+        bgColor = white;
         if(prop == ""){
-            textColour = "white"
+            textColour = white
         }else{
-            textColour = "black"
+            textColour = black
         }
     }
 
