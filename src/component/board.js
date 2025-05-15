@@ -38,8 +38,8 @@ export default function Chess() {
   }, [selectedSquare1]);
 
   useEffect(() => {
-    alert("Enpassent square: " + enpassent);
-    console.log("Enpassent square: " + enpassent);
+    alert("Enpassent square set to: " + enpassent);
+    console.log("Enpassent square set to: " + enpassent);
   }, [enpassent]);
 
   const selectSquare = (id) => {
@@ -116,12 +116,14 @@ export default function Chess() {
     setSelectedSquare2(64);
     console.log("Can next move be enpassent: " + enpassentNextMove)
     console.log("Enpassent square: " + enpassent)
+    /*
     if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
       setEnpassentNextMove(false)
     }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
       setEnpassent(-2)
     }
     return false
+    */
   }
   
   //Make sure the 2 selected squares make a valid rook move
@@ -266,161 +268,68 @@ export default function Chess() {
 
   //See if it is a legal pawn move
   const connectPawn = () => {
-    //Check if the selected square is a pawn
-    if(board[selectedSquare1][1] != 'P'){
-      console.log("Not pawn")
-      return false
-    }
-
-    //Check if the selected square is a white or black pawn
-    const type = board[selectedSquare1][0]
-
-    //square and square2 represent column
-    let square = selectedSquare1;
-    let row = 0;
-
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square - 8 >= 0) {
-      row += 1;
-      square -= 8;
+    const piece = board[selectedSquare1];
+    if (!piece || piece[1] !== 'P') return false;
+  
+    const type = piece[0]; // 'W' or 'B'
+    const isWhite = type === 'W';
+    const direction = isWhite ? -1 : 1;
+    const startRow = isWhite ? 6 : 1;
+    const doubleStepRow = isWhite ? 4 : 3;
+    const capturedOffset = isWhite ? 8 : -8;
+  
+    // Calculate row and col from square index
+    const getCoords = (index) => [Math.floor(index / 8), index % 8];
+    const [row1, col1] = getCoords(selectedSquare1);
+    const [row2, col2] = getCoords(selectedSquare2);
+  
+    const deltaRow = row2 - row1;
+    const deltaCol = col2 - col1;
+  
+    const targetPiece = board[selectedSquare2];
+    const targetType = targetPiece?.[0];
+  
+    // 1. Regular single forward move
+    if (deltaRow === direction && deltaCol === 0 && !targetPiece) {
+      return true;
     }
   
-    while (square2 - 8 >= 0) {
-      row2 += 1;
-      square2 -= 8;
+    // 2. Diagonal capture or en passant
+    if (deltaRow === direction && Math.abs(deltaCol) === 1) {
+      // Normal capture
+      if (targetType && targetType !== type) {
+        return true;
+      }
+  
+      // En passant
+      if (selectedSquare2 === enpassent) {
+        const capturedSquare = selectedSquare2 + capturedOffset;
+        const newBoard = [...board];
+        newBoard[capturedSquare] = '';
+        setBoard(newBoard);
+        setEnpassent(-2);
+        return true;
+      }
     }
-    //console.log('Checking pawn move')
-    //console.log('Start column' + square)
-    //console.log('Start row' + row)
-    //console.log('End column' + square2)
-    //console.log('End row' + row2)
-
-    const otherSquareType = board[selectedSquare2][0]
-    //console.log(otherSquareType)
-
-    if(type == "W"){
-      console.log("Enpassent check")
-      console.log(enpassent)
-      console.log(selectedSquare2)
-      if((row == (row2 + 1)) && (square == square2)){
-        if(otherSquareType == undefined){
-          return true
-        }else{
-          return false
-        }
-      }else
-      if((row == (row2 + 1)) && (square == (square2 + 1))){
-        if(otherSquareType == "B"){
-          return true
-        }else if(enpassent == selectedSquare2){
-          setEnpassent(-2);
-          const capturedSquare = selectedSquare2 + 8;
-          const newBoard = [...board];
-          newBoard[capturedSquare] = ""; // for white capturing black pawn
-          setBoard(newBoard);
-          return true
-        }
-      }else
-      if((row == (row2 + 1)) && (square == (square2 - 1))){
-        if(otherSquareType == "B"){
-          return true
-        }else if(enpassent == selectedSquare2){
-          setEnpassent(-2)
-          const capturedSquare = selectedSquare2 + 8
-          board[capturedSquare] = "" // for white capturing black pawn
-          return true
-        }
-      }else
-      if((row == 6)&&(row2==4)&&(square == square2)){
-        console.log("Pawn double jump")
-        if(otherSquareType == undefined){
-          console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
-          console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)])
-          console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == "")
-          if(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == ""){
-            setEnpassent(7)
-            setEnpassent(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
-            setEnpassentNextMove(true)
-            alert("Enpassent square: " + (selectedSquare1-((selectedSquare1 - selectedSquare2)/2)))
-            console.log("Setting enpassent:" + (selectedSquare1-((selectedSquare1 - selectedSquare2)/2)))
-            console.log("Square 2 is: " + selectedSquare2)
-            console.log("Square 1 is: " + selectedSquare1)
-            console.log(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
-            console.log(enpassent)
-            return true
-          }else{
-            console.log("Piece in the way of pawn")
-            return false
-          }
-        }else{
-          return false
-        }
-      }else{
-        return false
+  
+    // 3. Double move from starting row
+    if (row1 === startRow && row2 === doubleStepRow && deltaCol === 0 && !targetPiece) {
+      const middleSquare = (selectedSquare1 + selectedSquare2) / 2;
+      if (board[middleSquare] === '') {
+        alert("Enpassent possible next move");
+        console.log("Enpassent possible next move");
+        setEnpassent(middleSquare);
+        setEnpassentNextMove(true);
+        return true;
+      } else {
+        console.log("Piece in the way of pawn");
+        return false;
       }
-    }else if(type === "B"){
-      console.log("A  black pawn moved")
-      console.log("Enpassent check")
-      if((row == (row2 - 1)) && (square == square2)){
-        console.log(selectedSquare2)
-      }
-      if((row == (row2 - 1)) && (square == square2)){
-        if(otherSquareType == undefined){
-          return true
-        }else{
-          return false
-        }
-      }else
-      if((row == (row2 - 1)) && (square == (square2 + 1))){
-        if(otherSquareType == "W"){
-          setEnpassent(-2);
-          const capturedSquare = selectedSquare2 - 8;
-          const newBoard = [...board];
-          newBoard[capturedSquare] = ""; // for black capturing white pawn
-          setBoard(newBoard);
-          return true
-        }
-      }else
-      if((row == (row2 - 1)) && (square == (square2 - 1))){
-        if(otherSquareType == "W"){
-          return true
-        }else if(enpassent == selectedSquare2){
-          setEnpassent(-2)
-          const capturedSquare = selectedSquare2 - 8
-          board[capturedSquare] = "" // for black capturing white pawn
-          return true
-        }
-      }else
-      if((row == 1)&&(row2==3)&&(square == square2)){
-        console.log("Double jump")
-        if(otherSquareType == undefined){
-          console.log("BP double move")
-          console.log(selectedSquare1+((selectedSquare2 - selectedSquare1)/2))
-          console.log(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)])
-          console.log(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)] == "")
-          if(board[selectedSquare1+((selectedSquare2 - selectedSquare1)/2)] == ""){
-            setEnpassent(selectedSquare2-((selectedSquare2 - selectedSquare1)/2))
-            setEnpassentNextMove(true)
-            console.log("Setting enpassent:" + (selectedSquare2-((selectedSquare2 - selectedSquare1)/2)))
-            console.log("Square 2 is: " + selectedSquare2)
-            console.log("Square 1 is: " + selectedSquare1)
-            console.log(selectedSquare2-((selectedSquare2 - selectedSquare1)/2))
-            return true
-          }else{
-            console.log("Something in the way of pawn")
-            return false
-          }
-        }else{
-          return false
-        }
-      }
-      return false
     }
-    
-    return false//Because no other colour type
-  }
+  
+    return false;
+  };
+  
 
   const noGhostingHorizontal = () => {
     //Determine which way then if anything inbetween
@@ -577,7 +486,6 @@ export default function Chess() {
 
   const checkCastle = () => {
     //Check if king or that rook has already moved
-    //return reset()
 
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
       console.log("Possible valid castle")
