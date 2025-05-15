@@ -340,8 +340,10 @@ export default function Chess() {
           console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)])
           console.log(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == "")
           if(board[selectedSquare1-((selectedSquare1 - selectedSquare2)/2)] == ""){
+            setEnpassent(7)
             setEnpassent(selectedSquare1-((selectedSquare1 - selectedSquare2)/2))
             setEnpassentNextMove(true)
+            alert("Enpassent square: " + (selectedSquare1-((selectedSquare1 - selectedSquare2)/2)))
             console.log("Setting enpassent:" + (selectedSquare1-((selectedSquare1 - selectedSquare2)/2)))
             console.log("Square 2 is: " + selectedSquare2)
             console.log("Square 1 is: " + selectedSquare1)
@@ -355,8 +357,9 @@ export default function Chess() {
         }else{
           return false
         }
+      }else{
+        return false
       }
-      return false
     }else if(type === "B"){
       console.log("A  black pawn moved")
       console.log("Enpassent check")
