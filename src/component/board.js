@@ -543,18 +543,19 @@ export default function Chess() {
     return false
   }
   
-  const makeMove = (deleteSquare = -2) => {
+  const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
-
-    if(deleteSquare != -2){
-      if(newBoard[deleteSquare] == ""){//If the square is empty, then save it for enpassent
-        setEnpassent(deleteSquare);
+    if(specialSquare.includes("K")&specialSquare.includes("R")){
+      
+    }else if(specialSquare != -2){
+      if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
+        setEnpassent(specialSquare);
       }else{//Otherwise, remove the piece
-        console.log("Piece removed at square: " + deleteSquare)
-        newBoard[deleteSquare] = "";
+        console.log("Piece removed at square: " + specialSquare)
+        newBoard[specialSquare] = "";
       }
     }else{
       setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
