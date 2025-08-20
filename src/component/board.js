@@ -102,9 +102,11 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
-      if ((connectNeighboring() && noFriendlyFire()) /*Add castle here */) {
+      if ((connectNeighboring() && noFriendlyFire())) {
         return true;
-      } else {
+      } else if(checkCastle() /*Add castle here */){
+        return checkCastle()
+      } else{
         return ineligableMoveClear()
       }
     }
@@ -491,11 +493,38 @@ export default function Chess() {
   }  
 
   const checkCastle = () => {
-    //Check if king or that rook has already moved
+    console.log("Checking if possible castle")
+    //Get the row and columns of the 2 pieces
+    let square = selectedSquare1;
+    let row = 0;
+    let square2 = selectedSquare2;
+    let row2 = 0;
+    
+    while (square >= 8) {
+      row += 1;
+      square -= 8;
+    }
+    while (square2 >= 8) {
+      row2 += 1;
+      square2 -= 8;
+    }
+
+    //The king and rook have to be on the same square
+    if(row != row2){
+      console.log("Different rows")
+      console.log(square)
+      console.log(square2)
+      console.log(row)
+      console.log(row2)
+      return false
+    }
 
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
       console.log("Possible valid castle")
+      return true
     }
+
+    return false
   }
   
   const makeMove = (deleteSquare = -2) => {
