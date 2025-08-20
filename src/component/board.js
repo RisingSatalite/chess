@@ -548,7 +548,7 @@ export default function Chess() {
 
     let oldPiece = newBoard[selectedSquare1]
     let oldPiece2 = newBoard[selectedSquare2]
-
+    
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
     if(typeof specialSquare === "string") {
@@ -556,8 +556,8 @@ export default function Chess() {
         newBoard[selectedSquare2] = "";
         const newSquares = specialSquare.replace("K", "").split("R")
 
-        newBoard[newSquares[1]] = oldPiece
-        newBoard[newSquares[2]] = oldPiece2
+        newBoard[newSquares[0]] = oldPiece
+        newBoard[newSquares[1]] = oldPiece2
       }
     }else if(specialSquare != -2){
       if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
