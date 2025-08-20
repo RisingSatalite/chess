@@ -495,7 +495,7 @@ export default function Chess() {
   const checkCastle = () => {
     console.log("Checking if possible castle")
     //Get the row and columns of the 2 pieces
-    let intial = selectedSquare1;
+    let initial = selectedSquare1;
     let square = selectedSquare1;
     let row = 0;
     let square2 = selectedSquare2;
@@ -527,14 +527,14 @@ export default function Chess() {
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
       console.log("Possible valid castle")
       if(square < square2){
-        let newKingLocation = "K" + String(square+2)
-        let newRookLocation = "R" + String(square+2)
+        let newKingLocation = "K" + String(initial+2)
+        let newRookLocation = "R" + String(initial+2)
         return newKingLocation + newRookLocation
       }
 
       if(square > square2){
-        let newKingLocation = "K" + String(square+2)
-        let newRookLocation = "R" + String(square+2)
+        let newKingLocation = "K" + String(initial+2)
+        let newRookLocation = "R" + String(initial+2)
         return newKingLocation + newRookLocation
       }
       return false
@@ -551,7 +551,7 @@ export default function Chess() {
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
-    if(specialSquare.includes("K")&specialSquare.includes("R")){
+    if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
       newBoard[selectedSquare2] = "";
       newSquares = specialSquare.replace("K", "").split("R")
 
