@@ -546,10 +546,18 @@ export default function Chess() {
   const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
 
+    let oldPiece = newBoard[selectedSquare1]
+    let oldPiece2 = newBoard[selectedSquare2]
+
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
     if(specialSquare.includes("K")&specialSquare.includes("R")){
-      
+      newBoard[selectedSquare2] = "";
+      newSquares = specialSquare.replace("K", "").split("R")
+
+      newBoard[newSquares[1]] = oldPiece
+      newBoard[newSquares[2]] = oldPiece2
+
     }else if(specialSquare != -2){
       if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
         setEnpassent(specialSquare);
