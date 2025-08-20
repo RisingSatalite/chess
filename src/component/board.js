@@ -533,8 +533,8 @@ export default function Chess() {
       }
 
       if(square > square2){
-        let newKingLocation = "K" + String(initial+2)
-        let newRookLocation = "R" + String(initial+2)
+        let newKingLocation = "K" + String(initial-2)
+        let newRookLocation = "R" + String(initial-2)
         return newKingLocation + newRookLocation
       }
       return false
