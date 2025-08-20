@@ -516,7 +516,7 @@ export default function Chess() {
       return false
     }
 
-    if(square != square2){
+    if(square == square2){
       console.log("Same columns")
       return false
     }
@@ -551,13 +551,14 @@ export default function Chess() {
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
-    if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
-      newBoard[selectedSquare2] = "";
-      newSquares = specialSquare.replace("K", "").split("R")
+    if(typeof specialSquare === "string") {
+      if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
+        newBoard[selectedSquare2] = "";
+        const newSquares = specialSquare.replace("K", "").split("R")
 
-      newBoard[newSquares[1]] = oldPiece
-      newBoard[newSquares[2]] = oldPiece2
-
+        newBoard[newSquares[1]] = oldPiece
+        newBoard[newSquares[2]] = oldPiece2
+      }
     }else if(specialSquare != -2){
       if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
         setEnpassent(specialSquare);
