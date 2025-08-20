@@ -495,6 +495,7 @@ export default function Chess() {
   const checkCastle = () => {
     console.log("Checking if possible castle")
     //Get the row and columns of the 2 pieces
+    let intial = selectedSquare1;
     let square = selectedSquare1;
     let row = 0;
     let square2 = selectedSquare2;
@@ -512,16 +513,31 @@ export default function Chess() {
     //The king and rook have to be on the same square
     if(row != row2){
       console.log("Different rows")
-      console.log(square)
-      console.log(square2)
-      console.log(row)
-      console.log(row2)
       return false
     }
 
+    if(square != square2){
+      console.log("Same columns")
+      return false
+    }
+
+    //Add check for no check
+    //Add check for no pieces in the way
+    //Add check for not moving though check
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
       console.log("Possible valid castle")
-      return true
+      if(square < square2){
+        let newKingLocation = "K" + String(square+2)
+        let newRookLocation = "R" + String(square+2)
+        return newKingLocation + newRookLocation
+      }
+
+      if(square > square2){
+        let newKingLocation = "K" + String(square+2)
+        let newRookLocation = "R" + String(square+2)
+        return newKingLocation + newRookLocation
+      }
+      return false
     }
 
     return false
