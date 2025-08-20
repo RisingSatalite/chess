@@ -528,13 +528,13 @@ export default function Chess() {
       console.log("Possible valid castle")
       if(square < square2){
         let newKingLocation = "K" + String(initial+2)
-        let newRookLocation = "R" + String(initial+2)
+        let newRookLocation = "R" + String(initial+1)
         return newKingLocation + newRookLocation
       }
 
       if(square > square2){
         let newKingLocation = "K" + String(initial-2)
-        let newRookLocation = "R" + String(initial-2)
+        let newRookLocation = "R" + String(initial-1)
         return newKingLocation + newRookLocation
       }
       return false
