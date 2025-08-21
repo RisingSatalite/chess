@@ -496,6 +496,7 @@ export default function Chess() {
     console.log("Checking if possible castle")
     //Get the row and columns of the 2 pieces
     let initial = selectedSquare1;
+    let initial2 = selectedSquare2
     let square = selectedSquare1;
     let row = 0;
     let square2 = selectedSquare2;
@@ -522,7 +523,39 @@ export default function Chess() {
     }
 
     //Add check for no check
+
     //Add check for no pieces in the way
+    
+    /*
+    let first = true
+    while(initial2 != initial){
+      if(initial2 > initial){
+      initial2 -= 1;
+      if(first){
+        first = false;
+        continue;
+      }
+      if(board[initial2] != ""){
+        console.log("Pieces in the way of castling")
+        return false
+      }
+      }
+      if(initial2 < initial){
+        initial2 += 1;
+        if(first){
+          first = false;
+          continue;
+        }
+        if(board[initial2] != ""){
+          console.log("Pieces in the way of castling")
+          return false
+        }
+      }
+    }*/
+    if(!noGhostingHorizontal()){
+      return noGhostingHorizontal()
+    }
+
     //Add check for not moving though check
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
       console.log("Possible valid castle")
@@ -548,7 +581,7 @@ export default function Chess() {
 
     let oldPiece = newBoard[selectedSquare1]
     let oldPiece2 = newBoard[selectedSquare2]
-    
+
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
     if(typeof specialSquare === "string") {
