@@ -104,7 +104,7 @@ export default function Chess() {
     }else if(board[selectedSquare1][1] === 'K') {
       if ((connectNeighboring() && noFriendlyFire())) {
         return true;
-      } else if(checkCastle() /*Add castle here */){
+      } else if(checkCastle()/*Add castle here */ && noGhostingHorizontal()){
         return checkCastle()
       } else{
         return ineligableMoveClear()
@@ -552,9 +552,6 @@ export default function Chess() {
         }
       }
     }*/
-    if(!noGhostingHorizontal()){
-      return noGhostingHorizontal()
-    }
 
     //Add check for not moving though check
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
