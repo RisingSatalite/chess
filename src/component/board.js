@@ -522,6 +522,8 @@ export default function Chess() {
       return false
     }
 
+    //Make sure it is the first king and that rooks move and no repeating castling
+
     //Add check for no check
 
 
