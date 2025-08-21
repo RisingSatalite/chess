@@ -524,34 +524,6 @@ export default function Chess() {
 
     //Add check for no check
 
-    //Add check for no pieces in the way
-    
-    /*
-    let first = true
-    while(initial2 != initial){
-      if(initial2 > initial){
-      initial2 -= 1;
-      if(first){
-        first = false;
-        continue;
-      }
-      if(board[initial2] != ""){
-        console.log("Pieces in the way of castling")
-        return false
-      }
-      }
-      if(initial2 < initial){
-        initial2 += 1;
-        if(first){
-          first = false;
-          continue;
-        }
-        if(board[initial2] != ""){
-          console.log("Pieces in the way of castling")
-          return false
-        }
-      }
-    }*/
 
     //Add check for not moving though check
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
