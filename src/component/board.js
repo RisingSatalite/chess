@@ -526,7 +526,6 @@ export default function Chess() {
 
     //Add check for no check
 
-
     //Add check for not moving though check
     if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
       console.log("Possible valid castle")
