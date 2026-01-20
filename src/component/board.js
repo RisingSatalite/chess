@@ -19,6 +19,7 @@ export default function Chess() {
   const [selectedSquare1, setSelectedSquare1] = useState(64);
   const [selectedSquare2, setSelectedSquare2] = useState(64);
   const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
+  const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
 
   useEffect(() => {
     //console.log("Square 2 selected");
@@ -31,9 +32,11 @@ export default function Chess() {
     console.log("Possible move: " + possibleMove);
     if (possibleMove === true) {
       makeMove();
+      setTimeout(() => updateGameStatus(turn === "W" ? "B" : "W"), 0);
       turnChange();
     } else if (possibleMove) {
       makeMove(possibleMove);
+      setTimeout(() => updateGameStatus(turn === "W" ? "B" : "W"), 0);
       turnChange();
     }else {
       ineligableMoveClear()
@@ -64,8 +67,223 @@ export default function Chess() {
       setSelectedSquare1(id);
     }
   };
+
+  // Check if a square is attacked by a specific color
+  const isSquareAttackedByColor = (targetSquare, attackingColor, boardToCheck = board) => {
+    for (let i = 0; i < 64; i++) {
+      if (!boardToCheck[i] || boardToCheck[i][0] !== attackingColor) continue;
+      
+      const piece = boardToCheck[i];
+      const pieceName = piece[1];
+      
+      // Check each piece type for possible attack
+      if (pieceName === 'P') {
+        if (canPawnAttack(i, targetSquare, attackingColor, boardToCheck)) return true;
+      } else if (pieceName === 'R') {
+        if (canRookAttack(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'B') {
+        if (canBishopAttack(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'N') {
+        if (canKnightAttack(i, targetSquare)) return true;
+      } else if (pieceName === 'Q') {
+        if (canQueenAttack(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'K') {
+        if (canKingAttack(i, targetSquare)) return true;
+      }
+    }
+    return false;
+  };
+
+  // Pawn attack check
+  const canPawnAttack = (fromSquare, toSquare, color, boardToCheck) => {
+    const direction = color === 'W' ? -1 : 1;
+    const fromRow = Math.floor(fromSquare / 8);
+    const fromCol = fromSquare % 8;
+    const toRow = Math.floor(toSquare / 8);
+    const toCol = toSquare % 8;
+    
+    return toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1;
+  };
+
+  // Rook attack check
+  const canRookAttack = (fromSquare, toSquare, boardToCheck) => {
+    const fromRow = Math.floor(fromSquare / 8);
+    const fromCol = fromSquare % 8;
+    const toRow = Math.floor(toSquare / 8);
+    const toCol = toSquare % 8;
+    
+    if (fromRow !== toRow && fromCol !== toCol) return false;
+    
+    if (fromRow === toRow) {
+      const start = Math.min(fromCol, toCol) + 1;
+      const end = Math.max(fromCol, toCol);
+      for (let col = start; col < end; col++) {
+        if (boardToCheck[fromRow * 8 + col] !== '') return false;
+      }
+      return true;
+    } else {
+      const start = Math.min(fromRow, toRow) + 1;
+      const end = Math.max(fromRow, toRow);
+      for (let row = start; row < end; row++) {
+        if (boardToCheck[row * 8 + fromCol] !== '') return false;
+      }
+      return true;
+    }
+  };
+
+  // Bishop attack check
+  const canBishopAttack = (fromSquare, toSquare, boardToCheck) => {
+    const fromRow = Math.floor(fromSquare / 8);
+    const fromCol = fromSquare % 8;
+    const toRow = Math.floor(toSquare / 8);
+    const toCol = toSquare % 8;
+    
+    if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol)) return false;
+    
+    const rowStep = toRow > fromRow ? 1 : -1;
+    const colStep = toCol > fromCol ? 1 : -1;
+    let r = fromRow + rowStep;
+    let c = fromCol + colStep;
+    
+    while (r !== toRow) {
+      if (boardToCheck[r * 8 + c] !== '') return false;
+      r += rowStep;
+      c += colStep;
+    }
+    return true;
+  };
+
+  // Knight attack check
+  const canKnightAttack = (fromSquare, toSquare) => {
+    const fromRow = Math.floor(fromSquare / 8);
+    const fromCol = fromSquare % 8;
+    const toRow = Math.floor(toSquare / 8);
+    const toCol = toSquare % 8;
+    
+    const rowDiff = Math.abs(fromRow - toRow);
+    const colDiff = Math.abs(fromCol - toCol);
+    
+    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+  };
+
+  // Queen attack check
+  const canQueenAttack = (fromSquare, toSquare, boardToCheck) => {
+    return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
+  };
+
+  // King attack check
+  const canKingAttack = (fromSquare, toSquare) => {
+    const fromRow = Math.floor(fromSquare / 8);
+    const fromCol = fromSquare % 8;
+    const toRow = Math.floor(toSquare / 8);
+    const toCol = toSquare % 8;
+    
+    return Math.abs(fromRow - toRow) <= 1 && Math.abs(fromCol - toCol) <= 1;
+  };
+
+  // Find king position
+  const findKing = (color, boardToCheck = board) => {
+    for (let i = 0; i < 64; i++) {
+      if (boardToCheck[i] === color + 'K') return i;
+    }
+    return -1;
+  };
+
+  // Check if a player is in check
+  const isInCheck = (color, boardToCheck = board) => {
+    const kingSquare = findKing(color, boardToCheck);
+    if (kingSquare === -1) return false;
+    
+    const opponentColor = color === 'W' ? 'B' : 'W';
+    return isSquareAttackedByColor(kingSquare, opponentColor, boardToCheck);
+  };
+
+  // Check if a move would leave king in check
+  const wouldMoveLeaveKingInCheck = (fromSquare, toSquare, boardToCheck = board) => {
+    const testBoard = [...boardToCheck];
+    testBoard[toSquare] = testBoard[fromSquare];
+    testBoard[fromSquare] = '';
+    
+    const colorMoving = boardToCheck[fromSquare][0];
+    return isInCheck(colorMoving, testBoard);
+  };
+
+  // Check if player has any legal moves
+  const hasLegalMoves = (color, boardToCheck = board) => {
+    for (let from = 0; from < 64; from++) {
+      if (!boardToCheck[from] || boardToCheck[from][0] !== color) continue;
+      
+      for (let to = 0; to < 64; to++) {
+        if (!wouldMoveLeaveKingInCheck(from, to, boardToCheck)) {
+          // Need to check if move is actually possible based on piece rules
+          if (boardToCheck[from] === color + 'P' || boardToCheck[from] === color + 'K') {
+            if (isSimpleMove(from, to, boardToCheck, color)) return true;
+          } else if (isValidPieceMove(from, to, boardToCheck, color)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  // Check if a simple move is valid
+  const isSimpleMove = (from, to, boardToCheck, color) => {
+    const piece = boardToCheck[from];
+    if (!piece || piece[0] !== color) return false;
+    
+    // Can't move to a square with friendly piece
+    if (boardToCheck[to] && boardToCheck[to][0] === color) return false;
+    
+    return true;
+  };
+
+  // Check if piece move is valid
+  const isValidPieceMove = (from, to, boardToCheck, color) => {
+    const piece = boardToCheck[from];
+    if (!piece || piece[0] !== color) return false;
+    
+    // Can't move to a square with friendly piece
+    if (boardToCheck[to] && boardToCheck[to][0] === color) return false;
+    
+    const pieceName = piece[1];
+    
+    if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
+    if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
+    if (pieceName === 'N') return canKnightAttack(from, to);
+    if (pieceName === 'Q') return canQueenAttack(from, to, boardToCheck);
+    if (pieceName === 'K') return canKingAttack(from, to);
+    
+    return false;
+  };
+
+  // Update game status after move
+  const updateGameStatus = (colorToMove) => {
+    setTimeout(() => {
+      const opponentInCheck = isInCheck(colorToMove);
+      
+      if (opponentInCheck && !hasLegalMoves(colorToMove)) {
+        setGameStatus("checkmate");
+        console.log(colorToMove + " is in checkmate!");
+      } else if (opponentInCheck) {
+        setGameStatus("check");
+        console.log(colorToMove + " is in check!");
+      } else if (!hasLegalMoves(colorToMove)) {
+        setGameStatus("stalemate");
+        console.log("Stalemate!");
+      } else {
+        setGameStatus("playing");
+      }
+    }, 0);
+  };
   
   const checkIfPossibleMove = () => {
+    // Check if the move would leave own king in check
+    if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
+      console.log("Move would leave king in check!");
+      return ineligableMoveClear();
+    }
+
     console.log(board[selectedSquare1][1]);
     
     if (board[selectedSquare1][1] === 'R') {
@@ -621,8 +839,14 @@ export default function Chess() {
           'WR','WN','WB','WK','WQ','WB','WN','WR'
         ]);
           setTurn("W");
+          setGameStatus("playing");
         }}>Reset</button>
-        It is {turn} turn
+        <div>
+          <p>It is {turn} turn</p>
+          {gameStatus === "checkmate" && <p style={{color: "red", fontWeight: "bold"}}>CHECKMATE! {turn === "W" ? "Black" : "White"} wins!</p>}
+          {gameStatus === "check" && <p style={{color: "orange", fontWeight: "bold"}}>CHECK!</p>}
+          {gameStatus === "stalemate" && <p style={{color: "blue", fontWeight: "bold"}}>STALEMATE!</p>}
+        </div>
         {Array.from({ length: Math.ceil(board.length / 8) }, (_, rowIndex) => (
           <div key={rowIndex} className="row">
             {board.slice(rowIndex * 8, rowIndex * 8 + 8).map((item, index) => (
