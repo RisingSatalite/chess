@@ -235,11 +235,8 @@ export default function Chess() {
       
       for (let to = 0; to < 64; to++) {
         if (!wouldMoveLeaveKingInCheck(from, to, boardToCheck)) {
-          // Need to check if move is actually possible based on piece rules
-          console.log(`Is move possible ${color}P`);
-          if (boardToCheck[from] === (color + 'P') || boardToCheck[from] === color + 'K') {
-            if (isSimpleMove(from, to, boardToCheck, color)) return true;
-          } else if (isValidPieceMove(from, to, boardToCheck, color)) {
+          // Check if move is actually possible based on piece rules
+          if (isValidPieceMove(from, to, boardToCheck, color)) {
             return true;
           }
         }
@@ -259,6 +256,39 @@ export default function Chess() {
     return true;
   };
 
+  // Check if pawn move is valid
+  const canPawnMove = (from, to, boardToCheck, color) => {
+    if (!isSimpleMove(from, to, boardToCheck, color)) return false;
+    
+    const fromRow = Math.floor(from / 8);
+    const fromCol = from % 8;
+    const toRow = Math.floor(to / 8);
+    const toCol = to % 8;
+    
+    const direction = color === 'W' ? -1 : 1;
+    const startRow = color === 'W' ? 6 : 1;
+    const deltaRow = toRow - fromRow;
+    const deltaCol = toCol - fromCol;
+    
+    // Single forward move
+    if (deltaRow === direction && deltaCol === 0 && !boardToCheck[to]) {
+      return true;
+    }
+    
+    // Double forward move from start
+    if (fromRow === startRow && toRow === fromRow + 2 * direction && deltaCol === 0 && !boardToCheck[to]) {
+      const middleSquare = from + 8 * direction;
+      return !boardToCheck[middleSquare];
+    }
+    
+    // Diagonal capture
+    if (deltaRow === direction && Math.abs(deltaCol) === 1 && boardToCheck[to] && boardToCheck[to][0] !== color) {
+      return true;
+    }
+    
+    return false;
+  };
+
   // Check if piece move is valid
   const isValidPieceMove = (from, to, boardToCheck, color) => {
     const piece = boardToCheck[from];
@@ -269,6 +299,7 @@ export default function Chess() {
     
     const pieceName = piece[1];
     
+    if (pieceName === 'P') return canPawnMove(from, to, boardToCheck, color);
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
     if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
     if (pieceName === 'N') return canKnightAttack(from, to);
