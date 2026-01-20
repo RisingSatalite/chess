@@ -352,7 +352,7 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
-      if ((connectNeighboring() && noFriendlyFire())) {
+      if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
       } else if(checkCastle()/*Add castle here */ && noGhostingHorizontal()){
         return checkCastle()
