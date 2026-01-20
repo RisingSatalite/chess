@@ -32,11 +32,9 @@ export default function Chess() {
     console.log("Possible move: " + possibleMove);
     if (possibleMove === true) {
       makeMove();
-      setTimeout(() => updateGameStatus(turn === "W" ? "B" : "W"), 0);
       turnChange();
     } else if (possibleMove) {
       makeMove(possibleMove);
-      setTimeout(() => updateGameStatus(turn === "W" ? "B" : "W"), 0);
       turnChange();
     }else {
       ineligableMoveClear()
@@ -51,6 +49,28 @@ export default function Chess() {
     //alert("Enpassent square set to: " + enpassent);
     console.log("Enpassent square set to: " + enpassent);
   }, [enpassent]);
+
+  useEffect(() => {
+    // Check game status after board changes
+    const playersColor = turn// === "W" ? "B" : "W";
+    const playerInCheck = isInCheck(playersColor);
+
+    console.log(`Does ${playersColor} have a legal move ${hasLegalMoves(playersColor)}`)
+
+    if (playerInCheck && !hasLegalMoves(playersColor)) {
+      setGameStatus("checkmate");
+      console.log(playersColor + " is in checkmate!");
+    } else if (playerInCheck) {
+      setGameStatus("check");
+      console.log(playersColor + " is in check!");
+    } else if (!hasLegalMoves(playersColor)) {
+      setGameStatus("stalemate");
+      console.log("Stalemate!");
+    } else {
+      setGameStatus("playing");
+      console.log("Next move")
+    }
+  }, [turn]);
 
   const selectSquare = (id) => {
     console.log(id);
@@ -216,7 +236,8 @@ export default function Chess() {
       for (let to = 0; to < 64; to++) {
         if (!wouldMoveLeaveKingInCheck(from, to, boardToCheck)) {
           // Need to check if move is actually possible based on piece rules
-          if (boardToCheck[from] === color + 'P' || boardToCheck[from] === color + 'K') {
+          console.log(`Is move possible ${color}P`);
+          if (boardToCheck[from] === (color + 'P') || boardToCheck[from] === color + 'K') {
             if (isSimpleMove(from, to, boardToCheck, color)) return true;
           } else if (isValidPieceMove(from, to, boardToCheck, color)) {
             return true;
@@ -257,26 +278,6 @@ export default function Chess() {
     return false;
   };
 
-  // Update game status after move
-  const updateGameStatus = (colorToMove) => {
-    setTimeout(() => {
-      const opponentInCheck = isInCheck(colorToMove);
-      
-      if (opponentInCheck && !hasLegalMoves(colorToMove)) {
-        setGameStatus("checkmate");
-        console.log(colorToMove + " is in checkmate!");
-      } else if (opponentInCheck) {
-        setGameStatus("check");
-        console.log(colorToMove + " is in check!");
-      } else if (!hasLegalMoves(colorToMove)) {
-        setGameStatus("stalemate");
-        console.log("Stalemate!");
-      } else {
-        setGameStatus("playing");
-      }
-    }, 0);
-  };
-  
   const checkIfPossibleMove = () => {
     // Check if the move would leave own king in check
     if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
