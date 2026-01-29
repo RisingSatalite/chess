@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
 
 export default function XiangqiChess() {
   const [board, setBoard] = useState([
-    'BC','BH','BE','BA','BK','BA','BE','BH','BC',
-    '','BN','','','','','','BN','',
+    'BR','BH','BE','BA','BG','BA','BE','BH','BR',
+    '','BC','','','','','','BC','',
     'BS','','BS','','BS','','BS','','BS',
     '','','','','','','','','',
     '','','','','','','','','',
     '','','','','','','','','',
     '','','','','','','','','',
     'WS','','WS','','WS','','WS','','WS',
-    '','WN','','','','','','WN','',
-    'WC','WH','WE','WA','WK','WA','WE','WH','WC',
+    '','WC','','','','','','WC','',
+    'WR','WH','WE','WA','WG','WA','WE','WH','WR',
   ]);
 
   const boardLenght = 9
