@@ -224,8 +224,8 @@ export default function XiangqiChess() {
     testBoard[toSquare] = testBoard[fromSquare];
     testBoard[fromSquare] = '';
     
-    console.log(boardToCheck)
-    console.log(boardToCheck[fromSquare])
+    //console.log(boardToCheck)
+    //console.log(boardToCheck[fromSquare])
     const colorMoving = boardToCheck[fromSquare][0];
     return isInCheck(colorMoving, testBoard);
   };
