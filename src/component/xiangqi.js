@@ -334,6 +334,7 @@ export default function XiangqiChess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'H') {
+      console.log("Checking if horse can move")
       if (connectHorse() && noFriendlyFire()) {
         return true;
       } else {
@@ -498,36 +499,40 @@ export default function XiangqiChess() {
     console.log(square2)
 
     if(board[(initial + 1)] === ""){
-    if(row+1 == row2 && square+2 == square2){
-      return true
-    }
-    if(row-1 == row2 && square+2 == square2){
-      return true
-    }
+      console.log("Squrare", (initial + 1),board[(initial + 1)])
+      if(row+1 == row2 && square+2 == square2){
+        return true
+      }
+      if(row-1 == row2 && square+2 == square2){
+        return true
+      }
     }
     if(board[(initial - 1)] === ""){
-    if(row+1 == row2 && square-2 == square2){
-      return true
-    }
-    if(row-1 == row2 && square-2 == square2){
-      return true
-    }
+      console.log("Squrare", initial - 1, board[(initial - 1)])
+      if(row+1 == row2 && square-2 == square2){
+        return true
+      }
+      if(row-1 == row2 && square-2 == square2){
+        return true
+      }
     }
     if(board[(initial + boardLenght)] === ""){
-    if(row+2 == row2 && square+1 == square2){
-      return true
-    }
-    if(row+2 == row2 && square-1 == square2){
-      return true
-    }
+      console.log("Squrare", initial + boardLenght, board[(initial + boardLenght)])
+      if(row+2 == row2 && square+1 == square2){
+        return true
+      }
+      if(row+2 == row2 && square-1 == square2){
+        return true
+      }
     }
     if(board[(initial - boardLenght)] === ""){
-    if(row-2 == row2 && square+1 == square2){
-      return true
-    }
-    if(row-2 == row2 && square-1 == square2){
-      return true
-    }
+      console.log("Squrare", initial - boardLenght, board[(initial - boardLenght)])
+      if(row-2 == row2 && square+1 == square2){
+        return true
+      }
+      if(row-2 == row2 && square-1 == square2){
+        return true
+      }
     }
     return false
   }
