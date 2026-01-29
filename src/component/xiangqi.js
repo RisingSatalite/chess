@@ -24,7 +24,6 @@ export default function XiangqiChess() {
   const [turn, setTurn] = useState("W");
   const [selectedSquare1, setSelectedSquare1] = useState(boardSquareCount);
   const [selectedSquare2, setSelectedSquare2] = useState(boardSquareCount);
-  const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
   const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
 
   useEffect(() => {
@@ -50,11 +49,6 @@ export default function XiangqiChess() {
   useEffect(() => {
     //console.log("Updated selectedSquare1:", selectedSquare1);
   }, [selectedSquare1]);
-
-  useEffect(() => {
-    //alert("Enpassent square set to: " + enpassent);
-    console.log("Enpassent square set to: " + enpassent);
-  }, [enpassent]);
 
   useEffect(() => {
     // Check game status after board changes
@@ -348,7 +342,6 @@ export default function XiangqiChess() {
     }else if(board[selectedSquare1][1] === 'P') {
       const pawnMove = connectPawn();
       if (pawnMove) { //Check if promoting
-        console.log('Enpassent square: ' + enpassent)
         return pawnMove;
       } else {
         return ineligableMoveClear()
@@ -530,11 +523,6 @@ export default function XiangqiChess() {
     return false
   }
 
-  const checkEnpassent = () => {
-    //setEnpassent(9) // Yes the setEnpassent works
-    console.log("Enpassent" + enpassent)
-  }
-
   //See if it is a legal pawn move
   const connectPawn = () => {
     const piece = board[selectedSquare1];
@@ -569,15 +557,6 @@ export default function XiangqiChess() {
       if (targetType && targetType !== type) {
         return true;
       }
-  
-      // En passant
-      if (selectedSquare2 === enpassent) {
-        const capturedSquare = selectedSquare2 + capturedOffset;
-        console.log("Enpassent move");
-        console.log("Captured square: " + capturedSquare);
-        //removePiece(capturedSquare);
-        return capturedSquare;
-      }
     }
   
     // 3. Double move from starting row
@@ -586,7 +565,6 @@ export default function XiangqiChess() {
       if (board[middleSquare] === '') {
         //alert("Enpassent possible next move");
         console.log("Enpassent possible next move");
-        setEnpassent(middleSquare);
         return middleSquare;// Set en passant square, it will be evaluated as true and be stored for the next move
       } else {
         console.log("Piece in the way of pawn");
@@ -822,13 +800,11 @@ export default function XiangqiChess() {
       }
     }else if(specialSquare != -2){
       if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
-        setEnpassent(specialSquare);
       }else{//Otherwise, remove the piece
         console.log("Piece removed at square: " + specialSquare)
         newBoard[specialSquare] = "";
       }
     }else{
-      setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
     }
 
     //Move the pawn promote to queen if it reaches the end
