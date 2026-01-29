@@ -845,15 +845,17 @@ export default function XiangqiChess() {
       <span>
         Chess
         <button className="majorButton" onClick={() =>{ setBoard([
-          'BR','BN','BB','BK','BQ','BB','BN','BR',
-          'BP','BP','BP','BP','BP','BP','BP','BP',
-          '','','','','','','','',
-          '','','','','','','','',
-          '','','','','','','','',
-          '','','','','','','','',
-          'WP','WP','WP','WP','WP','WP','WP','WP',
-          'WR','WN','WB','WK','WQ','WB','WN','WR'
-        ]);
+    'BR','BH','BE','BA','BG','BA','BE','BH','BR',
+    '','BC','','','','','','BC','',
+    'BS','','BS','','BS','','BS','','BS',
+    '','','','','','','','','',
+    '','','','','','','','','',
+    '','','','','','','','','',
+    '','','','','','','','','',
+    'WS','','WS','','WS','','WS','','WS',
+    '','WC','','','','','','WC','',
+    'WR','WH','WE','WA','WG','WA','WE','WH','WR',
+  ]);
           setTurn("W");
           setGameStatus("playing");
         }}>Reset</button>
