@@ -18,7 +18,7 @@ export default function XiangqiChess() {
   ]);
 
   const boardLenght = 9
-  const boardHeight = 9
+  const boardHeight = 10
   const boardSquareCount = 90
   
   const [turn, setTurn] = useState("W");
@@ -887,7 +887,7 @@ export default function XiangqiChess() {
           {gameStatus === "check" && <p style={{color: "orange", fontWeight: "bold"}}>CHECK!</p>}
           {gameStatus === "stalemate" && <p style={{color: "blue", fontWeight: "bold"}}>STALEMATE!</p>}
         </div>
-        {Array.from({ length: Math.ceil(board.length / boardHeight) }, (_, rowIndex) => (
+        {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
           <div key={rowIndex} className="row">
             {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => (
               <Square
