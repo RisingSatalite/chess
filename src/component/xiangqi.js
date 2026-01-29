@@ -333,8 +333,8 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
-    }else if(board[selectedSquare1][1] === 'N') {
-      if (connectKnight() && noFriendlyFire()) {
+    }else if(board[selectedSquare1][1] === 'H') {
+      if (connectHorse() && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
@@ -474,7 +474,8 @@ export default function XiangqiChess() {
     return(row+1 >= row2 && row-1 <=row2 && square+1 >= square2 && square-1 <=square2)
   }
 
-  const connectKnight = () => {
+  const connectHorse = () => {
+    let initial = selectedSquare1
     let square = selectedSquare1;
     let row = 0;
     
@@ -496,29 +497,37 @@ export default function XiangqiChess() {
     console.log(square)
     console.log(square2)
 
+    if(board[(initial + 1)] === ""){
     if(row+1 == row2 && square+2 == square2){
       return true
     }
     if(row-1 == row2 && square+2 == square2){
       return true
     }
+    }
+    if(board[(initial - 1)] === ""){
     if(row+1 == row2 && square-2 == square2){
       return true
     }
     if(row-1 == row2 && square-2 == square2){
       return true
     }
+    }
+    if(board[(initial + boardLenght)] === ""){
     if(row+2 == row2 && square+1 == square2){
       return true
     }
     if(row+2 == row2 && square-1 == square2){
       return true
     }
+    }
+    if(board[(initial - boardLenght)] === ""){
     if(row-2 == row2 && square+1 == square2){
       return true
     }
     if(row-2 == row2 && square-1 == square2){
       return true
+    }
     }
     return false
   }
