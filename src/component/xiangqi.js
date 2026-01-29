@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 export default function XiangqiChess() {
   const [board, setBoard] = useState([
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
+    '','','','','','','','','',
     '','BC','','','','','','BC','',
     'BS','','BS','','BS','','BS','','BS',
     '','','','','','','','','',
     '','','','','','','','','',
-    '','','','','','','','','',
-    '','','','','','','','','',
     'WS','','WS','','WS','','WS','','WS',
     '','WC','','','','','','WC','',
+    '','','','','','','','','',
     'WR','WH','WE','WA','WG','WA','WE','WH','WR',
   ]);
 
@@ -476,66 +476,42 @@ export default function XiangqiChess() {
   }
 
   const connectHorse = () => {
-    let initial = selectedSquare1
-    let square = selectedSquare1;
-    let row = 0;
-    
-    while (square - boardLenght >= 0) {
-      row += 1;
-      square -= boardLenght;
-    }
-  
-    let square2 = selectedSquare2;
-    let row2 = 0;
-  
-    while (square2 - boardLenght >= 0) {
-      row2 += 1;
-      square2 -= boardLenght;
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
+
+    const r  = Math.floor(from / boardLenght);
+    const c  = from % boardLenght;
+    const r2 = Math.floor(to / boardLenght);
+    const c2 = to % boardLenght;
+
+    const index = (rr, cc) => rr * boardLenght + cc;
+
+    // Right leg
+    if (c + 1 < 9 && board[index(r, c + 1)] === "") {
+      if ((r + 1 === r2 && c + 2 === c2) ||
+          (r - 1 === r2 && c + 2 === c2)) return true;
     }
 
-    console.log(row)
-    console.log(row2)
-    console.log(square)
-    console.log(square2)
+    // Left leg
+    if (c - 1 >= 0 && board[index(r, c - 1)] === "") {
+      if ((r + 1 === r2 && c - 2 === c2) ||
+          (r - 1 === r2 && c - 2 === c2)) return true;
+    }
 
-    if(board[(initial + 1)] === ""){
-      console.log("Squrare", (initial + 1),board[(initial + 1)])
-      if(row+1 == row2 && square+2 == square2){
-        return true
-      }
-      if(row-1 == row2 && square+2 == square2){
-        return true
-      }
+    // Down leg
+    if (r + 1 < 10 && board[index(r + 1, c)] === "") {
+      if ((r + 2 === r2 && c + 1 === c2) ||
+          (r + 2 === r2 && c - 1 === c2)) return true;
     }
-    if(board[(initial - 1)] === ""){
-      console.log("Squrare", initial - 1, board[(initial - 1)])
-      if(row+1 == row2 && square-2 == square2){
-        return true
-      }
-      if(row-1 == row2 && square-2 == square2){
-        return true
-      }
+
+    // Up leg
+    if (r - 1 >= 0 && board[index(r - 1, c)] === "") {
+      if ((r - 2 === r2 && c + 1 === c2) ||
+          (r - 2 === r2 && c - 1 === c2)) return true;
     }
-    if(board[(initial + boardLenght)] === ""){
-      console.log("Squrare", initial + boardLenght, board[(initial + boardLenght)])
-      if(row+2 == row2 && square+1 == square2){
-        return true
-      }
-      if(row+2 == row2 && square-1 == square2){
-        return true
-      }
-    }
-    if(board[(initial - boardLenght)] === ""){
-      console.log("Squrare", initial - boardLenght, board[(initial - boardLenght)])
-      if(row-2 == row2 && square+1 == square2){
-        return true
-      }
-      if(row-2 == row2 && square-1 == square2){
-        return true
-      }
-    }
-    return false
-  }
+
+    return false;
+  };
 
   //See if it is a legal pawn move
   const connectPawn = () => {
@@ -860,14 +836,14 @@ export default function XiangqiChess() {
         Chess
         <button className="majorButton" onClick={() =>{ setBoard([
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
+    '','','','','','','','','',
     '','BC','','','','','','BC','',
     'BS','','BS','','BS','','BS','','BS',
     '','','','','','','','','',
     '','','','','','','','','',
-    '','','','','','','','','',
-    '','','','','','','','','',
     'WS','','WS','','WS','','WS','','WS',
     '','WC','','','','','','WC','',
+    '','','','','','','','','',
     'WR','WH','WE','WA','WG','WA','WE','WH','WR',
   ]);
           setTurn("W");
