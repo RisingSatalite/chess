@@ -14,16 +14,20 @@ export default function Chess() {
     'WP','WP','WP','WP','WP','WP','WP','WP',
     'WR','WN','WB','WK','WQ','WB','WN','WR'
   ]);
+
+  const boardLenght = 8
+  const boardHeight = 8
+  const boardSquareCount = 64
   
   const [turn, setTurn] = useState("W");
-  const [selectedSquare1, setSelectedSquare1] = useState(64);
-  const [selectedSquare2, setSelectedSquare2] = useState(64);
+  const [selectedSquare1, setSelectedSquare1] = useState(boardSquareCount);
+  const [selectedSquare2, setSelectedSquare2] = useState(boardSquareCount);
   const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
   const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
 
   useEffect(() => {
     //console.log("Square 2 selected");
-    if (selectedSquare1 === 64 || selectedSquare2 === 64) {
+    if (selectedSquare1 === boardSquareCount || selectedSquare2 === boardSquareCount) {
       return;
     }
 
@@ -76,10 +80,10 @@ export default function Chess() {
     console.log(id);
     console.log(board[id][0]);
     console.log(board[id][0] === turn);
-    console.log(selectedSquare1 !== 64);
+    console.log(selectedSquare1 !== boardSquareCount);
     console.log(selectedSquare1);
   
-    if (selectedSquare1 !== 64) {
+    if (selectedSquare1 !== boardSquareCount) {
       setSelectedSquare2(id);
       console.log("Square selected", id);
     } else if (board[id][0] === turn) {
@@ -90,7 +94,7 @@ export default function Chess() {
 
   // Check if a square is attacked by a specific color
   const isSquareAttackedByColor = (targetSquare, attackingColor, boardToCheck = board) => {
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < boardSquareCount; i++) {
       if (!boardToCheck[i] || boardToCheck[i][0] !== attackingColor) continue;
       
       const piece = boardToCheck[i];
@@ -117,20 +121,20 @@ export default function Chess() {
   // Pawn attack check
   const canPawnAttack = (fromSquare, toSquare, color, boardToCheck) => {
     const direction = color === 'W' ? -1 : 1;
-    const fromRow = Math.floor(fromSquare / 8);
-    const fromCol = fromSquare % 8;
-    const toRow = Math.floor(toSquare / 8);
-    const toCol = toSquare % 8;
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
     
     return toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1;
   };
 
   // Rook attack check
   const canRookAttack = (fromSquare, toSquare, boardToCheck) => {
-    const fromRow = Math.floor(fromSquare / 8);
-    const fromCol = fromSquare % 8;
-    const toRow = Math.floor(toSquare / 8);
-    const toCol = toSquare % 8;
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
     
     if (fromRow !== toRow && fromCol !== toCol) return false;
     
@@ -138,14 +142,14 @@ export default function Chess() {
       const start = Math.min(fromCol, toCol) + 1;
       const end = Math.max(fromCol, toCol);
       for (let col = start; col < end; col++) {
-        if (boardToCheck[fromRow * 8 + col] !== '') return false;
+        if (boardToCheck[fromRow * boardLenght + col] !== '') return false;
       }
       return true;
     } else {
       const start = Math.min(fromRow, toRow) + 1;
       const end = Math.max(fromRow, toRow);
       for (let row = start; row < end; row++) {
-        if (boardToCheck[row * 8 + fromCol] !== '') return false;
+        if (boardToCheck[row * boardLenght + fromCol] !== '') return false;
       }
       return true;
     }
@@ -153,10 +157,10 @@ export default function Chess() {
 
   // Bishop attack check
   const canBishopAttack = (fromSquare, toSquare, boardToCheck) => {
-    const fromRow = Math.floor(fromSquare / 8);
-    const fromCol = fromSquare % 8;
-    const toRow = Math.floor(toSquare / 8);
-    const toCol = toSquare % 8;
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
     
     if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol)) return false;
     
@@ -166,7 +170,7 @@ export default function Chess() {
     let c = fromCol + colStep;
     
     while (r !== toRow) {
-      if (boardToCheck[r * 8 + c] !== '') return false;
+      if (boardToCheck[r * boardLenght + c] !== '') return false;
       r += rowStep;
       c += colStep;
     }
@@ -175,10 +179,10 @@ export default function Chess() {
 
   // Knight attack check
   const canKnightAttack = (fromSquare, toSquare) => {
-    const fromRow = Math.floor(fromSquare / 8);
-    const fromCol = fromSquare % 8;
-    const toRow = Math.floor(toSquare / 8);
-    const toCol = toSquare % 8;
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
     
     const rowDiff = Math.abs(fromRow - toRow);
     const colDiff = Math.abs(fromCol - toCol);
@@ -193,17 +197,17 @@ export default function Chess() {
 
   // King attack check
   const canKingAttack = (fromSquare, toSquare) => {
-    const fromRow = Math.floor(fromSquare / 8);
-    const fromCol = fromSquare % 8;
-    const toRow = Math.floor(toSquare / 8);
-    const toCol = toSquare % 8;
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
     
     return Math.abs(fromRow - toRow) <= 1 && Math.abs(fromCol - toCol) <= 1;
   };
 
   // Find king position
   const findKing = (color, boardToCheck = board) => {
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < boardSquareCount; i++) {
       if (boardToCheck[i] === color + 'K') return i;
     }
     return -1;
@@ -230,10 +234,10 @@ export default function Chess() {
 
   // Check if player has any legal moves
   const hasLegalMoves = (color, boardToCheck = board) => {
-    for (let from = 0; from < 64; from++) {
+    for (let from = 0; from < boardSquareCount; from++) {
       if (!boardToCheck[from] || boardToCheck[from][0] !== color) continue;
       
-      for (let to = 0; to < 64; to++) {
+      for (let to = 0; to < boardSquareCount; to++) {
         if (!wouldMoveLeaveKingInCheck(from, to, boardToCheck)) {
           // Check if move is actually possible based on piece rules
           if (isValidPieceMove(from, to, boardToCheck, color)) {
@@ -260,10 +264,10 @@ export default function Chess() {
   const canPawnMove = (from, to, boardToCheck, color) => {
     if (!isSimpleMove(from, to, boardToCheck, color)) return false;
     
-    const fromRow = Math.floor(from / 8);
-    const fromCol = from % 8;
-    const toRow = Math.floor(to / 8);
-    const toCol = to % 8;
+    const fromRow = Math.floor(from / boardLenght);
+    const fromCol = from % boardLenght;
+    const toRow = Math.floor(to / boardLenght);
+    const toCol = to % boardLenght;
     
     const direction = color === 'W' ? -1 : 1;
     const startRow = color === 'W' ? 6 : 1;
@@ -277,7 +281,7 @@ export default function Chess() {
     
     // Double forward move from start
     if (fromRow === startRow && toRow === fromRow + 2 * direction && deltaCol === 0 && !boardToCheck[to]) {
-      const middleSquare = from + 8 * direction;
+      const middleSquare = from + boardLenght * direction;
       return !boardToCheck[middleSquare];
     }
     
@@ -366,14 +370,14 @@ export default function Chess() {
 
   //Clear just the selected squarces, but not the enpassent
   const ineligableMoveClear = () => {
-    setSelectedSquare1(64);
-    setSelectedSquare2(64);
+    setSelectedSquare1(boardSquareCount);
+    setSelectedSquare2(boardSquareCount);
     return false;
   }
 
   const reset = () => {
-    setSelectedSquare1(64);
-    setSelectedSquare2(64);
+    setSelectedSquare1(boardSquareCount);
+    setSelectedSquare2(boardSquareCount);
     //console.log(board)
     //alert("Can next move be enpassent: " + enpassentNextMove)
     //alert("Enpassent square: " + enpassent)
@@ -390,21 +394,21 @@ export default function Chess() {
   //Make sure the 2 selected squares make a valid rook move
   const horizontallyConnecting = () => {
     //Get the row or column
-    //Subtracts by 8s to get the row, and what is left is the column
+    //Subtracts by boardLenghts to get the row, and what is left is the column
     let square = selectedSquare1;
     let row = 0;
     
-    while (square - 8 >= 0) {
+    while (square - boardLenght >= 0) {
       row += 1;
-      square -= 8;
+      square -= boardLenght;
     }
   
     let square2 = selectedSquare2;
     let row2 = 0;
   
-    while (square2 - 8 >= 0) {
+    while (square2 - boardLenght >= 0) {
       row2 += 1;
-      square2 -= 8;
+      square2 -= boardLenght;
     }
   
     return row === row2 || square === square2;
@@ -438,14 +442,14 @@ export default function Chess() {
     let square2 = selectedSquare2;
     let row2 = 0;
     
-    while (square - 8 >= 0) {
+    while (square - boardLenght >= 0) {
       row += 1;
-      square -= 8;
+      square -= boardLenght;
     }
   
-    while (square2 - 8 >= 0) {
+    while (square2 - boardLenght >= 0) {
       row2 += 1;
-      square2 -= 8;
+      square2 -= boardLenght;
     }
   
     console.log(Math.abs(square-square2)==Math.abs(row-row2))
@@ -460,14 +464,14 @@ export default function Chess() {
     let square2 = selectedSquare2;
     let row2 = 0;
     
-    while (square - 8 > 0) {
+    while (square - boardLenght > 0) {
       row += 1;
-      square -= 8;
+      square -= boardLenght;
     }
   
-    while (square2 - 8 > 0) {
+    while (square2 - boardLenght > 0) {
       row2 += 1;
-      square2 -= 8;
+      square2 -= boardLenght;
     }
     
     return(row+1 >= row2 && row-1 <=row2 && square+1 >= square2 && square-1 <=square2)
@@ -477,17 +481,17 @@ export default function Chess() {
     let square = selectedSquare1;
     let row = 0;
     
-    while (square - 8 >= 0) {
+    while (square - boardLenght >= 0) {
       row += 1;
-      square -= 8;
+      square -= boardLenght;
     }
   
     let square2 = selectedSquare2;
     let row2 = 0;
   
-    while (square2 - 8 >= 0) {
+    while (square2 - boardLenght >= 0) {
       row2 += 1;
-      square2 -= 8;
+      square2 -= boardLenght;
     }
 
     console.log(row)
@@ -537,10 +541,10 @@ export default function Chess() {
     const direction = isWhite ? -1 : 1;
     const startRow = isWhite ? 6 : 1;
     const doubleStepRow = isWhite ? 4 : 3;
-    const capturedOffset = isWhite ? 8 : -8;
+    const capturedOffset = isWhite ? boardLenght : -boardLenght;
   
     // Calculate row and col from square index
-    const getCoords = (index) => [Math.floor(index / 8), index % 8];
+    const getCoords = (index) => [Math.floor(index / boardLenght), index % boardLenght];
     const [row1, col1] = getCoords(selectedSquare1);
     const [row2, col2] = getCoords(selectedSquare2);
   
@@ -600,14 +604,14 @@ export default function Chess() {
     let row2 = 0;
     
     //Convert the data, in the row and columns, to chekc which need to be checked
-    while (column - 8 >= 0) {
+    while (column - boardLenght >= 0) {
       row += 1;
-      column -= 8;
+      column -= boardLenght;
     }
   
-    while (column2 - 8 >= 0) {
+    while (column2 - boardLenght >= 0) {
       row2 += 1;
-      column2 -= 8;
+      column2 -= boardLenght;
     }
 
     if(row==row2){
@@ -663,7 +667,7 @@ export default function Chess() {
           console.log("Looping")
           console.log(square)
           console.log("Square 2 is ", square2)
-          square += 8//Move closer to the other square, using 8 because checking by moving pass rows
+          square += boardLenght//Move closer to the other square, using boardLenght because checking by moving pass rows
           //If no other piece in the way all the way to the other piece, then valid move
           if(square == square2){
             return true
@@ -685,7 +689,7 @@ export default function Chess() {
           console.log("Looping")
           console.log("Square 1 is ", square)
           console.log("Square 2 is ", square2)
-          square -= 8//Move closer to the other square, using 8 because checking by moving pass rows
+          square -= boardLenght//Move closer to the other square, using boardLenght because checking by moving pass rows
           //If no other piece in the way all the way to the other piece, then valid move
           if(square == square2){
             return true
@@ -711,10 +715,10 @@ export default function Chess() {
     let square1 = selectedSquare1;
     let square2 = selectedSquare2;
   
-    let row1 = Math.floor(square1 / 8);
-    let col1 = square1 % 8;
-    let row2 = Math.floor(square2 / 8);
-    let col2 = square2 % 8;
+    let row1 = Math.floor(square1 / boardLenght);
+    let col1 = square1 % boardLenght;
+    let row2 = Math.floor(square2 / boardLenght);
+    let col2 = square2 % boardLenght;
   
     // Not a diagonal move
     if (Math.abs(row2 - row1) !== Math.abs(col2 - col1)) {
@@ -728,7 +732,7 @@ export default function Chess() {
     let c = col1 + colStep;
   
     while (r !== row2 && c !== col2) {
-      let squareToCheck = r * 8 + c;
+      let squareToCheck = r * boardLenght + c;
   
       if (board[squareToCheck] !== '') {
         console.log("Piece in the way at", squareToCheck);
@@ -752,13 +756,13 @@ export default function Chess() {
     let square2 = selectedSquare2;
     let row2 = 0;
     
-    while (square >= 8) {
+    while (square >= boardLenght) {
       row += 1;
-      square -= 8;
+      square -= boardLenght;
     }
-    while (square2 >= 8) {
+    while (square2 >= boardLenght) {
       row2 += 1;
-      square2 -= 8;
+      square2 -= boardLenght;
     }
 
     //The king and rook have to be on the same square
@@ -826,9 +830,9 @@ export default function Chess() {
     //Move the pawn promote to queen if it reaches the end
     let column2 = selectedSquare2;
     let row2 = 0;
-    while (column2 - 8 >= 0) {
+    while (column2 - boardLenght >= 0) {
       row2 += 1;
-      column2 -= 8;
+      column2 -= boardLenght;
     }
     if(newBoard[selectedSquare2] == "WP" && row2 == 0){
       newBoard[selectedSquare2] = "WQ"
@@ -879,13 +883,13 @@ export default function Chess() {
           {gameStatus === "check" && <p style={{color: "orange", fontWeight: "bold"}}>CHECK!</p>}
           {gameStatus === "stalemate" && <p style={{color: "blue", fontWeight: "bold"}}>STALEMATE!</p>}
         </div>
-        {Array.from({ length: Math.ceil(board.length / 8) }, (_, rowIndex) => (
+        {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
           <div key={rowIndex} className="row">
-            {board.slice(rowIndex * 8, rowIndex * 8 + 8).map((item, index) => (
+            {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => (
               <Square
-                key={rowIndex * 8 + index}
-                number={rowIndex * 8 + index}
-                onClickFunction={() => selectSquare(rowIndex * 8 + index)}
+                key={rowIndex * boardLenght + index}
+                number={rowIndex * boardLenght + index}
+                onClickFunction={() => selectSquare(rowIndex * boardLenght + index)}
                 prop={item}
                 selected={selectedSquare1}
                 row={rowIndex}
