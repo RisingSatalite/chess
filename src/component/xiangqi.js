@@ -833,7 +833,7 @@ export default function XiangqiChess() {
   return (
     <div id="chess">
       <span>
-        Chess
+        Xiangqi
         <button className="majorButton" onClick={() =>{ setBoard([
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
     '','','','','','','','','',
