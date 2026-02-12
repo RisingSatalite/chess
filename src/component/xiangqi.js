@@ -432,9 +432,7 @@ export default function XiangqiChess() {
   }
 
   const connectingElephant = () => {
-    if(!noFriendlyFire()){
-        return false//Do not attack friendly pieces
-    }
+    if (!noFriendlyFire()) return false;
 
     const from = selectedSquare1;
     const to   = selectedSquare2;
@@ -444,33 +442,31 @@ export default function XiangqiChess() {
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
-    // Up Right leg
-    if (board[getPositionFromRowAndColumn(r - 1, c + 1)] === "") {
-      if(from == getPositionFromRowAndColumn(r - 2, c + 2)){
-        return true;
-      }
-    }else
-    // Up Left leg
-    if (board[getPositionFromRowAndColumn(r - 1, c - 1)] === "") {
-      if(from == getPositionFromRowAndColumn(r - 2, c - 2)){
-        return true;
-      }
-    }else
-    // Down Right leg
-    if (board[getPositionFromRowAndColumn(r + 1, c + 1)] === "") {
-      if(from == getPositionFromRowAndColumn(r + 2, c + 2)){
-        return true;
-      }
-    }else
-    // Down Left leg
-    if (board[getPositionFromRowAndColumn(r + 1, c - 1)] === "") {
-      if(from == getPositionFromRowAndColumn(r + 2, c - 2)){
-        return true;
-      }
+    const index = (rr, cc) => rr * boardLenght + cc;
+
+    // Elephant must move exactly 2 diagonal
+    if (Math.abs(r - r2) !== 2 || Math.abs(c - c2) !== 2) {
+      return false;
     }
 
-    return false
-  }
+    // River rule (assuming red bottom, black top)
+    // Red cannot go above row 4
+    // Black cannot go below row 5
+    const piece = board[from];
+
+    if (piece[0] === "W" && r2 < 5) return false;
+    if (piece[0] === "B" && r2 > 4) return false;
+
+    // Check eye (middle square)
+    const middleRow = (r + r2) / 2;
+    const middleCol = (c + c2) / 2;
+
+    if (board[index(middleRow, middleCol)] !== "") {
+      return false;
+    }
+
+    return true;
+  };
 
   const noFriendlyFire = () => {
     if(board[selectedSquare1][0] == "W" && (board[selectedSquare2][0] == "B" || board[selectedSquare2][0] == undefined)){
