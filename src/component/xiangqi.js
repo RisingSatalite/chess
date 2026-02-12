@@ -333,6 +333,12 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
+    }else if(board[selectedSquare1][1] === 'E') {
+      if (connectingElephant()) {
+        return true;
+      } else {
+        return ineligableMoveClear()
+      }
     }else if(board[selectedSquare1][1] === 'H') {
       console.log("Checking if horse can move")
       if (connectHorse() && noFriendlyFire()) {
@@ -412,6 +418,8 @@ export default function XiangqiChess() {
     return row === row2 || square === square2;
   };
 
+  const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
+
   const connectingBishop = () => {
     if(diagonalConnecting()){
       if(noFriendlyFire()){
@@ -420,6 +428,47 @@ export default function XiangqiChess() {
     }else{
       return false
     }
+    return false
+  }
+
+  const connectingElephant = () => {
+    if(!noFriendlyFire()){
+        return false//Do not attack friendly pieces
+    }
+
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
+
+    const r  = Math.floor(from / boardLenght);
+    const c  = from % boardLenght;
+    const r2 = Math.floor(to / boardLenght);
+    const c2 = to % boardLenght;
+
+    // Up Right leg
+    if (board[getPositionFromRowAndColumn(r - 1, c + 1)] === "") {
+      if(from == getPositionFromRowAndColumn(r - 2, c + 2)){
+        return true;
+      }
+    }else
+    // Up Left leg
+    if (board[getPositionFromRowAndColumn(r - 1, c - 1)] === "") {
+      if(from == getPositionFromRowAndColumn(r - 2, c - 2)){
+        return true;
+      }
+    }else
+    // Down Right leg
+    if (board[getPositionFromRowAndColumn(r + 1, c + 1)] === "") {
+      if(from == getPositionFromRowAndColumn(r + 2, c + 2)){
+        return true;
+      }
+    }else
+    // Down Left leg
+    if (board[getPositionFromRowAndColumn(r + 1, c - 1)] === "") {
+      if(from == getPositionFromRowAndColumn(r + 2, c - 2)){
+        return true;
+      }
+    }
+
     return false
   }
 
@@ -484,8 +533,7 @@ export default function XiangqiChess() {
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
-    const index = (rr, cc) => rr * boardLenght + cc;
-
+    const index = (rr, cc) => rr * boardLenght + cc;//Replace with getPositionFromRowAndColumn
     // Right leg
     if (c + 1 < 9 && board[index(r, c + 1)] === "") {
       if ((r + 1 === r2 && c + 2 === c2) ||
