@@ -819,17 +819,6 @@ export default function Chess() {
     reset()
   };
 
-  const removePiece = (id) => {
-    const newBoard = [...board];
-    newBoard[id] = "";
-    console.log("Piece removed at square: " + id)
-    console.log(board)
-    console.log(newBoard)
-    console.log(board[id])
-    console.log(newBoard[id])
-    setBoard(newBoard);
-  }
-  
   const turnChange = () => {
     setTurn(turn === "W" ? "B" : "W");
   };
