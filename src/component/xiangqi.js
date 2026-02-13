@@ -202,16 +202,16 @@ export default function XiangqiChess() {
   };
 
   // Find king position
-  const findKing = (color, boardToCheck = board) => {
+  const findGeneral = (color, boardToCheck = board) => {
     for (let i = 0; i < boardSquareCount; i++) {
-      if (boardToCheck[i] === color + 'K') return i;
+      if (boardToCheck[i] === color + 'G') return i;
     }
     return -1;
   };
 
   // Check if a player is in check
   const isInCheck = (color, boardToCheck = board) => {
-    const kingSquare = findKing(color, boardToCheck);
+    const kingSquare = findGeneral(color, boardToCheck);
     if (kingSquare === -1) return false;
     
     const opponentColor = color === 'W' ? 'B' : 'W';
