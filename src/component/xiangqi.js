@@ -362,8 +362,6 @@ export default function XiangqiChess() {
     }else if(board[selectedSquare1][1] === 'K') {
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else if(checkCastle()/*Add castle here */ && noGhostingHorizontal()){
-        return checkCastle()
       } else{
         return ineligableMoveClear()
       }
@@ -762,60 +760,6 @@ export default function XiangqiChess() {
     return true;
   }  
 
-  const checkCastle = () => {
-    console.log("Checking if possible castle")
-    //Get the row and columns of the 2 pieces
-    let initial = selectedSquare1;
-    let initial2 = selectedSquare2
-    let square = selectedSquare1;
-    let row = 0;
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square >= boardLenght) {
-      row += 1;
-      square -= boardLenght;
-    }
-    while (square2 >= boardLenght) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-
-    //The king and rook have to be on the same square
-    if(row != row2){
-      console.log("Different rows")
-      return false
-    }
-
-    if(square == square2){
-      console.log("Same columns")
-      return false
-    }
-
-    //Make sure it is the first king and that rooks move and no repeating castling
-
-    //Add check for no check
-
-    //Add check for not moving though check
-    if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
-      console.log("Possible valid castle")
-      if(square < square2){
-        let newKingLocation = "K" + String(initial+2)
-        let newRookLocation = "R" + String(initial+1)
-        return newKingLocation + newRookLocation
-      }
-
-      if(square > square2){
-        let newKingLocation = "K" + String(initial-2)
-        let newRookLocation = "R" + String(initial-1)
-        return newKingLocation + newRookLocation
-      }
-      return false
-    }
-
-    return false
-  }
-  
   const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
 
