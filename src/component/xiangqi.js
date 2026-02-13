@@ -491,27 +491,6 @@ export default function XiangqiChess() {
     return (Math.abs(square-square2)==Math.abs(row-row2))
   };
 
-  //Check if the 2 seclected squares are a valid king move 
-  const connectNeighboring = () => {
-    let square = selectedSquare1;
-    let row = 0;
-
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square - boardLenght > 0) {
-      row += 1;
-      square -= boardLenght;
-    }
-  
-    while (square2 - boardLenght > 0) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-    
-    return(row+1 >= row2 && row-1 <=row2 && square+1 >= square2 && square-1 <=square2)
-  }
-
   const connectHorse = () => {
     const from = selectedSquare1;
     const to   = selectedSquare2;
