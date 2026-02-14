@@ -434,8 +434,6 @@ export default function XiangqiChess() {
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
-    const index = (rr, cc) => rr * boardLenght + cc;
-
     // Elephant must move exactly 2 diagonal
     if (Math.abs(r - r2) !== 2 || Math.abs(c - c2) !== 2) {
       return false;
@@ -453,7 +451,7 @@ export default function XiangqiChess() {
     const middleRow = (r + r2) / 2;
     const middleCol = (c + c2) / 2;
 
-    if (board[index(middleRow, middleCol)] !== "") {
+    if (board[getPositionFromRowAndColumn(middleRow, middleCol)] !== "") {
       return false;
     }
 
@@ -500,27 +498,26 @@ export default function XiangqiChess() {
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
-    const index = (rr, cc) => rr * boardLenght + cc;//Replace with getPositionFromRowAndColumn
     // Right leg
-    if (c + 1 < 9 && board[index(r, c + 1)] === "") {
+    if (c + 1 < 9 && board[getPositionFromRowAndColumn(r, c + 1)] === "") {
       if ((r + 1 === r2 && c + 2 === c2) ||
           (r - 1 === r2 && c + 2 === c2)) return true;
     }
 
     // Left leg
-    if (c - 1 >= 0 && board[index(r, c - 1)] === "") {
+    if (c - 1 >= 0 && board[getPositionFromRowAndColumn(r, c - 1)] === "") {
       if ((r + 1 === r2 && c - 2 === c2) ||
           (r - 1 === r2 && c - 2 === c2)) return true;
     }
 
     // Down leg
-    if (r + 1 < 10 && board[index(r + 1, c)] === "") {
+    if (r + 1 < 10 && board[getPositionFromRowAndColumn(r + 1, c)] === "") {
       if ((r + 2 === r2 && c + 1 === c2) ||
           (r + 2 === r2 && c - 1 === c2)) return true;
     }
 
     // Up leg
-    if (r - 1 >= 0 && board[index(r - 1, c)] === "") {
+    if (r - 1 >= 0 && board[getPositionFromRowAndColumn(r - 1, c)] === "") {
       if ((r - 2 === r2 && c + 1 === c2) ||
           (r - 2 === r2 && c - 1 === c2)) return true;
     }
