@@ -327,12 +327,6 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
-    }else if(board[selectedSquare1][1] === 'B') {
-      if ((connectingBishop() && noGhostingDiagonal()) && noFriendlyFire()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
     }else if(board[selectedSquare1][1] === 'E') {
       if (connectingElephant()) {
         return true;
@@ -411,17 +405,6 @@ export default function XiangqiChess() {
   };
 
   const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
-
-  const connectingBishop = () => {
-    if(diagonalConnecting()){
-      if(noFriendlyFire()){
-        return true
-      }
-    }else{
-      return false
-    }
-    return false
-  }
 
   const connectingElephant = () => {
     if (!noFriendlyFire()) return false;
@@ -552,28 +535,6 @@ export default function XiangqiChess() {
     if (deltaRow === direction && deltaCol === 0 && !targetPiece) {
       return true;
     }
-  
-    // 2. Diagonal capture or en passant
-    if (deltaRow === direction && Math.abs(deltaCol) === 1) {
-      // Normal capture
-      if (targetType && targetType !== type) {
-        return true;
-      }
-    }
-  
-    // 3. Double move from starting row
-    if (row1 === startRow && row2 === doubleStepRow && deltaCol === 0 && !targetPiece) {
-      const middleSquare = (selectedSquare1 + selectedSquare2) / 2;
-      if (board[middleSquare] === '') {
-        //alert("Enpassent possible next move");
-        console.log("Enpassent possible next move");
-        return middleSquare;// Set en passant square, it will be evaluated as true and be stored for the next move
-      } else {
-        console.log("Piece in the way of pawn");
-        return false;
-      }
-    }
-  
     return false;
   };
   
