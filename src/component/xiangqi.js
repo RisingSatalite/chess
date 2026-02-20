@@ -340,6 +340,13 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
+    }else if(board[selectedSquare1][1] === 'A') {
+      console.log("Checking if advisor can move")
+      if (connectAdvisor() && noFriendlyFire()) {
+        return true;
+      } else {
+        return ineligableMoveClear()
+      }
     }else if(board[selectedSquare1][1] === 'P') {
       const pawnMove = connectPawn();
       if (pawnMove) { //Check if promoting
@@ -451,26 +458,49 @@ export default function XiangqiChess() {
     return false
   }
 
-  const diagonalConnecting = () => {
-    let square = selectedSquare1;
-    let row = 0;
+  const connectAdvisor = () => {
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
 
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square - boardLenght >= 0) {
-      row += 1;
-      square -= boardLenght;
+    const r  = Math.floor(from / boardLenght);
+    const c  = from % boardLenght;
+    const r2 = Math.floor(to / boardLenght);
+    const c2 = to % boardLenght;
+
+    if(c2 == 3 || c2 == 4 || c2 == 5){
+      if(board[from][0] == "B"){
+        if(r2 == 0 || r2 == 1 || r2 == 2){
+        }else{
+          console.log("Move goes outside of the palace row", r2)
+          return false;//Move is outside of the palace
+        }
+      }
+      if(board[from][0] == "W"){
+        if(r2 == 7 || r2 == 8 || r2 == 9){
+        }else{
+          console.log("Move goes outside of the palace row", r2)
+          return false;//Move is outside of the palace
+        }
+      }
+
+      if (r + 1 === r2 && c - 1 === c2){
+        return true;
+      }
+      if (r + 1 === r2 && c + 1 === c2){
+        return true;
+      }
+      if (r - 1 === r2 && c + 1 === c2){
+        return true;
+      }
+      if (r - 1 === r2 && c - 1 === c2){
+        return true;
+      }
+
+    }else{
+      console.log("Move goes outside of the palace column")
+      return false;//Move is outside of the palace
     }
-  
-    while (square2 - boardLenght >= 0) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-  
-    console.log(Math.abs(square-square2)==Math.abs(row-row2))
-    return (Math.abs(square-square2)==Math.abs(row-row2))
-  };
+  }
 
   const connectHorse = () => {
     const from = selectedSquare1;
