@@ -675,122 +675,33 @@ export default function XiangqiChess() {
   };
   
   const noGhostingHorizontal = () => {
-    //Determine which way then if anything inbetween
-    let square = selectedSquare1
-    let column = selectedSquare1;
-    let row = 0;
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
 
-    let square2 = selectedSquare2
-    let column2 = selectedSquare2;
-    let row2 = 0;
-    
-    //Convert the data, in the row and columns, to chekc which need to be checked
-    while (column - boardLenght >= 0) {
-      row += 1;
-      column -= boardLenght;
-    }
-  
-    while (column2 - boardLenght >= 0) {
-      row2 += 1;
-      column2 -= boardLenght;
+    const r1 = Math.floor(from / boardLenght);
+    const c1 = from % boardLenght;
+    const r2 = Math.floor(to / boardLenght);
+    const c2 = to % boardLenght;
+
+    // Must be strictly horizontal or vertical
+    if (!(r1 === r2 || c1 === c2)) return false;
+
+    const step =
+      r1 === r2
+        ? Math.sign(to - from)          // horizontal
+        : Math.sign(r2 - r1) * boardLenght; // vertical
+
+    let current = from + step;
+
+    while (current !== to) {
+      if (board[current] !== '') {
+        return false; // piece blocking the path
+      }
+      current += step;
     }
 
-    if(row==row2){
-      if(square < square2){
-        while (true){
-          console.log("Looping")
-          console.log(square)
-          console.log("Square 2 is ", square2)
-          square += 1//Move closer to the other square
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            console.log("Piece in the way")
-            return false
-          }
-          if(square > square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }else{
-        while (true){
-          console.log("Looping")
-          console.log(square)
-          console.log("Square 2 is ", square2)
-          square -= 1//Move closer to the other square
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            return false
-          }
-          if(square < square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }
-    }else{
-      if(square < square2){
-        while (true){
-          console.log("Looping")
-          console.log(square)
-          console.log("Square 2 is ", square2)
-          square += boardLenght//Move closer to the other square, using boardLenght because checking by moving pass rows
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            return false
-          }
-          if(square > square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }else{
-        while (true){
-          console.log("Looping")
-          console.log("Square 1 is ", square)
-          console.log("Square 2 is ", square2)
-          square -= boardLenght//Move closer to the other square, using boardLenght because checking by moving pass rows
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            return false
-          }
-          if(square < square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }
-    }
-    return false
-  }
+    return true;
+  };
 
   const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
