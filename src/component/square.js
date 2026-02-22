@@ -16,6 +16,13 @@ const pieceImages = {
     BR: "/BlackRook.png",
     BN: "/BlackKnight.png",
     BP: "/BlackPawn.png",
+
+    WS: "/WhitePawn.png",
+    BS: "/BlackPawn.png",
+    WH: "/WhiteKnight.png",
+    BH: "/BlackKnight.png",
+    WG: "/WhiteKing.png",
+    BG: "/BlackKing.png",
 };
 
 export default function Square({ prop, onClickFunction, number = 0, selected = 64, row=0 }) {
