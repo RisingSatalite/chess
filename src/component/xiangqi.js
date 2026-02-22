@@ -361,13 +361,6 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
-    }else if(board[selectedSquare1][1] === 'P') {
-      const pawnMove = connectPawn();
-      if (pawnMove) { //Check if promoting
-        return pawnMove;
-      } else {
-        return ineligableMoveClear()
-      }
     }
     
     return ineligableMoveClear()
@@ -629,36 +622,6 @@ export default function XiangqiChess() {
 
     return false;
   };
-
-  //See if it is a legal pawn move
-  const connectPawn = () => {
-    const piece = board[selectedSquare1];
-    if (!piece || piece[1] !== 'P') return false;
-  
-    const type = piece[0]; // 'W' or 'B'
-    const isWhite = type === 'W';
-    const direction = isWhite ? -1 : 1;
-    const startRow = isWhite ? 6 : 1;
-    const doubleStepRow = isWhite ? 4 : 3;
-    const capturedOffset = isWhite ? boardLenght : -boardLenght;
-  
-    // Calculate row and col from square index
-    const getCoords = (index) => [Math.floor(index / boardLenght), index % boardLenght];
-    const [row1, col1] = getCoords(selectedSquare1);
-    const [row2, col2] = getCoords(selectedSquare2);
-  
-    const deltaRow = row2 - row1;
-    const deltaCol = col2 - col1;
-  
-    const targetPiece = board[selectedSquare2];
-    const targetType = targetPiece?.[0];
-  
-    // 1. Regular single forward move
-    if (deltaRow === direction && deltaCol === 0 && !targetPiece) {
-      return true;
-    }
-    return false;
-  };
   
   const noGhostingHorizontal = () => {
     //Determine which way then if anything inbetween
@@ -777,41 +740,6 @@ export default function XiangqiChess() {
     }
     return false
   }
-
-  const noGhostingDiagonal = () => {
-    let square1 = selectedSquare1;
-    let square2 = selectedSquare2;
-  
-    let row1 = Math.floor(square1 / boardLenght);
-    let col1 = square1 % boardLenght;
-    let row2 = Math.floor(square2 / boardLenght);
-    let col2 = square2 % boardLenght;
-  
-    // Not a diagonal move
-    if (Math.abs(row2 - row1) !== Math.abs(col2 - col1)) {
-      return false;
-    }
-  
-    let rowStep = row2 > row1 ? 1 : -1;
-    let colStep = col2 > col1 ? 1 : -1;
-  
-    let r = row1 + rowStep;
-    let c = col1 + colStep;
-  
-    while (r !== row2 && c !== col2) {
-      let squareToCheck = r * boardLenght + c;
-  
-      if (board[squareToCheck] !== '') {
-        console.log("Piece in the way at", squareToCheck);
-        return false;
-      }
-  
-      r += rowStep;
-      c += colStep;
-    }
-  
-    return true;
-  }  
 
   const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
