@@ -336,7 +336,7 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'N') {
-      if (connectKnight() && noFriendlyFire()) {
+      if (canKnightAttack(selectedSquare1,selectedSquare2) && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
@@ -455,39 +455,6 @@ export default function Chess() {
     console.log(Math.abs(square-square2)==Math.abs(row-row2))
     return (Math.abs(square-square2)==Math.abs(row-row2))
   };
-
-  const connectKnight = (from=selectedSquare1,to=selectedSquare2) => {
-    const r  = Math.floor(from / boardLenght);
-    const c  = from % boardLenght;
-    const r2 = Math.floor(to / boardLenght);
-    const c2 = to % boardLenght;
-
-    if(r+1 == r2 && c+2 == c2){
-      return true
-    }
-    if(r-1 == r2 && c+2 == c2){
-      return true
-    }
-    if(r+1 == r2 && c-2 == c2){
-      return true
-    }
-    if(r-1 == row2 && c-2 == c2){
-      return true
-    }
-    if(r+2 == row2 && c+1 == c2){
-      return true
-    }
-    if(r+2 == row2 && c-1 == c2){
-      return true
-    }
-    if(r-2 == row2 && c+1 == c2){
-      return true
-    }
-    if(r-2 == row2 && c-1 == c2){
-      return true
-    }
-    return false
-  }
 
   //See if it is a legal pawn move
   const connectPawn = () => {
