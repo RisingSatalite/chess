@@ -323,7 +323,6 @@ export default function Chess() {
     console.log(board[selectedSquare1][1]);
     
     if (board[selectedSquare1][1] === 'R') {
-      console.log(noGhostingHorizontal())
       if (horizontallyConnecting() && noFriendlyFire() && noGhostingHorizontal()) {
         return true;
       } else {
