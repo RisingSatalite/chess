@@ -8,10 +8,10 @@ export default function XiangqiChess() {
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
     '','','','','','','','','',
     '','BC','','','','','','BC','',
-    'Bs','','Bs','','Bs','','Bs','','Bs',
+    'BS','','BS','','BS','','BS','','BS',
     '','','','','','','','','',
     '','','','','','','','','',
-    'Ws','','Ws','','Ws','','Ws','','Ws',
+    'WS','','WS','','WS','','WS','','WS',
     '','WC','','','','','','WC','',
     '','','','','','','','','',
     'WR','WH','WE','WA','WG','WA','WE','WH','WR',
@@ -340,6 +340,13 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
+    }else if(board[selectedSquare1][1] === 'S') {
+      console.log("Checking if solider can move")
+      if (connectSolider() && noFriendlyFire()) {
+        return true;
+      } else {
+        return ineligableMoveClear()
+      }
     }else if(board[selectedSquare1][1] === 'A') {
       console.log("Checking if advisor can move")
       if (connectAdvisor() && noFriendlyFire()) {
@@ -545,6 +552,46 @@ export default function XiangqiChess() {
       console.log("Move goes outside of the palace column")
       return false;//Move is outside of the palace
     }
+  }
+
+  const connectSolider = () => {
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
+
+    const r  = Math.floor(from / boardLenght);
+    const c  = from % boardLenght;
+    const r2 = Math.floor(to / boardLenght);
+    const c2 = to % boardLenght;
+
+    
+    if(board[from][0] == "B"){
+      if (r + 1 === r2 && c === c2){
+        return true;
+      }
+      if (r > 4){
+        if (r === r2 && c + 1 === c2){
+          return true;
+        }
+        if (r === r2 && c - 1 === c2){
+          return true;
+        }
+      }
+    }
+
+    if(board[from][0] == "W"){
+      if (r - 1 === r2 && c === c2){
+        return true;
+      }
+      if (r < 5){
+        if (r === r2 && c + 1 === c2){
+          return true;
+        }
+        if (r === r2 && c - 1 === c2){
+          return true;
+        }
+      }
+    }
+    return false
   }
 
   const connectHorse = () => {
@@ -821,10 +868,10 @@ export default function XiangqiChess() {
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
     '','','','','','','','','',
     '','BC','','','','','','BC','',
-    'Bs','','Bs','','Bs','','Bs','','Bs',
+    'BS','','BS','','BS','','BS','','BS',
     '','','','','','','','','',
     '','','','','','','','','',
-    'Ws','','Ws','','Ws','','Ws','','Ws',
+    'WS','','WS','','WS','','WS','','WS',
     '','WC','','','','','','WC','',
     '','','','','','','','','',
     'WR','WH','WE','WA','WG','WA','WE','WH','WR',
