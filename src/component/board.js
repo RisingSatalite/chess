@@ -130,7 +130,7 @@ export default function Chess() {
   };
 
   // Rook attack check
-  const canRookAttack = (fromSquare, toSquare, boardToCheck = board) => {
+  const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -156,7 +156,7 @@ export default function Chess() {
   };
 
   // Bishop attack check
-  const canBishopAttack = (fromSquare, toSquare, boardToCheck = board) => {
+  const canBishopAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -178,7 +178,7 @@ export default function Chess() {
   };
 
   // Knight attack check
-  const canKnightAttack = (fromSquare, toSquare) => {
+  const canKnightAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -191,12 +191,12 @@ export default function Chess() {
   };
 
   // Queen attack check
-  const canQueenAttack = (fromSquare, toSquare, boardToCheck = board) => {
+  const canQueenAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
   };
 
   // King attack check
-  const canKingAttack = (fromSquare, toSquare) => {
+  const canKingAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -330,13 +330,13 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'B') {
-      if ((connectingBishop() && noGhostingDiagonal()) && noFriendlyFire()) {
+      if (canBishopAttack() && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'N') {
-      if (canKnightAttack(selectedSquare1,selectedSquare2) && noFriendlyFire()) {
+      if (canKnightAttack() && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
