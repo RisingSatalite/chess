@@ -358,7 +358,7 @@ export default function Chess() {
     }else if(board[selectedSquare1][1] === 'K') {
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else if(checkCastle()/*Add castle here */ && noGhostingHorizontal()){
+      } else if(checkCastle() && noGhostingHorizontal()){
         return checkCastle()
       } else{
         return ineligableMoveClear()
