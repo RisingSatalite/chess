@@ -339,6 +339,13 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
+    }else if(board[selectedSquare1][1] === 'C') {
+      console.log("Checking if cannon can move")
+      if (connectCannon() && noFriendlyFire()) {
+        return true;
+      } else {
+        return ineligableMoveClear()
+      }
     }else if(board[selectedSquare1][1] === 'S') {
       console.log("Checking if solider can move")
       if (connectSolider() && noFriendlyFire()) {
@@ -409,6 +416,104 @@ export default function XiangqiChess() {
     }
   
     return row === row2 || square === square2;
+  };
+
+  const connectCannon = () => {
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
+
+    var r  = Math.floor(from / boardLenght);
+    var c  = from % boardLenght;
+    var r2 = Math.floor(to / boardLenght);
+    var c2 = to % boardLenght;
+
+    if(!(r === r2 || c === c2)){
+      console.log("Neithor squre is in the same file or row")
+      return false
+    }
+
+    //Preforming a rook like move, not taking
+    if(board[to] == ""){
+      return noGhostingHorizontal()//We only care that the cannon is not phasing thought another piece
+
+    //Preforming a cannon capture attack
+    }else{
+      var pieceInTheWay = 0//There must be 1 piece in the way
+      if(r==r2){
+        if(c < c2){
+          while (true){
+            c += 1//Move closer to the other square
+            if(c == c2){//CHeck if the columns are the same
+              if(pieceInTheWay == 1){
+                return true;
+              }
+              return false;
+            }
+            if(board[getPositionFromRowAndColumn(r,c)] != ''){
+              pieceInTheWay += 1
+              if(pieceInTheWay > 1){
+                console.log("Multiple pieces in the way")
+                return false;
+              }
+            }
+          }
+        }else{
+          while (true){
+            c -= 1//Move closer to the other square
+            if(c == c2){//CHeck if the columns are the same
+              if(pieceInTheWay == 1){
+                return true;
+              }
+              return false;
+            }
+            if(board[getPositionFromRowAndColumn(r,c)] != ''){
+              pieceInTheWay += 1
+              if(pieceInTheWay > 1){
+                console.log("Multiple pieces in the way")
+                return false;
+              }
+            }
+          }
+        }
+      }else{
+        if(r < r2){
+          while (true){
+            r += 1//Move closer to the other square
+            if(r == r2){//CHeck if the columns are the same
+              if(pieceInTheWay == 1){
+                return true;
+              }
+              return false;
+            }
+            if(board[getPositionFromRowAndColumn(r,c)] != ''){
+              pieceInTheWay += 1
+              if(pieceInTheWay > 1){
+                console.log("Multiple pieces in the way")
+                return false;
+              }
+            }
+          }
+        }else{
+          while (true){
+            r -= 1//Move closer to the other square
+            if(r == r2){//CHeck if the columns are the same
+              if(pieceInTheWay == 1){
+                return true;
+              }
+              return false;
+            }
+            if(board[getPositionFromRowAndColumn(r,c)] != ''){
+              pieceInTheWay += 1
+              if(pieceInTheWay > 1){
+                console.log("Multiple pieces in the way")
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false
   };
 
   const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
