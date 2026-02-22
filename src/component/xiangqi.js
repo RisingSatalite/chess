@@ -438,80 +438,27 @@ export default function XiangqiChess() {
 
     //Preforming a cannon capture attack
     }else{
-      var pieceInTheWay = 0//There must be 1 piece in the way
-      if(r==r2){
-        if(c < c2){
-          while (true){
-            c += 1//Move closer to the other square
-            if(c == c2){//CHeck if the columns are the same
-              if(pieceInTheWay == 1){
-                return true;
-              }
-              return false;
-            }
-            if(board[getPositionFromRowAndColumn(r,c)] != ''){
-              pieceInTheWay += 1
-              if(pieceInTheWay > 1){
-                console.log("Multiple pieces in the way")
-                return false;
-              }
-            }
-          }
-        }else{
-          while (true){
-            c -= 1//Move closer to the other square
-            if(c == c2){//CHeck if the columns are the same
-              if(pieceInTheWay == 1){
-                return true;
-              }
-              return false;
-            }
-            if(board[getPositionFromRowAndColumn(r,c)] != ''){
-              pieceInTheWay += 1
-              if(pieceInTheWay > 1){
-                console.log("Multiple pieces in the way")
-                return false;
-              }
-            }
-          }
+      //Math.sign return 1,0,or -1 which give the direction to change.
+      //The one with 0 is not change, but as the loop progress the other row or column is moved until it is the same as respective target 
+      const dr = Math.sign(r2 - r);
+      const dc = Math.sign(c2 - c);
+
+      //Avoid checking the initial square here
+      let curR = r + dr;
+      let curC = c + dc;
+      let piecesBetween = 0;
+
+      while (curR !== r2 || curC !== c2) {
+        if (board[getPositionFromRowAndColumn(curR, curC)] !== '') {
+          piecesBetween++;
+          if (piecesBetween > 1) return false;
         }
-      }else{
-        if(r < r2){
-          while (true){
-            r += 1//Move closer to the other square
-            if(r == r2){//CHeck if the columns are the same
-              if(pieceInTheWay == 1){
-                return true;
-              }
-              return false;
-            }
-            if(board[getPositionFromRowAndColumn(r,c)] != ''){
-              pieceInTheWay += 1
-              if(pieceInTheWay > 1){
-                console.log("Multiple pieces in the way")
-                return false;
-              }
-            }
-          }
-        }else{
-          while (true){
-            r -= 1//Move closer to the other square
-            if(r == r2){//CHeck if the columns are the same
-              if(pieceInTheWay == 1){
-                return true;
-              }
-              return false;
-            }
-            if(board[getPositionFromRowAndColumn(r,c)] != ''){
-              pieceInTheWay += 1
-              if(pieceInTheWay > 1){
-                console.log("Multiple pieces in the way")
-                return false;
-              }
-            }
-          }
-        }
+
+        curR += dr;
+        curC += dc;
       }
+      //Make sure there is a piece in the way, then true, or else return false
+      return piecesBetween === 1;
     }
     return false
   };
