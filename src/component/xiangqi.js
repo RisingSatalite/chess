@@ -361,12 +361,6 @@ export default function XiangqiChess() {
       } else {
         return ineligableMoveClear()
       }
-    }else if(board[selectedSquare1][1] === 'K') {
-      if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
-        return true;
-      } else{
-        return ineligableMoveClear()
-      }
     }
     
     return ineligableMoveClear()
