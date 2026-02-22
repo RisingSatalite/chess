@@ -130,7 +130,7 @@ export default function Chess() {
   };
 
   // Rook attack check
-  const canRookAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canRookAttack = (fromSquare, toSquare, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -156,7 +156,7 @@ export default function Chess() {
   };
 
   // Bishop attack check
-  const canBishopAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canBishopAttack = (fromSquare, toSquare, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -191,7 +191,7 @@ export default function Chess() {
   };
 
   // Queen attack check
-  const canQueenAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canQueenAttack = (fromSquare, toSquare, boardToCheck = board) => {
     return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
   };
 
