@@ -1,8 +1,33 @@
 'use client'
 
 import Image from "next/image";
+import { useState } from "react";
+
+const pieceImages = {
+    WK: "/WhiteKing.png",
+    WQ: "/WhiteQueen.png",
+    WB: "/WhiteBishop.png",
+    WR: "/WhiteRook.png",
+    WN: "/WhiteKnight.png",
+    WP: "/WhitePawn.png",
+    BK: "/BlackKing.png",
+    BQ: "/BlackQueen.png",
+    BB: "/BlackBishop.png",
+    BR: "/BlackRook.png",
+    BN: "/BlackKnight.png",
+    BP: "/BlackPawn.png",
+
+    WS: "/WhitePawn.png",
+    BS: "/BlackPawn.png",
+    WH: "/WhiteKnight.png",
+    BH: "/BlackKnight.png",
+    WG: "/WhiteKing.png",
+    BG: "/BlackKing.png",
+};
 
 export default function Square({ prop, onClickFunction, number = 0, selected = 64, row=0 }) {
+    const [imageError, setImageError] = useState(false);
+
     let bgColor;
     let textColour;
     let display = prop
@@ -10,6 +35,8 @@ export default function Square({ prop, onClickFunction, number = 0, selected = 6
     if(display == ""){
         display = "-"
     }
+
+    const imageSrc = pieceImages[display];
 
     var black = "#353535";
     var white = "#f6f6f6";
@@ -43,19 +70,19 @@ export default function Square({ prop, onClickFunction, number = 0, selected = 6
     
     return (
         <button onClick={onClickFunction} style={buttonStyle} className="square">
-            {display === "-" && <Image src="/invisible.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "WK" && <Image src="/WhiteKing.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "WQ" && <Image src="/WhiteQueen.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "WB" && <Image src="/WhiteBishop.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "WR" && <Image src="/WhiteRook.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "WN" && <Image src="/WhiteKnight.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "WP" && <Image src="/WhitePawn.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "BK" && <Image src="/BlackKing.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "BQ" && <Image src="/BlackQueen.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "BB" && <Image src="/BlackBishop.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "BR" && <Image src="/BlackRook.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "BN" && <Image src="/BlackKnight.png" alt={display} width={pieceWidth} height={pieceHeight} />}
-            {display === "BP" && <Image src="/BlackPawn.png" alt={display} width={pieceWidth} height={pieceHeight} />}
+            {imageSrc && !imageError ? (
+                <Image
+                    src={imageSrc}
+                    alt={display}
+                    width={pieceWidth}
+                    height={pieceHeight}
+                    onError={() => setImageError(true)}
+                />
+            ) : (
+                <span style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    {display}
+                </span>
+            )}
         </button>
     );
 }

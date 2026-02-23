@@ -130,7 +130,7 @@ export default function Chess() {
   };
 
   // Rook attack check
-  const canRookAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -156,7 +156,7 @@ export default function Chess() {
   };
 
   // Bishop attack check
-  const canBishopAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canBishopAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -178,7 +178,7 @@ export default function Chess() {
   };
 
   // Knight attack check
-  const canKnightAttack = (fromSquare, toSquare) => {
+  const canKnightAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -191,12 +191,12 @@ export default function Chess() {
   };
 
   // Queen attack check
-  const canQueenAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canQueenAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
   };
 
   // King attack check
-  const canKingAttack = (fromSquare, toSquare) => {
+  const canKingAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -323,20 +323,19 @@ export default function Chess() {
     console.log(board[selectedSquare1][1]);
     
     if (board[selectedSquare1][1] === 'R') {
-      console.log(noGhostingHorizontal())
       if (horizontallyConnecting() && noFriendlyFire() && noGhostingHorizontal()) {
         return true;
       } else {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'B') {
-      if ((connectingBishop() && noGhostingDiagonal()) && noFriendlyFire()) {
+      if (canBishopAttack() && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'N') {
-      if (connectKnight() && noFriendlyFire()) {
+      if (canKnightAttack() && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
@@ -358,7 +357,7 @@ export default function Chess() {
     }else if(board[selectedSquare1][1] === 'K') {
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else if(checkCastle()/*Add castle here */ && noGhostingHorizontal()){
+      } else if(checkCastle() && noGhostingHorizontal()){
         return checkCastle()
       } else{
         return ineligableMoveClear()
@@ -456,81 +455,6 @@ export default function Chess() {
     return (Math.abs(square-square2)==Math.abs(row-row2))
   };
 
-  //Check if the 2 seclected squares are a valid king move 
-  const connectNeighboring = () => {
-    let square = selectedSquare1;
-    let row = 0;
-
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square - boardLenght > 0) {
-      row += 1;
-      square -= boardLenght;
-    }
-  
-    while (square2 - boardLenght > 0) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-    
-    return(row+1 >= row2 && row-1 <=row2 && square+1 >= square2 && square-1 <=square2)
-  }
-
-  const connectKnight = () => {
-    let square = selectedSquare1;
-    let row = 0;
-    
-    while (square - boardLenght >= 0) {
-      row += 1;
-      square -= boardLenght;
-    }
-  
-    let square2 = selectedSquare2;
-    let row2 = 0;
-  
-    while (square2 - boardLenght >= 0) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-
-    console.log(row)
-    console.log(row2)
-    console.log(square)
-    console.log(square2)
-
-    if(row+1 == row2 && square+2 == square2){
-      return true
-    }
-    if(row-1 == row2 && square+2 == square2){
-      return true
-    }
-    if(row+1 == row2 && square-2 == square2){
-      return true
-    }
-    if(row-1 == row2 && square-2 == square2){
-      return true
-    }
-    if(row+2 == row2 && square+1 == square2){
-      return true
-    }
-    if(row+2 == row2 && square-1 == square2){
-      return true
-    }
-    if(row-2 == row2 && square+1 == square2){
-      return true
-    }
-    if(row-2 == row2 && square-1 == square2){
-      return true
-    }
-    return false
-  }
-
-  const checkEnpassent = () => {
-    //setEnpassent(9) // Yes the setEnpassent works
-    console.log("Enpassent" + enpassent)
-  }
-
   //See if it is a legal pawn move
   const connectPawn = () => {
     const piece = board[selectedSquare1];
@@ -594,122 +518,33 @@ export default function Chess() {
   };
   
   const noGhostingHorizontal = () => {
-    //Determine which way then if anything inbetween
-    let square = selectedSquare1
-    let column = selectedSquare1;
-    let row = 0;
+    const from = selectedSquare1;
+    const to   = selectedSquare2;
 
-    let square2 = selectedSquare2
-    let column2 = selectedSquare2;
-    let row2 = 0;
-    
-    //Convert the data, in the row and columns, to chekc which need to be checked
-    while (column - boardLenght >= 0) {
-      row += 1;
-      column -= boardLenght;
-    }
-  
-    while (column2 - boardLenght >= 0) {
-      row2 += 1;
-      column2 -= boardLenght;
+    const r1 = Math.floor(from / boardLenght);
+    const c1 = from % boardLenght;
+    const r2 = Math.floor(to / boardLenght);
+    const c2 = to % boardLenght;
+
+    // Must be strictly horizontal or vertical
+    if (!(r1 === r2 || c1 === c2)) return false;
+
+    const step =
+      r1 === r2
+        ? Math.sign(to - from)          // horizontal
+        : Math.sign(r2 - r1) * boardLenght; // vertical
+
+    let current = from + step;
+
+    while (current !== to) {
+      if (board[current] !== '') {
+        return false; // piece blocking the path
+      }
+      current += step;
     }
 
-    if(row==row2){
-      if(square < square2){
-        while (true){
-          console.log("Looping")
-          console.log(square)
-          console.log("Square 2 is ", square2)
-          square += 1//Move closer to the other square
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            console.log("Piece in the way")
-            return false
-          }
-          if(square > square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }else{
-        while (true){
-          console.log("Looping")
-          console.log(square)
-          console.log("Square 2 is ", square2)
-          square -= 1//Move closer to the other square
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            return false
-          }
-          if(square < square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }
-    }else{
-      if(square < square2){
-        while (true){
-          console.log("Looping")
-          console.log(square)
-          console.log("Square 2 is ", square2)
-          square += boardLenght//Move closer to the other square, using boardLenght because checking by moving pass rows
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            return false
-          }
-          if(square > square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }else{
-        while (true){
-          console.log("Looping")
-          console.log("Square 1 is ", square)
-          console.log("Square 2 is ", square2)
-          square -= boardLenght//Move closer to the other square, using boardLenght because checking by moving pass rows
-          //If no other piece in the way all the way to the other piece, then valid move
-          if(square == square2){
-            return true
-          }
-          //If inbetween square is a square, then the move is not valid because another piece in the way
-          console.log(board[square])
-          console.log("")
-          console.log(board[square] != '')
-          if(board[square] != ''){
-            return false
-          }
-          if(square < square2){
-            console.log("Squares do not align")
-            return false
-          }
-        }
-      }
-    }
-    return false
-  }
+    return true;
+  };
 
   const noGhostingDiagonal = () => {
     let square1 = selectedSquare1;
@@ -845,17 +680,6 @@ export default function Chess() {
     reset()
   };
 
-  const removePiece = (id) => {
-    const newBoard = [...board];
-    newBoard[id] = "";
-    console.log("Piece removed at square: " + id)
-    console.log(board)
-    console.log(newBoard)
-    console.log(board[id])
-    console.log(newBoard[id])
-    setBoard(newBoard);
-  }
-  
   const turnChange = () => {
     setTurn(turn === "W" ? "B" : "W");
   };
