@@ -598,17 +598,14 @@ export default function XiangqiChess() {
     }
   }
 
-  const connectSolider = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectSolider = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
     
-    if(board[from][0] == "B"){
+    if(boardToCheck[from][0] == "B"){
       if (r + 1 === r2 && c === c2){
         return true;
       }
@@ -622,7 +619,7 @@ export default function XiangqiChess() {
       }
     }
 
-    if(board[from][0] == "W"){
+    if(boardToCheck[from][0] == "W"){
       if (r - 1 === r2 && c === c2){
         return true;
       }
