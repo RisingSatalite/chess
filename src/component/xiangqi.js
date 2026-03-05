@@ -434,21 +434,21 @@ export default function XiangqiChess() {
     }
   }
 
-  const connectGeneral = (from = selectedSquare1,to   = selectedSquare2) => {
+  const connectGeneral = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
     if(c2 == 3 || c2 == 4 || c2 == 5){
-      if(board[from][0] == "B"){
+      if(boardToCheck[from][0] == "B"){
         if(r2 == 0 || r2 == 1 || r2 == 2){
         }else{
           console.log("Move goes outside of the palace row", r2)
           return false;//Move is outside of the palace
         }
       }
-      if(board[from][0] == "W"){
+      if(boardToCheck[from][0] == "W"){
         if(r2 == 7 || r2 == 8 || r2 == 9){
         }else{
           console.log("Move goes outside of the palace row", r2)
