@@ -138,19 +138,6 @@ export default function XiangqiChess() {
     }
   };
 
-  // Knight attack check
-  const canKnightAttack = (fromSquare, toSquare) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    const rowDiff = Math.abs(fromRow - toRow);
-    const colDiff = Math.abs(fromCol - toCol);
-    
-    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-  };
-
   // Find king position
   const findGeneral = (color, boardToCheck = board) => {
     for (let i = 0; i < boardSquareCount; i++) {
