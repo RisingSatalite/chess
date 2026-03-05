@@ -383,10 +383,10 @@ export default function XiangqiChess() {
     return true;
   };
 
-  const noFriendlyFire = () => {
-    if(board[selectedSquare1][0] == "W" && (board[selectedSquare2][0] == "B" || board[selectedSquare2][0] == undefined)){
+  const noFriendlyFire = (boardToCheck = board) => {
+    if(boardToCheck[selectedSquare1][0] == "W" && (boardToCheck[selectedSquare2][0] == "B" || boardToCheck[selectedSquare2][0] == undefined)){
       return true
-    }else if(board[selectedSquare1][0] == "B" && (board[selectedSquare2][0] == "W" || board[selectedSquare2][0] == undefined)){
+    }else if(boardToCheck[selectedSquare1][0] == "B" && (boardToCheck[selectedSquare2][0] == "W" || boardToCheck[selectedSquare2][0] == undefined)){
       return true
     }
     console.log("No friendly fire allowed")
