@@ -243,50 +243,6 @@ export default function XiangqiChess() {
     return false;
   };
 
-  // Check if a simple move is valid
-  const isSimpleMove = (from, to, boardToCheck, color) => {
-    const piece = boardToCheck[from];
-    if (!piece || piece[0] !== color) return false;
-    
-    // Can't move to a square with friendly piece
-    if (boardToCheck[to] && boardToCheck[to][0] === color) return false;
-    
-    return true;
-  };
-
-  // Check if pawn move is valid
-  const canPawnMove = (from, to, boardToCheck, color) => {
-    if (!isSimpleMove(from, to, boardToCheck, color)) return false;
-    
-    const fromRow = Math.floor(from / boardLenght);
-    const fromCol = from % boardLenght;
-    const toRow = Math.floor(to / boardLenght);
-    const toCol = to % boardLenght;
-    
-    const direction = color === 'W' ? -1 : 1;
-    const startRow = color === 'W' ? 6 : 1;
-    const deltaRow = toRow - fromRow;
-    const deltaCol = toCol - fromCol;
-    
-    // Single forward move
-    if (deltaRow === direction && deltaCol === 0 && !boardToCheck[to]) {
-      return true;
-    }
-    
-    // Double forward move from start
-    if (fromRow === startRow && toRow === fromRow + 2 * direction && deltaCol === 0 && !boardToCheck[to]) {
-      const middleSquare = from + boardLenght * direction;
-      return !boardToCheck[middleSquare];
-    }
-    
-    // Diagonal capture
-    if (deltaRow === direction && Math.abs(deltaCol) === 1 && boardToCheck[to] && boardToCheck[to][0] !== color) {
-      return true;
-    }
-    
-    return false;
-  };
-
   // Check if piece move is valid
   const isValidPieceMove = (from, to, boardToCheck, color) => {
     const piece = boardToCheck[from];
