@@ -193,10 +193,10 @@ export default function XiangqiChess() {
     
     if (pieceName === 'S') return connectSolider(from, to, boardToCheck);
     //Does not matter if we check adiviors, elephant from attacking as defends type pieces
-    if (pieceName === 'R') return canRookAttack(from, to);
+    if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
     if (pieceName === 'C') return connectCannon(from, to, boardToCheck);
-    if (pieceName === 'H') return connectHorse(from, to);
-    if (pieceName === 'G') return connectGeneral(from, to);
+    if (pieceName === 'H') return connectHorse(from, to, boardToCheck);
+    if (pieceName === 'G') return connectGeneral(from, to, boardToCheck);
     
     return false;
   };
