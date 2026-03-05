@@ -38,9 +38,6 @@ export default function XiangqiChess() {
     if (possibleMove === true) {
       makeMove();
       turnChange();
-    } else if (possibleMove) {
-      makeMove(possibleMove);
-      turnChange();
     }else {
       ineligableMoveClear()
     }
@@ -583,40 +580,8 @@ export default function XiangqiChess() {
   const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
 
-    let oldPiece = newBoard[selectedSquare1]
-    let oldPiece2 = newBoard[selectedSquare2]
-
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
-    if(typeof specialSquare === "string") {
-      if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
-        newBoard[selectedSquare2] = "";
-        const newSquares = specialSquare.replace("K", "").split("R")
-
-        newBoard[newSquares[0]] = oldPiece
-        newBoard[newSquares[1]] = oldPiece2
-      }
-    }else if(specialSquare != -2){
-      if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
-      }else{//Otherwise, remove the piece
-        console.log("Piece removed at square: " + specialSquare)
-        newBoard[specialSquare] = "";
-      }
-    }else{
-    }
-
-    //Move the pawn promote to queen if it reaches the end
-    let column2 = selectedSquare2;
-    let row2 = 0;
-    while (column2 - boardLenght >= 0) {
-      row2 += 1;
-      column2 -= boardLenght;
-    }
-    if(newBoard[selectedSquare2] == "WP" && row2 == 0){
-      newBoard[selectedSquare2] = "WQ"
-    }else if(newBoard[selectedSquare2] == "BP" && row2 == 7){
-      newBoard[selectedSquare2] = "BQ"
-    }
 
     setBoard(newBoard);
   
