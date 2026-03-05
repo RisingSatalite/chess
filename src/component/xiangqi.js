@@ -45,10 +45,6 @@ export default function XiangqiChess() {
       ineligableMoveClear()
     }
   }, [selectedSquare2]);
-  
-  useEffect(() => {
-    //console.log("Updated selectedSquare1:", selectedSquare1);
-  }, [selectedSquare1]);
 
   useEffect(() => {
     // Check game status after board changes
@@ -609,7 +605,7 @@ export default function XiangqiChess() {
       if (r + 1 === r2 && c === c2){
         return true;
       }
-      if (r > 4){
+      if (r > (boardHeight/2)){
         if (r === r2 && c + 1 === c2){
           return true;
         }
@@ -623,7 +619,7 @@ export default function XiangqiChess() {
       if (r - 1 === r2 && c === c2){
         return true;
       }
-      if (r < 5){
+      if (r < (boardHeight/2)){
         if (r === r2 && c + 1 === c2){
           return true;
         }
