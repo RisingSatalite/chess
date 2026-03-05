@@ -93,16 +93,20 @@ export default function XiangqiChess() {
       const pieceName = piece[1];
       
       // Check each piece type for possible attack
-      if (pieceName === 'P') {
-        if (canPawnAttack(i, targetSquare, attackingColor, boardToCheck)) return true;
+      if (pieceName === 'S') {
+        if (connectSolider(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'R') {
         if (canRookAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'E') {
         if (connectingElephant(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'A') {
+        if (connectAdvisor(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'C') {
+        if (connectCannon(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'H') {
         if (connectHorse(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'K') {
-        if (canKingAttack(i, targetSquare)) return true;
+      } else if (pieceName === 'G') {
+        if (connectGeneral(i, targetSquare)) return true;
       }
     }
     return false;
@@ -250,7 +254,7 @@ export default function XiangqiChess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'E') {
-      if (connectingElephant()) {
+      if (connectingElephant() && noFriendlyFire()){
         return true;
       } else {
         return ineligableMoveClear()
@@ -386,7 +390,6 @@ export default function XiangqiChess() {
   const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
 
   const connectingElephant = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
-    if (!noFriendlyFire()) return false;
 
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
