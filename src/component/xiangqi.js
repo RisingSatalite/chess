@@ -103,9 +103,10 @@ export default function XiangqiChess() {
       } else if (pieceName === 'H') {
         if (connectHorse(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'G') {
-        if (connectGeneral(i, targetSquare)) return true;
+        if (connectGeneral(i, targetSquare, boardToCheck)) return true;
       }
     }
+    if(connectFlyingGeneral(boardToCheck)) return true;//Check if the flying general can attack
     return false;
   };
 
@@ -424,6 +425,23 @@ export default function XiangqiChess() {
     }
   }
 
+  const connectFlyingGeneral = (boardToCheck = board) => {
+    //Flying general rule
+    const whiteGeneralPosition = findGeneral('W', boardToCheck);
+    const blackGeneralPosition = findGeneral('B', boardToCheck);
+
+    const cWhiteGeneral  = whiteGeneralPosition % boardLenght;
+    const cBlackGeneral = blackGeneralPosition % boardLenght;
+
+    if(!cWhiteGeneral == cBlackGeneral){
+      return false;
+    }
+    if(noGhostingHorizontal(whiteGeneralPosition, blackGeneralPosition, boardToCheck)){
+      return true;
+    }
+    return false;
+  }
+
   const connectGeneral = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
@@ -431,7 +449,6 @@ export default function XiangqiChess() {
     const c2 = to % boardLenght;
 
     const generalColour = boardToCheck[from][0];
-    //Flying general rule
 
     if(c2 == 3 || c2 == 4 || c2 == 5){
       if(generalColour == "B"){
