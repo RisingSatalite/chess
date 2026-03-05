@@ -99,8 +99,8 @@ export default function XiangqiChess() {
         if (canRookAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'E') {
         if (connectingElephant(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'N') {
-        if (canKnightAttack(i, targetSquare)) return true;
+      } else if (pieceName === 'H') {
+        if (connectHorse(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'K') {
         if (canKingAttack(i, targetSquare)) return true;
       }
@@ -549,35 +549,32 @@ export default function XiangqiChess() {
     return false
   }
 
-  const connectHorse = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectHorse = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
     // Right leg
-    if (c + 1 < 9 && board[getPositionFromRowAndColumn(r, c + 1)] === "") {
+    if (c + 1 < 9 && boardToCheck[getPositionFromRowAndColumn(r, c + 1)] === "") {
       if ((r + 1 === r2 && c + 2 === c2) ||
           (r - 1 === r2 && c + 2 === c2)) return true;
     }
 
     // Left leg
-    if (c - 1 >= 0 && board[getPositionFromRowAndColumn(r, c - 1)] === "") {
+    if (c - 1 >= 0 && boardToCheck[getPositionFromRowAndColumn(r, c - 1)] === "") {
       if ((r + 1 === r2 && c - 2 === c2) ||
           (r - 1 === r2 && c - 2 === c2)) return true;
     }
 
     // Down leg
-    if (r + 1 < 10 && board[getPositionFromRowAndColumn(r + 1, c)] === "") {
+    if (r + 1 < 10 && boardToCheck[getPositionFromRowAndColumn(r + 1, c)] === "") {
       if ((r + 2 === r2 && c + 1 === c2) ||
           (r + 2 === r2 && c - 1 === c2)) return true;
     }
 
     // Up leg
-    if (r - 1 >= 0 && board[getPositionFromRowAndColumn(r - 1, c)] === "") {
+    if (r - 1 >= 0 && boardToCheck[getPositionFromRowAndColumn(r - 1, c)] === "") {
       if ((r - 2 === r2 && c + 1 === c2) ||
           (r - 2 === r2 && c - 1 === c2)) return true;
     }
