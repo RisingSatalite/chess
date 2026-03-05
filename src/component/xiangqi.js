@@ -430,15 +430,18 @@ export default function XiangqiChess() {
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
+    const generalColour = boardToCheck[from][0];
+    //Flying general rule
+
     if(c2 == 3 || c2 == 4 || c2 == 5){
-      if(boardToCheck[from][0] == "B"){
+      if(generalColour == "B"){
         if(r2 == 0 || r2 == 1 || r2 == 2){
         }else{
           console.log("Move goes outside of the palace row", r2)
           return false;//Move is outside of the palace
         }
       }
-      if(boardToCheck[from][0] == "W"){
+      if(generalColour == "W"){
         if(r2 == 7 || r2 == 8 || r2 == 9){
         }else{
           console.log("Move goes outside of the palace row", r2)
