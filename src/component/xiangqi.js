@@ -574,7 +574,7 @@ export default function XiangqiChess() {
     return true;
   };
 
-  const makeMove = (specialSquare = -2) => {
+  const makeMove = () => {
     const newBoard = [...board];
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
