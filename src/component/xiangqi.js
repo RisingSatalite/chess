@@ -101,8 +101,6 @@ export default function XiangqiChess() {
         if (connectingElephant(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'N') {
         if (canKnightAttack(i, targetSquare)) return true;
-      } else if (pieceName === 'Q') {
-        if (canQueenAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'K') {
         if (canKingAttack(i, targetSquare)) return true;
       }
@@ -147,28 +145,6 @@ export default function XiangqiChess() {
     }
   };
 
-  // Bishop attack check
-  const canBishopAttack = (fromSquare, toSquare, boardToCheck) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol)) return false;
-    
-    const rowStep = toRow > fromRow ? 1 : -1;
-    const colStep = toCol > fromCol ? 1 : -1;
-    let r = fromRow + rowStep;
-    let c = fromCol + colStep;
-    
-    while (r !== toRow) {
-      if (boardToCheck[r * boardLenght + c] !== '') return false;
-      r += rowStep;
-      c += colStep;
-    }
-    return true;
-  };
-
   // Knight attack check
   const canKnightAttack = (fromSquare, toSquare) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
@@ -180,11 +156,6 @@ export default function XiangqiChess() {
     const colDiff = Math.abs(fromCol - toCol);
     
     return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-  };
-
-  // Queen attack check
-  const canQueenAttack = (fromSquare, toSquare, boardToCheck) => {
-    return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
   };
 
   // King attack check
