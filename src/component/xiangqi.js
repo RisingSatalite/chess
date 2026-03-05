@@ -321,7 +321,7 @@ export default function XiangqiChess() {
 
     //Preforming a rook like move, not taking
     if(boardToCheck[to] == ""){
-      return noGhostingHorizontal()//We only care that the cannon is not phasing thought another piece
+      return noGhostingHorizontal(from, to, boardToCheck)//We only care that the cannon is not phasing thought another piece
 
     //Preforming a cannon capture attack
     }else{
@@ -545,9 +545,7 @@ export default function XiangqiChess() {
     return false;
   };
   
-  const noGhostingHorizontal = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
+  const noGhostingHorizontal = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
 
     const r1 = Math.floor(from / boardLenght);
     const c1 = from % boardLenght;
@@ -565,7 +563,7 @@ export default function XiangqiChess() {
     let current = from + step;
 
     while (current !== to) {
-      if (board[current] !== '') {
+      if (boardToCheck[current] !== '') {
         return false; // piece blocking the path
       }
       current += step;
