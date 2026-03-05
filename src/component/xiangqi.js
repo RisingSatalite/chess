@@ -162,16 +162,6 @@ export default function XiangqiChess() {
     return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
   };
 
-  // King attack check
-  const canKingAttack = (fromSquare, toSquare) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    return Math.abs(fromRow - toRow) <= 1 && Math.abs(fromCol - toCol) <= 1;
-  };
-
   // Find king position
   const findGeneral = (color, boardToCheck = board) => {
     for (let i = 0; i < boardSquareCount; i++) {
