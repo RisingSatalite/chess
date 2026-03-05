@@ -122,7 +122,7 @@ export default function XiangqiChess() {
   };
 
   // Rook attack check
-  const canRookAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -297,12 +297,12 @@ export default function XiangqiChess() {
     
     const pieceName = piece[1];
     
-    if (pieceName === 'P') return canPawnMove(from, to, boardToCheck, color);
-    if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
-    if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
-    if (pieceName === 'N') return canKnightAttack(from, to);
-    if (pieceName === 'Q') return canQueenAttack(from, to, boardToCheck);
-    if (pieceName === 'K') return canKingAttack(from, to);
+    if (pieceName === 'S') return connectSolider(from, to, boardToCheck);
+    //Does not matter if we check adiviors, elephant from attacking as defends type pieces
+    if (pieceName === 'R') return canRookAttack(from, to);
+    if (pieceName === 'C') return connectCannon(from, to);
+    if (pieceName === 'H') return connectHorse(from, to);
+    if (pieceName === 'G') return connectGeneral(from, to);
     
     return false;
   };
@@ -414,10 +414,7 @@ export default function XiangqiChess() {
     return row === row2 || square === square2;
   };
 
-  const connectCannon = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectCannon = (from = selectedSquare1, to   = selectedSquare2) => {
     var r  = Math.floor(from / boardLenght);
     var c  = from % boardLenght;
     var r2 = Math.floor(to / boardLenght);
@@ -550,10 +547,7 @@ export default function XiangqiChess() {
     }
   }
 
-  const connectGeneral = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectGeneral = (from = selectedSquare1,to   = selectedSquare2) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
