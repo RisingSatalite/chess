@@ -25,7 +25,7 @@ const pieceImages = {
     BG: "/BlackKing.png",
 };
 
-export default function Square({ prop, onClickFunction, number = 0, selected = 64, row=0 }) {
+export default function Square({ prop, onClickFunction, number = 0, selected = -1, row=0 }) {
     const [imageError, setImageError] = useState(false);
 
     let bgColor;
