@@ -112,17 +112,6 @@ export default function XiangqiChess() {
     return false;
   };
 
-  // Pawn attack check
-  const canPawnAttack = (fromSquare, toSquare, color, boardToCheck) => {
-    const direction = color === 'W' ? -1 : 1;
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    return toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1;
-  };
-
   // Rook attack check
   const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
