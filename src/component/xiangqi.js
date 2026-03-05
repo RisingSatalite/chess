@@ -97,8 +97,8 @@ export default function XiangqiChess() {
         if (canPawnAttack(i, targetSquare, attackingColor, boardToCheck)) return true;
       } else if (pieceName === 'R') {
         if (canRookAttack(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'B') {
-        if (canBishopAttack(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'E') {
+        if (connectingElephant(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'N') {
         if (canKnightAttack(i, targetSquare)) return true;
       } else if (pieceName === 'Q') {
@@ -414,11 +414,8 @@ export default function XiangqiChess() {
 
   const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
 
-  const connectingElephant = () => {
+  const connectingElephant = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     if (!noFriendlyFire()) return false;
-
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
 
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
@@ -433,7 +430,7 @@ export default function XiangqiChess() {
     // River rule (assuming red bottom, black top)
     // Red cannot go above row 4
     // Black cannot go below row 5
-    const piece = board[from];
+    const piece = boardToCheck[from];
 
     if (piece[0] === "W" && r2 < 5) return false;
     if (piece[0] === "B" && r2 > 4) return false;
@@ -442,7 +439,7 @@ export default function XiangqiChess() {
     const middleRow = (r + r2) / 2;
     const middleCol = (c + c2) / 2;
 
-    if (board[getPositionFromRowAndColumn(middleRow, middleCol)] !== "") {
+    if (boardToCheck[getPositionFromRowAndColumn(middleRow, middleCol)] !== "") {
       return false;
     }
 
