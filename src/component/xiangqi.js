@@ -1,6 +1,6 @@
 'use client'
 
-import Square from "./square"
+import Square from "./xiangqiboard";
 import { useEffect, useState } from "react";
 
 export default function XiangqiChess() {
@@ -194,7 +194,7 @@ export default function XiangqiChess() {
     if (pieceName === 'S') return connectSolider(from, to, boardToCheck);
     //Does not matter if we check adiviors, elephant from attacking as defends type pieces
     if (pieceName === 'R') return canRookAttack(from, to);
-    if (pieceName === 'C') return connectCannon(from, to);
+    if (pieceName === 'C') return connectCannon(from, to, boardToCheck);
     if (pieceName === 'H') return connectHorse(from, to);
     if (pieceName === 'G') return connectGeneral(from, to);
     
@@ -308,7 +308,7 @@ export default function XiangqiChess() {
     return row === row2 || square === square2;
   };
 
-  const connectCannon = (from = selectedSquare1, to   = selectedSquare2) => {
+  const connectCannon = (from = selectedSquare1, to   = selectedSquare2, boardToCheck = board) => {
     var r  = Math.floor(from / boardLenght);
     var c  = from % boardLenght;
     var r2 = Math.floor(to / boardLenght);
@@ -320,7 +320,7 @@ export default function XiangqiChess() {
     }
 
     //Preforming a rook like move, not taking
-    if(board[to] == ""){
+    if(boardToCheck[to] == ""){
       return noGhostingHorizontal()//We only care that the cannon is not phasing thought another piece
 
     //Preforming a cannon capture attack
@@ -336,7 +336,7 @@ export default function XiangqiChess() {
       let piecesBetween = 0;
 
       while (curR !== r2 || curC !== c2) {
-        if (board[getPositionFromRowAndColumn(curR, curC)] !== '') {
+        if (boardToCheck[getPositionFromRowAndColumn(curR, curC)] !== '') {
           piecesBetween++;
           if (piecesBetween > 1) return false;
         }
