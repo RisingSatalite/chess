@@ -272,16 +272,6 @@ export default function XiangqiChess() {
   const reset = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
-    //console.log(board)
-    //alert("Can next move be enpassent: " + enpassentNextMove)
-    //alert("Enpassent square: " + enpassent)
-    /*
-    if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
-      setEnpassentNextMove(false)
-    }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
-      setEnpassent(-2)
-    }
-    */
     return false   
   }
   
