@@ -72,11 +72,15 @@ export default function XiangqiChess() {
 
   const selectSquare = (id) => {
     if (selectedSquare1 !== boardSquareCount) {
+      if (board[id] && board[id][0] === turn) {
+        setSelectedSquare1(id);
+        setFeedback("Choose a destination square");
+        return;
+      }
       setSelectedSquare2(id);
-      console.log("Square selected", id);
     } else if (board[id][0] === turn) {
-      console.log("Square selected", id);
       setSelectedSquare1(id);
+      setFeedback("Choose a destination square");
     }
   };
 
@@ -196,6 +200,8 @@ export default function XiangqiChess() {
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
     if (pieceName === 'C') return connectCannon(from, to, boardToCheck);
     if (pieceName === 'H') return connectHorse(from, to, boardToCheck);
+    if (pieceName === 'E') return connectingElephant(from, to, boardToCheck);
+    if (pieceName === 'A') return connectAdvisor(from, to, boardToCheck);
     if (pieceName === 'G') return connectGeneral(from, to, boardToCheck);
     
     return false;
@@ -266,14 +272,25 @@ export default function XiangqiChess() {
   const ineligableMoveClear = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
+    setFeedback("That move is not legal");
     return false;
   }
 
   const reset = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
-    return false   
+    return false;
   }
+
+  const resetGame = () => {
+    setBoard(initialBoard);
+    setTurn("W");
+    setGameStatus("playing");
+    setMoveHistory([]);
+    setLastMove(null);
+    setFeedback("Select a piece to begin");
+    reset();
+  };
   
   //Make sure the 2 selected squares make a valid rook move
   const horizontallyConnecting = () => {
@@ -429,10 +446,12 @@ export default function XiangqiChess() {
     const whiteGeneralPosition = findGeneral('W', boardToCheck);
     const blackGeneralPosition = findGeneral('B', boardToCheck);
 
+    if (whiteGeneralPosition === -1 || blackGeneralPosition === -1) return false;
+
     const cWhiteGeneral  = whiteGeneralPosition % boardLenght;
     const cBlackGeneral = blackGeneralPosition % boardLenght;
 
-    if(!cWhiteGeneral == cBlackGeneral){
+    if(cWhiteGeneral !== cBlackGeneral){
       return false;
     }
     if(noGhostingHorizontal(whiteGeneralPosition, blackGeneralPosition, boardToCheck)){
@@ -583,11 +602,19 @@ export default function XiangqiChess() {
 
   const makeMove = () => {
     const newBoard = [...board];
+    const movingPiece = newBoard[selectedSquare1];
+    const capturedPiece = newBoard[selectedSquare2];
 
-    newBoard[selectedSquare2] = newBoard[selectedSquare1];
+    newBoard[selectedSquare2] = movingPiece;
     newBoard[selectedSquare1] = "";
 
     setBoard(newBoard);
+    setLastMove({ from: selectedSquare1, to: selectedSquare2 });
+    setMoveHistory((history) => [
+      ...history,
+      { piece: movingPiece, from: selectedSquare1, to: selectedSquare2, captured: Boolean(capturedPiece) },
+    ]);
+    setFeedback(capturedPiece ? "Capture made" : "Move made");
   
     reset()
   };
@@ -597,44 +624,72 @@ export default function XiangqiChess() {
   };
 
   return (
-    <div id="chess">
-      <span>
-        Xiangqi
-        <button className="majorButton" onClick={() =>{ setBoard([
-    'BR','BH','BE','BA','BG','BA','BE','BH','BR',
-    '','','','','','','','','',
-    '','BC','','','','','','BC','',
-    'BS','','BS','','BS','','BS','','BS',
-    '','','','','','','','','',
-    '','','','','','','','','',
-    'WS','','WS','','WS','','WS','','WS',
-    '','WC','','','','','','WC','',
-    '','','','','','','','','',
-    'WR','WH','WE','WA','WG','WA','WE','WH','WR',
-  ]);
-          setTurn("W");
-          setGameStatus("playing");
-        }}>Reset</button>
+    <main className="xiangqi-shell">
+      <header className="game-header">
         <div>
-          <p>It is {turn} turn</p>
-          {gameStatus === "checkmate" && <p style={{color: "red", fontWeight: "bold"}}>CHECKMATE! {turn === "W" ? "Black" : "White"} wins!</p>}
-          {gameStatus === "check" && <p style={{color: "orange", fontWeight: "bold"}}>CHECK!</p>}
-          {gameStatus === "stalemate" && <p style={{color: "blue", fontWeight: "bold"}}>STALEMATE!</p>}
+          <p className="eyebrow">Two-player board game</p>
+          <h1>Xiangqi</h1>
+          <p className="subtitle">Chinese chess on a 9 x 10 river board</p>
         </div>
-        {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => (
-              <Square
-                key={rowIndex * boardLenght + index}
-                number={rowIndex * boardLenght + index}
-                onClickFunction={() => selectSquare(rowIndex * boardLenght + index)}
-                prop={item}
-                selected={selectedSquare1}
-                row={rowIndex}
-              />
-            ))}
+        <button className="majorButton" onClick={resetGame} type="button">New game</button>
+      </header>
+
+      <div className="game-layout">
+        <section className="board-panel" aria-label="Xiangqi board">
+          <div className="turn-bar">
+            <span className={`turn-marker ${turn === "W" ? "red" : "black"}`} />
+            <div>
+              <strong>{turn === "W" ? "Red" : "Black"} to move</strong>
+              <span className="feedback">{feedback}</span>
+            </div>
+            <span className={`status status-${gameStatus}`}>{gameStatus}</span>
           </div>
-        ))}
-      </span>
-    </div>
+          <div className="board-frame">
+            <div className="board-grid">
+              {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
+                <div key={rowIndex} className="row">
+                  {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => {
+                    const squareNumber = rowIndex * boardLenght + index;
+                    return (
+                      <Square
+                        key={squareNumber}
+                        number={squareNumber}
+                        onClickFunction={() => selectSquare(squareNumber)}
+                        prop={item}
+                        selected={selectedSquare1}
+                        lastMove={lastMove}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            <div className="river-label">楚河 <span>漢界</span></div>
+          </div>
+        </section>
+
+        <aside className="game-sidebar">
+          <div className="rules-panel">
+            <p className="eyebrow">Match status</p>
+            <h2>{gameStatus === "playing" ? "In play" : gameStatus}</h2>
+            <p>{gameStatus === "checkmate" ? `${turn === "W" ? "Black" : "Red"} wins the match.` : "Capture the opposing general to win."}</p>
+          </div>
+          <div className="history-panel">
+            <div className="history-heading"><h2>Move history</h2><span>{moveHistory.length}</span></div>
+            {moveHistory.length === 0 ? (
+              <p className="empty-history">Moves will appear here.</p>
+            ) : (
+              <ol className="move-list">
+                {moveHistory.slice(-8).map((move, index) => (
+                  <li key={`${move.from}-${move.to}-${index}`}>
+                    <span>{Math.floor(move.from / boardLenght) + 1}.{move.piece}</span>
+                    <span>{Math.floor(move.to / boardLenght) + 1}-{(move.to % boardLenght) + 1}{move.captured ? " x" : ""}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </aside>
+      </div>
+    </main>
   )}
