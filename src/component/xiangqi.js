@@ -68,12 +68,6 @@ export default function XiangqiChess() {
   }, [turn]);
 
   const selectSquare = (id) => {
-    console.log(id);
-    console.log(board[id][0]);
-    console.log(board[id][0] === turn);
-    console.log(selectedSquare1 !== boardSquareCount);
-    console.log(selectedSquare1);
-  
     if (selectedSquare1 !== boardSquareCount) {
       setSelectedSquare2(id);
       console.log("Square selected", id);
