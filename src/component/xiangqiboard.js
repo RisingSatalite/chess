@@ -41,17 +41,10 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     var black = "#353535";
     var white = "#f6f6f6";
 
-    if (number === selected) {
-        bgColor = "yellow";
-        textColour = black
-    } else {
-        bgColor = white;
-        if(prop == ""){
-            textColour = white
-        }else{
-            textColour = black
-        }
-    }
+    const isSelected = number === selected;
+    const isLastMove = lastMove && (number === lastMove.from || number === lastMove.to);
+    bgColor = isSelected ? "#f5c84b" : white;
+    textColour = prop == "" ? white : black;
 
     const buttonStyle = {
         backgroundColor: bgColor,
