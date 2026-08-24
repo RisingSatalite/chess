@@ -55,7 +55,13 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     const pieceHeight = 50;
     
     return (
-        <button onClick={onClickFunction} style={buttonStyle} className="square">
+        <button
+            onClick={onClickFunction}
+            style={buttonStyle}
+            className={`square${isLastMove ? " last-move" : ""}${isSelected ? " selected" : ""}`}
+            type="button"
+            aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
+        >
             {imageSrc && !imageError ? (
                 <Image
                     src={imageSrc}
