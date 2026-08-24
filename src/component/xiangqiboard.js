@@ -25,7 +25,7 @@ const pieceImages = {
     BG: "/BlackKing.png",
 };
 
-export default function Square({ prop, onClickFunction, number = 0, selected = -1, row=0 }) {
+export default function Square({ prop, onClickFunction, number = 0, selected = -1, boardwidth = 0, boardheight = 0 }) {
     const [imageError, setImageError] = useState(false);
 
     let bgColor;
@@ -44,13 +44,6 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     if (number === selected) {
         bgColor = "yellow";
         textColour = black
-    } else if ((number + row) % 2 === 0) {
-        bgColor = black;
-        if(prop == ""){
-            textColour = black
-        }else{
-            textColour = white
-        }
     } else {
         bgColor = white;
         if(prop == ""){

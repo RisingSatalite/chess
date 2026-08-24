@@ -1,6 +1,6 @@
 'use client'
 
-import Square from "./square"
+import Square from "./xiangqiboard";
 import { useEffect, useState } from "react";
 
 export default function XiangqiChess() {
@@ -38,17 +38,10 @@ export default function XiangqiChess() {
     if (possibleMove === true) {
       makeMove();
       turnChange();
-    } else if (possibleMove) {
-      makeMove(possibleMove);
-      turnChange();
     }else {
       ineligableMoveClear()
     }
   }, [selectedSquare2]);
-  
-  useEffect(() => {
-    //console.log("Updated selectedSquare1:", selectedSquare1);
-  }, [selectedSquare1]);
 
   useEffect(() => {
     // Check game status after board changes
@@ -88,7 +81,7 @@ export default function XiangqiChess() {
     }
   };
 
-  // Check if a square is attacked by a specific color
+  // Check if a square is attacked by a specific color, for checks and checkmates
   const isSquareAttackedByColor = (targetSquare, attackingColor, boardToCheck = board) => {
     for (let i = 0; i < boardSquareCount; i++) {
       if (!boardToCheck[i] || boardToCheck[i][0] !== attackingColor) continue;
@@ -97,36 +90,28 @@ export default function XiangqiChess() {
       const pieceName = piece[1];
       
       // Check each piece type for possible attack
-      if (pieceName === 'P') {
-        if (canPawnAttack(i, targetSquare, attackingColor, boardToCheck)) return true;
+      if (pieceName === 'S') {
+        if (connectSolider(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'R') {
         if (canRookAttack(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'B') {
-        if (canBishopAttack(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'N') {
-        if (canKnightAttack(i, targetSquare)) return true;
-      } else if (pieceName === 'Q') {
-        if (canQueenAttack(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'K') {
-        if (canKingAttack(i, targetSquare)) return true;
+      } else if (pieceName === 'E') {
+        if (connectingElephant(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'A') {
+        if (connectAdvisor(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'C') {
+        if (connectCannon(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'H') {
+        if (connectHorse(i, targetSquare, boardToCheck)) return true;
+      } else if (pieceName === 'G') {
+        if (connectGeneral(i, targetSquare, boardToCheck)) return true;
       }
     }
+    if(connectFlyingGeneral(boardToCheck)) return true;//Check if the flying general can attack
     return false;
   };
 
-  // Pawn attack check
-  const canPawnAttack = (fromSquare, toSquare, color, boardToCheck) => {
-    const direction = color === 'W' ? -1 : 1;
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    return toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1;
-  };
-
   // Rook attack check
-  const canRookAttack = (fromSquare, toSquare, boardToCheck) => {
+  const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
@@ -149,56 +134,6 @@ export default function XiangqiChess() {
       }
       return true;
     }
-  };
-
-  // Bishop attack check
-  const canBishopAttack = (fromSquare, toSquare, boardToCheck) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol)) return false;
-    
-    const rowStep = toRow > fromRow ? 1 : -1;
-    const colStep = toCol > fromCol ? 1 : -1;
-    let r = fromRow + rowStep;
-    let c = fromCol + colStep;
-    
-    while (r !== toRow) {
-      if (boardToCheck[r * boardLenght + c] !== '') return false;
-      r += rowStep;
-      c += colStep;
-    }
-    return true;
-  };
-
-  // Knight attack check
-  const canKnightAttack = (fromSquare, toSquare) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    const rowDiff = Math.abs(fromRow - toRow);
-    const colDiff = Math.abs(fromCol - toCol);
-    
-    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-  };
-
-  // Queen attack check
-  const canQueenAttack = (fromSquare, toSquare, boardToCheck) => {
-    return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
-  };
-
-  // King attack check
-  const canKingAttack = (fromSquare, toSquare) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    return Math.abs(fromRow - toRow) <= 1 && Math.abs(fromCol - toCol) <= 1;
   };
 
   // Find king position
@@ -247,50 +182,6 @@ export default function XiangqiChess() {
     return false;
   };
 
-  // Check if a simple move is valid
-  const isSimpleMove = (from, to, boardToCheck, color) => {
-    const piece = boardToCheck[from];
-    if (!piece || piece[0] !== color) return false;
-    
-    // Can't move to a square with friendly piece
-    if (boardToCheck[to] && boardToCheck[to][0] === color) return false;
-    
-    return true;
-  };
-
-  // Check if pawn move is valid
-  const canPawnMove = (from, to, boardToCheck, color) => {
-    if (!isSimpleMove(from, to, boardToCheck, color)) return false;
-    
-    const fromRow = Math.floor(from / boardLenght);
-    const fromCol = from % boardLenght;
-    const toRow = Math.floor(to / boardLenght);
-    const toCol = to % boardLenght;
-    
-    const direction = color === 'W' ? -1 : 1;
-    const startRow = color === 'W' ? 6 : 1;
-    const deltaRow = toRow - fromRow;
-    const deltaCol = toCol - fromCol;
-    
-    // Single forward move
-    if (deltaRow === direction && deltaCol === 0 && !boardToCheck[to]) {
-      return true;
-    }
-    
-    // Double forward move from start
-    if (fromRow === startRow && toRow === fromRow + 2 * direction && deltaCol === 0 && !boardToCheck[to]) {
-      const middleSquare = from + boardLenght * direction;
-      return !boardToCheck[middleSquare];
-    }
-    
-    // Diagonal capture
-    if (deltaRow === direction && Math.abs(deltaCol) === 1 && boardToCheck[to] && boardToCheck[to][0] !== color) {
-      return true;
-    }
-    
-    return false;
-  };
-
   // Check if piece move is valid
   const isValidPieceMove = (from, to, boardToCheck, color) => {
     const piece = boardToCheck[from];
@@ -301,12 +192,12 @@ export default function XiangqiChess() {
     
     const pieceName = piece[1];
     
-    if (pieceName === 'P') return canPawnMove(from, to, boardToCheck, color);
+    if (pieceName === 'S') return connectSolider(from, to, boardToCheck);
+    //Does not matter if we check adiviors, elephant from attacking as defends type pieces
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
-    if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
-    if (pieceName === 'N') return canKnightAttack(from, to);
-    if (pieceName === 'Q') return canQueenAttack(from, to, boardToCheck);
-    if (pieceName === 'K') return canKingAttack(from, to);
+    if (pieceName === 'C') return connectCannon(from, to, boardToCheck);
+    if (pieceName === 'H') return connectHorse(from, to, boardToCheck);
+    if (pieceName === 'G') return connectGeneral(from, to, boardToCheck);
     
     return false;
   };
@@ -327,7 +218,7 @@ export default function XiangqiChess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'E') {
-      if (connectingElephant()) {
+      if (connectingElephant() && noFriendlyFire()){
         return true;
       } else {
         return ineligableMoveClear()
@@ -382,16 +273,6 @@ export default function XiangqiChess() {
   const reset = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
-    //console.log(board)
-    //alert("Can next move be enpassent: " + enpassentNextMove)
-    //alert("Enpassent square: " + enpassent)
-    /*
-    if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
-      setEnpassentNextMove(false)
-    }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
-      setEnpassent(-2)
-    }
-    */
     return false   
   }
   
@@ -418,10 +299,7 @@ export default function XiangqiChess() {
     return row === row2 || square === square2;
   };
 
-  const connectCannon = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectCannon = (from = selectedSquare1, to   = selectedSquare2, boardToCheck = board) => {
     var r  = Math.floor(from / boardLenght);
     var c  = from % boardLenght;
     var r2 = Math.floor(to / boardLenght);
@@ -433,8 +311,8 @@ export default function XiangqiChess() {
     }
 
     //Preforming a rook like move, not taking
-    if(board[to] == ""){
-      return noGhostingHorizontal()//We only care that the cannon is not phasing thought another piece
+    if(boardToCheck[to] == ""){
+      return noGhostingHorizontal(from, to, boardToCheck)//We only care that the cannon is not phasing thought another piece
 
     //Preforming a cannon capture attack
     }else{
@@ -449,7 +327,7 @@ export default function XiangqiChess() {
       let piecesBetween = 0;
 
       while (curR !== r2 || curC !== c2) {
-        if (board[getPositionFromRowAndColumn(curR, curC)] !== '') {
+        if (boardToCheck[getPositionFromRowAndColumn(curR, curC)] !== '') {
           piecesBetween++;
           if (piecesBetween > 1) return false;
         }
@@ -465,11 +343,7 @@ export default function XiangqiChess() {
 
   const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
 
-  const connectingElephant = () => {
-    if (!noFriendlyFire()) return false;
-
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
+  const connectingElephant = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
 
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
@@ -484,7 +358,7 @@ export default function XiangqiChess() {
     // River rule (assuming red bottom, black top)
     // Red cannot go above row 4
     // Black cannot go below row 5
-    const piece = board[from];
+    const piece = boardToCheck[from];
 
     if (piece[0] === "W" && r2 < 5) return false;
     if (piece[0] === "B" && r2 > 4) return false;
@@ -493,41 +367,38 @@ export default function XiangqiChess() {
     const middleRow = (r + r2) / 2;
     const middleCol = (c + c2) / 2;
 
-    if (board[getPositionFromRowAndColumn(middleRow, middleCol)] !== "") {
+    if (boardToCheck[getPositionFromRowAndColumn(middleRow, middleCol)] !== "") {
       return false;
     }
 
     return true;
   };
 
-  const noFriendlyFire = () => {
-    if(board[selectedSquare1][0] == "W" && (board[selectedSquare2][0] == "B" || board[selectedSquare2][0] == undefined)){
+  const noFriendlyFire = (boardToCheck = board) => {
+    if(boardToCheck[selectedSquare1][0] == "W" && (boardToCheck[selectedSquare2][0] == "B" || boardToCheck[selectedSquare2][0] == undefined)){
       return true
-    }else if(board[selectedSquare1][0] == "B" && (board[selectedSquare2][0] == "W" || board[selectedSquare2][0] == undefined)){
+    }else if(boardToCheck[selectedSquare1][0] == "B" && (boardToCheck[selectedSquare2][0] == "W" || boardToCheck[selectedSquare2][0] == undefined)){
       return true
     }
     console.log("No friendly fire allowed")
     return false
   }
 
-  const connectAdvisor = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectAdvisor = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
     if(c2 == 3 || c2 == 4 || c2 == 5){
-      if(board[from][0] == "B"){
+      if(boardToCheck[from][0] == "B"){
         if(r2 == 0 || r2 == 1 || r2 == 2){
         }else{
           console.log("Move goes outside of the palace row", r2)
           return false;//Move is outside of the palace
         }
       }
-      if(board[from][0] == "W"){
+      if(boardToCheck[from][0] == "W"){
         if(r2 == 7 || r2 == 8 || r2 == 9){
         }else{
           console.log("Move goes outside of the palace row", r2)
@@ -554,24 +425,40 @@ export default function XiangqiChess() {
     }
   }
 
-  const connectGeneral = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
+  const connectFlyingGeneral = (boardToCheck = board) => {
+    //Flying general rule
+    const whiteGeneralPosition = findGeneral('W', boardToCheck);
+    const blackGeneralPosition = findGeneral('B', boardToCheck);
 
+    const cWhiteGeneral  = whiteGeneralPosition % boardLenght;
+    const cBlackGeneral = blackGeneralPosition % boardLenght;
+
+    if(!cWhiteGeneral == cBlackGeneral){
+      return false;
+    }
+    if(noGhostingHorizontal(whiteGeneralPosition, blackGeneralPosition, boardToCheck)){
+      return true;
+    }
+    return false;
+  }
+
+  const connectGeneral = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
+    const generalColour = boardToCheck[from][0];
+
     if(c2 == 3 || c2 == 4 || c2 == 5){
-      if(board[from][0] == "B"){
+      if(generalColour == "B"){
         if(r2 == 0 || r2 == 1 || r2 == 2){
         }else{
           console.log("Move goes outside of the palace row", r2)
           return false;//Move is outside of the palace
         }
       }
-      if(board[from][0] == "W"){
+      if(generalColour == "W"){
         if(r2 == 7 || r2 == 8 || r2 == 9){
         }else{
           console.log("Move goes outside of the palace row", r2)
@@ -598,21 +485,18 @@ export default function XiangqiChess() {
     }
   }
 
-  const connectSolider = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectSolider = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
     
-    if(board[from][0] == "B"){
+    if(boardToCheck[from][0] == "B"){
       if (r + 1 === r2 && c === c2){
         return true;
       }
-      if (r > 4){
+      if (r > (boardHeight/2)){
         if (r === r2 && c + 1 === c2){
           return true;
         }
@@ -622,11 +506,11 @@ export default function XiangqiChess() {
       }
     }
 
-    if(board[from][0] == "W"){
+    if(boardToCheck[from][0] == "W"){
       if (r - 1 === r2 && c === c2){
         return true;
       }
-      if (r < 5){
+      if (r < (boardHeight/2)){
         if (r === r2 && c + 1 === c2){
           return true;
         }
@@ -638,35 +522,32 @@ export default function XiangqiChess() {
     return false
   }
 
-  const connectHorse = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
-
+  const connectHorse = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
     const r  = Math.floor(from / boardLenght);
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
     // Right leg
-    if (c + 1 < 9 && board[getPositionFromRowAndColumn(r, c + 1)] === "") {
+    if (c + 1 < 9 && boardToCheck[getPositionFromRowAndColumn(r, c + 1)] === "") {
       if ((r + 1 === r2 && c + 2 === c2) ||
           (r - 1 === r2 && c + 2 === c2)) return true;
     }
 
     // Left leg
-    if (c - 1 >= 0 && board[getPositionFromRowAndColumn(r, c - 1)] === "") {
+    if (c - 1 >= 0 && boardToCheck[getPositionFromRowAndColumn(r, c - 1)] === "") {
       if ((r + 1 === r2 && c - 2 === c2) ||
           (r - 1 === r2 && c - 2 === c2)) return true;
     }
 
     // Down leg
-    if (r + 1 < 10 && board[getPositionFromRowAndColumn(r + 1, c)] === "") {
+    if (r + 1 < 10 && boardToCheck[getPositionFromRowAndColumn(r + 1, c)] === "") {
       if ((r + 2 === r2 && c + 1 === c2) ||
           (r + 2 === r2 && c - 1 === c2)) return true;
     }
 
     // Up leg
-    if (r - 1 >= 0 && board[getPositionFromRowAndColumn(r - 1, c)] === "") {
+    if (r - 1 >= 0 && boardToCheck[getPositionFromRowAndColumn(r - 1, c)] === "") {
       if ((r - 2 === r2 && c + 1 === c2) ||
           (r - 2 === r2 && c - 1 === c2)) return true;
     }
@@ -674,9 +555,7 @@ export default function XiangqiChess() {
     return false;
   };
   
-  const noGhostingHorizontal = () => {
-    const from = selectedSquare1;
-    const to   = selectedSquare2;
+  const noGhostingHorizontal = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
 
     const r1 = Math.floor(from / boardLenght);
     const c1 = from % boardLenght;
@@ -694,7 +573,7 @@ export default function XiangqiChess() {
     let current = from + step;
 
     while (current !== to) {
-      if (board[current] !== '') {
+      if (boardToCheck[current] !== '') {
         return false; // piece blocking the path
       }
       current += step;
@@ -703,43 +582,11 @@ export default function XiangqiChess() {
     return true;
   };
 
-  const makeMove = (specialSquare = -2) => {
+  const makeMove = () => {
     const newBoard = [...board];
-
-    let oldPiece = newBoard[selectedSquare1]
-    let oldPiece2 = newBoard[selectedSquare2]
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
-    if(typeof specialSquare === "string") {
-      if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
-        newBoard[selectedSquare2] = "";
-        const newSquares = specialSquare.replace("K", "").split("R")
-
-        newBoard[newSquares[0]] = oldPiece
-        newBoard[newSquares[1]] = oldPiece2
-      }
-    }else if(specialSquare != -2){
-      if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
-      }else{//Otherwise, remove the piece
-        console.log("Piece removed at square: " + specialSquare)
-        newBoard[specialSquare] = "";
-      }
-    }else{
-    }
-
-    //Move the pawn promote to queen if it reaches the end
-    let column2 = selectedSquare2;
-    let row2 = 0;
-    while (column2 - boardLenght >= 0) {
-      row2 += 1;
-      column2 -= boardLenght;
-    }
-    if(newBoard[selectedSquare2] == "WP" && row2 == 0){
-      newBoard[selectedSquare2] = "WQ"
-    }else if(newBoard[selectedSquare2] == "BP" && row2 == 7){
-      newBoard[selectedSquare2] = "BQ"
-    }
 
     setBoard(newBoard);
   
