@@ -4,7 +4,7 @@ import Square from "./xiangqiboard";
 import { useEffect, useState } from "react";
 
 export default function XiangqiChess() {
-  const [board, setBoard] = useState([
+  const initialBoard = [
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
     '','','','','','','','','',
     '','BC','','','','','','BC','',
@@ -15,7 +15,9 @@ export default function XiangqiChess() {
     '','WC','','','','','','WC','',
     '','','','','','','','','',
     'WR','WH','WE','WA','WG','WA','WE','WH','WR',
-  ]);
+  ];
+
+  const [board, setBoard] = useState(initialBoard);
 
   const boardLenght = 9
   const boardHeight = 10
