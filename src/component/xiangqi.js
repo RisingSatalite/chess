@@ -27,6 +27,9 @@ export default function XiangqiChess() {
   const [selectedSquare1, setSelectedSquare1] = useState(boardSquareCount);
   const [selectedSquare2, setSelectedSquare2] = useState(boardSquareCount);
   const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [lastMove, setLastMove] = useState(null);
+  const [feedback, setFeedback] = useState("Select a piece to begin");
 
   useEffect(() => {
     //console.log("Square 2 selected");
