@@ -4,7 +4,7 @@ import Square from "./square"
 import { useEffect, useState } from "react";
 
 export default function Chess() {
-  const [board, setBoard] = useState([
+  const initialBoard = [
     'BR','BN','BB','BK','BQ','BB','BN','BR',
     'BP','BP','BP','BP','BP','BP','BP','BP',
     '','','','','','','','',
@@ -13,7 +13,9 @@ export default function Chess() {
     '','','','','','','','',
     'WP','WP','WP','WP','WP','WP','WP','WP',
     'WR','WN','WB','WK','WQ','WB','WN','WR'
-  ]);
+  ];
+
+  const [board, setBoard] = useState(initialBoard);
 
   const boardLenght = 8
   const boardHeight = 8
@@ -24,6 +26,9 @@ export default function Chess() {
   const [selectedSquare2, setSelectedSquare2] = useState(boardSquareCount);
   const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
   const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [lastMove, setLastMove] = useState(null);
+  const [feedback, setFeedback] = useState("Select a piece to begin");
 
   useEffect(() => {
     //console.log("Square 2 selected");
@@ -77,18 +82,16 @@ export default function Chess() {
   }, [turn]);
 
   const selectSquare = (id) => {
-    console.log(id);
-    console.log(board[id][0]);
-    console.log(board[id][0] === turn);
-    console.log(selectedSquare1 !== boardSquareCount);
-    console.log(selectedSquare1);
-  
     if (selectedSquare1 !== boardSquareCount) {
+      if (board[id] && board[id][0] === turn) {
+        setSelectedSquare1(id);
+        setFeedback("Choose a destination square");
+        return;
+      }
       setSelectedSquare2(id);
-      console.log("Square selected", id);
-    } else if (board[id][0] === turn) {
-      console.log("Square selected", id);
+    } else if (board[id] && board[id][0] === turn) {
       setSelectedSquare1(id);
+      setFeedback("Choose a destination square");
     }
   };
 
@@ -371,6 +374,7 @@ export default function Chess() {
   const ineligableMoveClear = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
+    setFeedback("That move is not legal");
     return false;
   }
 
@@ -387,8 +391,19 @@ export default function Chess() {
       setEnpassent(-2)
     }
     */
-    return false   
+    return false;
   }
+
+  const resetGame = () => {
+    setBoard(initialBoard);
+    setTurn("W");
+    setEnpassent(-2);
+    setGameStatus("playing");
+    setMoveHistory([]);
+    setLastMove(null);
+    setFeedback("Select a piece to begin");
+    reset();
+  };
   
   //Make sure the 2 selected squares make a valid rook move
   const horizontallyConnecting = () => {
@@ -640,6 +655,7 @@ export default function Chess() {
 
     let oldPiece = newBoard[selectedSquare1]
     let oldPiece2 = newBoard[selectedSquare2]
+    const wasCapture = Boolean(oldPiece2) || (typeof specialSquare === "number" && specialSquare !== -2 && newBoard[specialSquare]);
 
     newBoard[selectedSquare2] = newBoard[selectedSquare1];
     newBoard[selectedSquare1] = "";
@@ -676,6 +692,12 @@ export default function Chess() {
     }
 
     setBoard(newBoard);
+    setLastMove({ from: selectedSquare1, to: selectedSquare2 });
+    setMoveHistory((history) => [
+      ...history,
+      { piece: oldPiece, from: selectedSquare1, to: selectedSquare2, captured: Boolean(wasCapture) },
+    ]);
+    setFeedback(wasCapture ? "Capture made" : "Move made");
   
     reset()
   };
@@ -684,43 +706,83 @@ export default function Chess() {
     setTurn(turn === "W" ? "B" : "W");
   };
 
+  const statusMessage = gameStatus === "checkmate"
+    ? `${turn === "W" ? "Black" : "White"} wins the match.`
+    : gameStatus === "check"
+      ? `${turn === "W" ? "White" : "Black"} king is under attack.`
+      : gameStatus === "stalemate"
+        ? "No legal moves remain."
+        : "Checkmate the opposing king to win.";
+
   return (
-    <div id="chess">
-      <span>
-        Chess
-        <button className="majorButton" onClick={() =>{ setBoard([
-          'BR','BN','BB','BK','BQ','BB','BN','BR',
-          'BP','BP','BP','BP','BP','BP','BP','BP',
-          '','','','','','','','',
-          '','','','','','','','',
-          '','','','','','','','',
-          '','','','','','','','',
-          'WP','WP','WP','WP','WP','WP','WP','WP',
-          'WR','WN','WB','WK','WQ','WB','WN','WR'
-        ]);
-          setTurn("W");
-          setGameStatus("playing");
-        }}>Reset</button>
+    <main className="xiangqi-shell chess-shell">
+      <header className="game-header">
         <div>
-          <p>It is {turn} turn</p>
-          {gameStatus === "checkmate" && <p style={{color: "red", fontWeight: "bold"}}>CHECKMATE! {turn === "W" ? "Black" : "White"} wins!</p>}
-          {gameStatus === "check" && <p style={{color: "orange", fontWeight: "bold"}}>CHECK!</p>}
-          {gameStatus === "stalemate" && <p style={{color: "blue", fontWeight: "bold"}}>STALEMATE!</p>}
+          <p className="eyebrow">Two-player board game</p>
+          <h1>Chess</h1>
+          <p className="subtitle">Classic chess on an 8 x 8 board</p>
         </div>
-        {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => (
-              <Square
-                key={rowIndex * boardLenght + index}
-                number={rowIndex * boardLenght + index}
-                onClickFunction={() => selectSquare(rowIndex * boardLenght + index)}
-                prop={item}
-                selected={selectedSquare1}
-                row={rowIndex}
-              />
-            ))}
+        <button className="majorButton" onClick={resetGame} type="button">New game</button>
+      </header>
+
+      <div className="game-layout">
+        <section className="board-panel" aria-label="Chess board">
+          <div className={`turn-bar turn-bar-${gameStatus}`}>
+            <span className={`turn-marker ${turn === "W" ? "red" : "black"}`} />
+            <div>
+              <strong>{turn === "W" ? "White" : "Black"} to move</strong>
+              <span className="feedback">{feedback}</span>
+            </div>
+            <span className={`status status-${gameStatus}`}>{gameStatus}</span>
           </div>
-        ))}
-      </span>
-    </div>
+          <div className="board-frame chess-board-frame">
+            <div className="board-grid chess-board-grid">
+              {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
+                <div key={rowIndex} className="row">
+                  {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => {
+                    const squareNumber = rowIndex * boardLenght + index;
+                    return (
+                      <Square
+                        key={squareNumber}
+                        number={squareNumber}
+                        onClickFunction={() => selectSquare(squareNumber)}
+                        prop={item}
+                        selected={selectedSquare1}
+                        row={rowIndex}
+                        lastMove={lastMove}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <aside className="game-sidebar">
+          <div className={`rules-panel status-panel status-panel-${gameStatus}`} role="status" aria-live="polite">
+            <p className="eyebrow">Match status</p>
+            <h2 className="status-title">
+              {gameStatus === "playing" ? "In play" : gameStatus === "check" ? "Check" : gameStatus === "checkmate" ? "Checkmate" : "Stalemate"}
+            </h2>
+            <p className="status-message">{statusMessage}</p>
+          </div>
+          <div className="history-panel">
+            <div className="history-heading"><h2>Move history</h2><span>{moveHistory.length}</span></div>
+            {moveHistory.length === 0 ? (
+              <p className="empty-history">Moves will appear here.</p>
+            ) : (
+              <ol className="move-list">
+                {moveHistory.slice(-8).map((move, index) => (
+                  <li key={`${move.from}-${move.to}-${index}`}>
+                    <span>{Math.floor(move.from / boardLenght) + 1}.{move.piece}</span>
+                    <span>{Math.floor(move.to / boardLenght) + 1}-{(move.to % boardLenght) + 1}{move.captured ? " x" : ""}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </aside>
+      </div>
+    </main>
   )}

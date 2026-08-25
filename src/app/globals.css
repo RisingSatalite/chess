@@ -83,6 +83,9 @@ h2 { font-size: 1.15rem; letter-spacing: -0.02em; margin-bottom: 8px; text-trans
 .turn-bar-checkmate .feedback, .turn-bar-checkmate .status { color: #fff8ed; }
 .board-frame { background: var(--wood); border: 8px solid var(--wood-dark); box-shadow: 0 12px 24px rgba(72, 39, 20, .16); max-width: max-content; padding: 7px; position: relative; }
 .board-grid { background: var(--paper); }
+.chess-board-frame { background: #384957; border-color: #24333e; }
+.chess-board-grid .square { border-color: rgba(29, 40, 47, .42); }
+.chess-board-grid .square.last-move::after { border-color: rgba(245, 200, 75, .85); }
 .river-label { align-items: center; color: rgba(101, 54, 29, .8); display: flex; font-family: serif; font-size: clamp(.65rem, 2vw, 1rem); height: 0; justify-content: space-between; left: 7%; position: absolute; right: 7%; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .river-label span { font-size: .82em; }
 .game-sidebar { display: grid; gap: 18px; }
