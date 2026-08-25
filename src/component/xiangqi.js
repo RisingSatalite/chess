@@ -623,6 +623,14 @@ export default function XiangqiChess() {
     setTurn(turn === "W" ? "B" : "W");
   };
 
+  const statusMessage = gameStatus === "checkmate"
+    ? `${turn === "W" ? "Black" : "Red"} wins the match.`
+    : gameStatus === "check"
+      ? `${turn === "W" ? "Red" : "Black"} general is under attack.`
+      : gameStatus === "stalemate"
+        ? "No legal moves remain."
+        : "Capture the opposing general to win.";
+
   return (
     <main className="xiangqi-shell">
       <header className="game-header">
@@ -636,7 +644,7 @@ export default function XiangqiChess() {
 
       <div className="game-layout">
         <section className="board-panel" aria-label="Xiangqi board">
-          <div className="turn-bar">
+          <div className={`turn-bar turn-bar-${gameStatus}`}>
             <span className={`turn-marker ${turn === "W" ? "red" : "black"}`} />
             <div>
               <strong>{turn === "W" ? "Red" : "Black"} to move</strong>
@@ -669,10 +677,12 @@ export default function XiangqiChess() {
         </section>
 
         <aside className="game-sidebar">
-          <div className="rules-panel">
+          <div className={`rules-panel status-panel status-panel-${gameStatus}`} role="status" aria-live="polite">
             <p className="eyebrow">Match status</p>
-            <h2>{gameStatus === "playing" ? "In play" : gameStatus}</h2>
-            <p>{gameStatus === "checkmate" ? `${turn === "W" ? "Black" : "Red"} wins the match.` : "Capture the opposing general to win."}</p>
+            <h2 className="status-title">
+              {gameStatus === "playing" ? "In play" : gameStatus === "check" ? "Check" : gameStatus === "checkmate" ? "Checkmate" : "Stalemate"}
+            </h2>
+            <p className="status-message">{statusMessage}</p>
           </div>
           <div className="history-panel">
             <div className="history-heading"><h2>Move history</h2><span>{moveHistory.length}</span></div>

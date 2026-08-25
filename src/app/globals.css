@@ -78,6 +78,9 @@ h2 { font-size: 1.15rem; letter-spacing: -0.02em; margin-bottom: 8px; text-trans
 .feedback { color: var(--muted); display: block; font-size: .72rem; margin-top: 2px; }
 .status { color: var(--muted); font: 500 .65rem 'DM Mono', monospace; margin-left: auto; text-transform: uppercase; }
 .status-check, .status-checkmate { color: var(--red); }
+.turn-bar-check { background: #f5d98a; border-left: 5px solid #c88a16; padding: 10px 10px 15px; }
+.turn-bar-checkmate { background: #c74838; color: #fff8ed; border-left: 5px solid #762219; padding: 10px 10px 15px; }
+.turn-bar-checkmate .feedback, .turn-bar-checkmate .status { color: #fff8ed; }
 .board-frame { background: var(--wood); border: 8px solid var(--wood-dark); box-shadow: 0 12px 24px rgba(72, 39, 20, .16); max-width: max-content; padding: 7px; position: relative; }
 .board-grid { background: var(--paper); }
 .river-label { align-items: center; color: rgba(101, 54, 29, .8); display: flex; font-family: serif; font-size: clamp(.65rem, 2vw, 1rem); height: 0; justify-content: space-between; left: 7%; position: absolute; right: 7%; top: 50%; transform: translateY(-50%); pointer-events: none; }
@@ -85,6 +88,15 @@ h2 { font-size: 1.15rem; letter-spacing: -0.02em; margin-bottom: 8px; text-trans
 .game-sidebar { display: grid; gap: 18px; }
 .rules-panel, .history-panel { padding: 20px; }
 .rules-panel p, .empty-history { color: var(--muted); font-size: .78rem; line-height: 1.6; margin-bottom: 0; }
+.status-panel { transition: background-color 180ms ease, border-color 180ms ease; }
+.status-panel .status-title { font-size: 1.6rem; margin-bottom: 9px; }
+.status-panel .status-message { font-weight: 600; }
+.status-panel-check { background: #f5d98a; border-color: #c88a16; }
+.status-panel-check .eyebrow, .status-panel-check .status-message { color: #80570b; }
+.status-panel-checkmate { background: #c74838; border-color: #762219; color: #fff8ed; }
+.status-panel-checkmate .eyebrow, .status-panel-checkmate .status-message { color: #fff8ed; }
+.status-panel-stalemate { background: #d9e4e0; border-color: #6d8f88; }
+.status-panel-stalemate .eyebrow, .status-panel-stalemate .status-message { color: #365d55; }
 .history-heading { align-items: center; display: flex; justify-content: space-between; }
 .history-heading span { background: #e8d5bb; border-radius: 50%; color: var(--wood-dark); font: 500 .7rem 'DM Mono', monospace; padding: 6px 8px; }
 .move-list { font: .72rem 'DM Mono', monospace; list-style: none; margin: 15px 0 0; padding: 0; }
