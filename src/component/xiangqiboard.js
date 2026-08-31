@@ -25,7 +25,7 @@ const pieceImages = {
     BG: "/BlackKing.png",
 };
 
-export default function Square({ prop, onClickFunction, number = 0, selected = -1, lastMove = null }) {
+export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, lastMove = null }) {
     const [imageError, setImageError] = useState(false);
 
     let bgColor;
@@ -57,6 +57,10 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     return (
         <button
             onClick={onClickFunction}
+            onDragStart={onDragStart}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            draggable={Boolean(prop)}
             style={buttonStyle}
             className={`square${isLastMove ? " last-move" : ""}${isSelected ? " selected" : ""}`}
             type="button"
