@@ -359,8 +359,6 @@ export default function Chess() {
       //console.log("Can castle?" + checkCastle())
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else if(checkCastle()){
-        return checkCastle();
       } else {
         return ineligableMoveClear()
       }
@@ -548,77 +546,6 @@ export default function Chess() {
     }
   
     return true;
-  }  
-
-  const checkCastle = () => {
-    const king = board[selectedSquare1];
-    const rook = board[selectedSquare2];
-    if (!king || !rook || king[1] !== "K" || rook[1] !== "R" || king[0] !== rook[0]) {
-      console.log("Not king and or rook")
-      return false;
-    }
-
-    const color = king[0];
-    const homeRow = color === "W" ? 7 : 0;
-    const kingHome = homeRow * boardLenght + 3;
-    
-    if (selectedSquare1 !== kingHome) {
-      console.log("Not original king square")
-      return false;
-    }
-
-    const kingsideRookHome = homeRow * boardLenght + 7;
-    const queensideRookHome = homeRow * boardLenght;
-
-    const isKingsideCastle = selectedSquare2 === kingsideRookHome;
-    const isQueensideCastle = selectedSquare2 === queensideRookHome;
-    if (!isKingsideCastle && !isQueensideCastle) {
-      return false;
-    }
-
-    const rookHome = isKingsideCastle ? kingsideRookHome : queensideRookHome;
-    if (moveHistory.some((move) => move.from === kingHome || move.from === rookHome)) {
-      return false;
-    }
-
-    const kingDestination = isKingsideCastle ? kingHome + 2 : kingHome - 2;
-    const rookDestination = isKingsideCastle ? kingHome + 1 : kingHome - 1;
-    const pathSquares = isKingsideCastle
-      ? [kingHome + 1, kingHome + 2]
-      : [kingHome - 1, kingHome - 2];
-
-    if (pathSquares.some((square) => board[square] !== "")) {
-      console.log("Something in the way")
-      return false;
-    }
-
-    const opponentColor = color === "W" ? "B" : "W";
-    if (isInCheck(color)) {
-      console.log("Can not castle out of check")
-      return false;
-    }
-
-    const squaresKingMustNotCross = [...pathSquares];
-
-    for (const square of squaresKingMustNotCross) {
-      const simulatedBoard = [...board];
-      simulatedBoard[kingHome] = "";
-      simulatedBoard[square] = king;
-      if (isSquareAttackedByColor(square, opponentColor, simulatedBoard)) {
-        return false;
-      }
-    }
-
-    const finalBoard = [...board];
-    finalBoard[kingHome] = "";
-    finalBoard[rookHome] = "";
-    finalBoard[kingDestination] = king;
-    finalBoard[rookDestination] = rook;
-    if (isSquareAttackedByColor(kingDestination, opponentColor, finalBoard)) {
-      return false;
-    }
-
-    return "K" + String(kingDestination) + "R" + String(rookDestination);
   }
   
   const makeMove = (specialSquare = -2) => {
