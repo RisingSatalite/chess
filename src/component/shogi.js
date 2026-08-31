@@ -25,7 +25,6 @@ export default function Chess() {
   const [turn, setTurn] = useState("W");
   const [selectedSquare1, setSelectedSquare1] = useState(boardSquareCount);
   const [selectedSquare2, setSelectedSquare2] = useState(boardSquareCount);
-  const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
   const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
   const [moveHistory, setMoveHistory] = useState([]);
   const [lastMove, setLastMove] = useState(null);
@@ -50,11 +49,6 @@ export default function Chess() {
       ineligableMoveClear()
     }
   }, [selectedSquare2]);
-
-  useEffect(() => {
-    //alert("Enpassent square set to: " + enpassent);
-    console.log("Enpassent square set to: " + enpassent);
-  }, [enpassent]);
 
   useEffect(() => {
     // Check game status after board changes
@@ -378,7 +372,6 @@ export default function Chess() {
   const resetGame = () => {
     setBoard(initialBoard);
     setTurn("W");
-    setEnpassent(-2);
     setGameStatus("playing");
     setMoveHistory([]);
     setLastMove(null);
@@ -550,29 +543,7 @@ export default function Chess() {
     const wasCapture = Boolean(oldPiece2) || (typeof specialSquare === "number" && specialSquare !== -2 && newBoard[specialSquare]);
 
     if(typeof specialSquare === "string") {
-      if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
-        const [kingTargetText, rookTargetText] = specialSquare.replace("K", "").split("R");
-        const kingTarget = Number(kingTargetText);
-        const rookTarget = Number(rookTargetText);
-
-        newBoard[selectedSquare1] = "";
-        newBoard[selectedSquare2] = "";
-        newBoard[kingTarget] = oldPiece;
-        newBoard[rookTarget] = oldPiece2;
-      }
-    } else {
-      newBoard[selectedSquare2] = newBoard[selectedSquare1];
-      newBoard[selectedSquare1] = "";
-      if(specialSquare != -2){
-        if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
-          setEnpassent(specialSquare);
-        }else{//Otherwise, remove the piece
-          console.log("Piece removed at square: " + specialSquare)
-          newBoard[specialSquare] = "";
-        }
-      }else{
-        setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
-      }
+      //Preform special move
     }
 
     //Move the pawn promote to queen if it reaches the end
