@@ -470,6 +470,33 @@ export default function Chess() {
   
     return false;
   };
+
+  const connectLance = () => {
+    const piece = board[selectedSquare1];
+    if (!piece || piece[1] !== 'L') return false;
+  
+    const type = piece[0]; // 'W' or 'B'
+    const isWhite = type === 'W';
+    const direction = isWhite ? -1 : 1;
+  
+    // Calculate row and col from square index
+    const getCoords = (index) => [Math.floor(index / boardLenght), index % boardLenght];
+    const [row1, col1] = getCoords(selectedSquare1);
+    const [row2, col2] = getCoords(selectedSquare2);
+  
+    const deltaRow = row2 - row1;
+    const deltaCol = col2 - col1;
+  
+    // Rush attack
+    if (deltaRow < 0 && direction == -1 && deltaCol === 0) {
+      return true;
+    }
+    if (deltaRow > 0 && direction == 1 && deltaCol === 0) {
+      return true;
+    }
+  
+    return false;
+  };
   
   const noGhostingHorizontal = () => {
     const from = selectedSquare1;
