@@ -682,9 +682,7 @@ export default function Chess() {
     <main className="xiangqi-shell chess-shell">
       <header className="game-header">
         <div>
-          <p className="eyebrow">Two-player board game</p>
-          <h1>Chess</h1>
-          <p className="subtitle">Classic chess on an 8 x 8 board</p>
+          <h1>Shogi</h1>
         </div>
         <button className="majorButton" onClick={resetGame} type="button">New game</button>
       </header>
@@ -699,30 +697,91 @@ export default function Chess() {
             </div>
             <span className={`status status-${gameStatus}`}>{gameStatus}</span>
           </div>
-          <div className="board-frame chess-board-frame">
-            <div className="board-grid chess-board-grid">
-              {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
-                <div key={rowIndex} className="row">
-                  {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => {
-                    const squareNumber = rowIndex * boardLenght + index;
-                    return (
-                      <Square
-                        key={squareNumber}
-                        number={squareNumber}
-                        onClickFunction={() => selectSquare(squareNumber)}
-                        onDragStart={(event) => handleDragStart(event, squareNumber)}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={(event) => handleDrop(event, squareNumber)}
-                        prop={item}
-                        selected={selectedSquare1}
-                        row={rowIndex}
-                        lastMove={lastMove}
-                        dataTestId={`board-square-${squareNumber}`}
-                      />
-                    );
-                  })}
-                </div>
-              ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', minHeight: '3rem', alignItems: 'center', padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.75rem', background: '#f9fafb' }}>
+              <strong style={{ width: '100%', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.7 }}>Black captured</strong>
+              {capturedPieces.B.length === 0 ? (
+                <span style={{ opacity: 0.6 }}>None</span>
+              ) : (
+                capturedPieces.B.map((pieceCode, index) => (
+                  <button
+                    key={`B-${pieceCode}-${index}`}
+                    type="button"
+                    draggable={false}
+                    data-testid={`captured-piece-B-${pieceCode}`}
+                    onDragStart={(event) => handleCapturedDragStart(event, pieceCode)}
+                    onDragOver={(event) => event.preventDefault()}
+                    style={{
+                      minWidth: '2.5rem',
+                      minHeight: '2.5rem',
+                      borderRadius: '0.5rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#fff',
+                      fontSize: '1.1rem',
+                      cursor: 'grab',
+                    }}
+                    aria-label={`Black captured ${pieceCode}`}
+                  >
+                    {pieceCode}
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="board-frame chess-board-frame">
+              <div className="board-grid chess-board-grid">
+                {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
+                  <div key={rowIndex} className="row">
+                    {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => {
+                      const squareNumber = rowIndex * boardLenght + index;
+                      return (
+                        <Square
+                          key={squareNumber}
+                          number={squareNumber}
+                          onClickFunction={() => selectSquare(squareNumber)}
+                          onDragStart={(event) => handleDragStart(event, squareNumber)}
+                          onDragOver={(event) => event.preventDefault()}
+                          onDrop={(event) => handleDrop(event, squareNumber)}
+                          prop={item}
+                          selected={selectedSquare1}
+                          row={rowIndex}
+                          lastMove={lastMove}
+                          dataTestId={`board-square-${squareNumber}`}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', minHeight: '3rem', alignItems: 'center', padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.75rem', background: '#f9fafb' }}>
+              <strong style={{ width: '100%', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.7 }}>White captured</strong>
+              {capturedPieces.W.length === 0 ? (
+                <span style={{ opacity: 0.6 }}>None</span>
+              ) : (
+                capturedPieces.W.map((pieceCode, index) => (
+                  <button
+                    key={`W-${pieceCode}-${index}`}
+                    type="button"
+                    draggable={turn === 'W'}
+                    data-testid={`captured-piece-W-${pieceCode}`}
+                    onDragStart={(event) => handleCapturedDragStart(event, pieceCode)}
+                    onDragOver={(event) => event.preventDefault()}
+                    style={{
+                      minWidth: '2.5rem',
+                      minHeight: '2.5rem',
+                      borderRadius: '0.5rem',
+                      border: '1px solid #cbd5e1',
+                      background: '#fff',
+                      fontSize: '1.1rem',
+                      cursor: turn === 'W' ? 'grab' : 'not-allowed',
+                      opacity: turn === 'W' ? 1 : 0.7,
+                    }}
+                    aria-label={`White captured ${pieceCode}`}
+                  >
+                    {pieceCode}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -749,45 +808,6 @@ export default function Chess() {
                 ))}
               </ol>
             )}
-          </div>
-          <div className="history-panel" style={{ marginTop: '1rem' }}>
-            <div className="history-heading"><h2>Captured pieces</h2><span>{Object.values(capturedPieces).flat().length}</span></div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.75rem' }}>
-              {(['W', 'B']).map((player) => (
-                <div key={player} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', minWidth: '100%' }}>
-                  <strong style={{ width: '100%', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.7 }}>
-                    {player === 'W' ? 'White' : 'Black'}
-                  </strong>
-                  {capturedPieces[player].length === 0 ? (
-                    <span style={{ opacity: 0.6 }}>None</span>
-                  ) : (
-                    capturedPieces[player].map((pieceCode, index) => (
-                      <button
-                        key={`${player}-${pieceCode}-${index}`}
-                        type="button"
-                        draggable={player === turn}
-                        data-testid={`captured-piece-${player}-${pieceCode}`}
-                        onDragStart={(event) => handleCapturedDragStart(event, pieceCode)}
-                        onDragOver={(event) => event.preventDefault()}
-                        style={{
-                          minWidth: '2.5rem',
-                          minHeight: '2.5rem',
-                          borderRadius: '0.5rem',
-                          border: '1px solid #cbd5e1',
-                          background: '#fff',
-                          fontSize: '1.1rem',
-                          cursor: player === turn ? 'grab' : 'not-allowed',
-                          opacity: player === turn ? 1 : 0.7,
-                        }}
-                        aria-label={`${player === 'W' ? 'White' : 'Black'} captured ${pieceCode}`}
-                      >
-                        {pieceCode}
-                      </button>
-                    ))
-                  )}
-                </div>
-              ))}
-            </div>
           </div>
         </aside>
       </div>
