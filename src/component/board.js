@@ -596,14 +596,15 @@ export default function Chess() {
 
     const color = king[0];
     const homeRow = color === "W" ? 7 : 0;
-    const kingHome = homeRow * boardLenght + 4;
-    const kingsideRookHome = homeRow * boardLenght + 7;
-    const queensideRookHome = homeRow * boardLenght;
-
+    const kingHome = homeRow * boardLenght + 3;
+    
     if (selectedSquare1 !== kingHome) {
       console.log("Not original king square")
       return false;
     }
+
+    const kingsideRookHome = homeRow * boardLenght + 7;
+    const queensideRookHome = homeRow * boardLenght;
 
     const isKingsideCastle = selectedSquare2 === kingsideRookHome;
     const isQueensideCastle = selectedSquare2 === queensideRookHome;
@@ -617,15 +618,17 @@ export default function Chess() {
     }
 
     const pathSquares = isKingsideCastle
-      ? [homeRow * boardLenght + 5, homeRow * boardLenght + 6]
-      : [homeRow * boardLenght + 1, homeRow * boardLenght + 2, homeRow * boardLenght + 3];
+      ? [homeRow * boardLenght + 4, homeRow * boardLenght + 5, homeRow * boardLenght + 6]
+      : [homeRow * boardLenght + 1, homeRow * boardLenght + 2];
 
     if (pathSquares.some((square) => board[square] !== "")) {
+      console.log("Something in the way")
       return false;
     }
 
     const opponentColor = color === "W" ? "B" : "W";
     if (isInCheck(color)) {
+      console.log("Can not castle out of check")
       return false;
     }
 
