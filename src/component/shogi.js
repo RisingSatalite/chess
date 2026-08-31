@@ -343,6 +343,12 @@ export default function Chess() {
       } else {
         return ineligableMoveClear()
       }
+    }else if(board[selectedSquare1][1] === 'L') {
+      if (connectLance() && noFriendlyFire() && noGhostingHorizontal()) { //Check if promoting
+        return true
+      } else {
+        return ineligableMoveClear()
+      }
     }else if(board[selectedSquare1][1] === 'K') {
       //console.log("Can castle?" + checkCastle())
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
