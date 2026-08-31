@@ -19,7 +19,7 @@ export default function Chess() {
 
   const boardLenght = 8
   const boardHeight = 8
-  const boardSquareCount = 64
+  const boardSquareCount = boardLenght * boardHeight
   
   const [turn, setTurn] = useState("W");
   const [selectedSquare1, setSelectedSquare1] = useState(boardSquareCount);
@@ -500,8 +500,8 @@ export default function Chess() {
   };
 
   //See if it is a legal pawn move
-  const connectPawn = () => {
-    const piece = board[selectedSquare1];
+  const connectPawn = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
+    const piece = boardToCheck[from];
     if (!piece || piece[1] !== 'P') return false;
   
     const type = piece[0]; // 'W' or 'B'
@@ -513,13 +513,13 @@ export default function Chess() {
   
     // Calculate row and col from square index
     const getCoords = (index) => [Math.floor(index / boardLenght), index % boardLenght];
-    const [row1, col1] = getCoords(selectedSquare1);
-    const [row2, col2] = getCoords(selectedSquare2);
+    const [row1, col1] = getCoords(from);
+    const [row2, col2] = getCoords(to);
   
     const deltaRow = row2 - row1;
     const deltaCol = col2 - col1;
   
-    const targetPiece = board[selectedSquare2];
+    const targetPiece = board[to];
     const targetType = targetPiece?.[0];
   
     // 1. Regular single forward move
@@ -535,8 +535,8 @@ export default function Chess() {
       }
   
       // En passant
-      if (selectedSquare2 === enpassent) {
-        const capturedSquare = selectedSquare2 + capturedOffset;
+      if (to === enpassent) {
+        const capturedSquare = to + capturedOffset;
         console.log("Enpassent move");
         console.log("Captured square: " + capturedSquare);
         //removePiece(capturedSquare);
@@ -546,7 +546,7 @@ export default function Chess() {
   
     // 3. Double move from starting row
     if (row1 === startRow && row2 === doubleStepRow && deltaCol === 0 && !targetPiece) {
-      const middleSquare = (selectedSquare1 + selectedSquare2) / 2;
+      const middleSquare = (from + to) / 2;
       if (board[middleSquare] === '') {
         //alert("Enpassent possible next move");
         console.log("Enpassent possible next move");
