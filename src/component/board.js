@@ -49,10 +49,6 @@ export default function Chess() {
       ineligableMoveClear()
     }
   }, [selectedSquare2]);
-  
-  useEffect(() => {
-    //console.log("Updated selectedSquare1:", selectedSquare1);
-  }, [selectedSquare1]);
 
   useEffect(() => {
     //alert("Enpassent square set to: " + enpassent);
@@ -83,7 +79,8 @@ export default function Chess() {
 
   const selectSquare = (id) => {
     if (selectedSquare1 !== boardSquareCount) {
-      if (board[id] && board[id][0] === turn) {
+      const selectingCastlingRook = board[selectedSquare1]?.[1] === "K" && board[id]?.[1] === "R";
+      if (board[id] && board[id][0] === turn && !selectingCastlingRook) {
         setSelectedSquare1(id);
         setFeedback("Choose a destination square");
         return;
@@ -317,6 +314,13 @@ export default function Chess() {
   };
 
   const checkIfPossibleMove = () => {
+    console.log("Checking if possible")
+    const castle = board[selectedSquare1]?.[1] === 'K' ? checkCastle() : false;
+    if (castle) {
+      "Can castle"
+      return castle;
+    }
+
     // Check if the move would leave own king in check
     if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
       console.log("Move would leave king in check!");
@@ -360,8 +364,6 @@ export default function Chess() {
     }else if(board[selectedSquare1][1] === 'K') {
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else if(checkCastle() && noGhostingHorizontal()){
-        return checkCastle()
       } else{
         return ineligableMoveClear()
       }
@@ -381,16 +383,6 @@ export default function Chess() {
   const reset = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
-    //console.log(board)
-    //alert("Can next move be enpassent: " + enpassentNextMove)
-    //alert("Enpassent square: " + enpassent)
-    /*
-    if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
-      setEnpassentNextMove(false)
-    }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
-      setEnpassent(-2)
-    }
-    */
     return false;
   }
 
@@ -597,57 +589,58 @@ export default function Chess() {
   }  
 
   const checkCastle = () => {
-    console.log("Checking if possible castle")
-    //Get the row and columns of the 2 pieces
-    let initial = selectedSquare1;
-    let initial2 = selectedSquare2
-    let square = selectedSquare1;
-    let row = 0;
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square >= boardLenght) {
-      row += 1;
-      square -= boardLenght;
-    }
-    while (square2 >= boardLenght) {
-      row2 += 1;
-      square2 -= boardLenght;
+    const king = board[selectedSquare1];
+    const rook = board[selectedSquare2];
+    if (!king || !rook || king[1] !== "K" || rook[1] !== "R" || king[0] !== rook[0]) {
+      console.log("Not king and or rook")
+      return false;
     }
 
-    //The king and rook have to be on the same square
-    if(row != row2){
-      console.log("Different rows")
-      return false
+    const color = king[0];
+    const homeRow = color === "W" ? 7 : 0;
+    const kingHome = homeRow * boardLenght + 4;
+    const rookHome = selectedSquare2 === homeRow * boardLenght ? homeRow * boardLenght : homeRow * boardLenght + 7;
+    if (selectedSquare1 !== kingHome || selectedSquare2 !== rookHome) {
+      return false;
     }
 
-    if(square == square2){
-      console.log("Same columns")
-      return false
+    if (moveHistory.some((move) => move.from === kingHome || move.from === rookHome)) {
+      return false;
     }
 
-    //Make sure it is the first king and that rooks move and no repeating castling
-
-    //Add check for no check
-
-    //Add check for not moving though check
-    if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
-      console.log("Possible valid castle")
-      if(square < square2){
-        let newKingLocation = "K" + String(initial+2)
-        let newRookLocation = "R" + String(initial+1)
-        return newKingLocation + newRookLocation
+    const direction = selectedSquare2 > selectedSquare1 ? 1 : -1;
+    const kingDestination = selectedSquare1 + direction * 2;
+    const rookDestination = selectedSquare1 + direction;
+    const betweenStart = Math.min(selectedSquare1, selectedSquare2) + 1;
+    const betweenEnd = Math.max(selectedSquare1, selectedSquare2);
+    for (let square = betweenStart; square < betweenEnd; square++) {
+      if (board[square] !== "") {
+        return false;
       }
-
-      if(square > square2){
-        let newKingLocation = "K" + String(initial-2)
-        let newRookLocation = "R" + String(initial-1)
-        return newKingLocation + newRookLocation
-      }
-      return false
     }
 
-    return false
+    const opponentColor = color === "W" ? "B" : "W";
+    if (isInCheck(color)) {
+      return false;
+    }
+
+    const transitBoard = [...board];
+    transitBoard[selectedSquare1] = "";
+    transitBoard[rookDestination] = king;
+    if (isSquareAttackedByColor(rookDestination, opponentColor, transitBoard)) {
+      return false;
+    }
+
+    const castleBoard = [...board];
+    castleBoard[selectedSquare1] = "";
+    castleBoard[selectedSquare2] = "";
+    castleBoard[kingDestination] = king;
+    castleBoard[rookDestination] = rook;
+    if (isSquareAttackedByColor(kingDestination, opponentColor, castleBoard)) {
+      return false;
+    }
+
+    return "K" + String(kingDestination) + "R" + String(rookDestination);
   }
   
   const makeMove = (specialSquare = -2) => {
