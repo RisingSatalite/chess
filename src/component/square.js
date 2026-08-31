@@ -25,7 +25,7 @@ const pieceImages = {
     BG: "/BlackKing.png",
 };
 
-export default function Square({ prop, onClickFunction, number = 0, selected = -1, row=0 }) {
+export default function Square({ prop, onClickFunction, number = 0, selected = -1, row=0, lastMove = null }) {
     const [imageError, setImageError] = useState(false);
 
     let bgColor;
@@ -41,7 +41,10 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     var black = "#353535";
     var white = "#f6f6f6";
 
-    if (number === selected) {
+    const isSelected = number === selected;
+    const isLastMove = lastMove && (number === lastMove.from || number === lastMove.to);
+
+    if (isSelected) {
         bgColor = "yellow";
         textColour = black
     } else if ((number + row) % 2 === 0) {
@@ -69,7 +72,13 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     const pieceHeight = 50;
     
     return (
-        <button onClick={onClickFunction} style={buttonStyle} className="square">
+        <button
+            onClick={onClickFunction}
+            style={buttonStyle}
+            className={`square chess-square${isLastMove ? " last-move" : ""}${isSelected ? " selected" : ""}`}
+            type="button"
+            aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
+        >
             {imageSrc && !imageError ? (
                 <Image
                     src={imageSrc}

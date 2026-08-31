@@ -25,7 +25,7 @@ const pieceImages = {
     BG: "/BlackKing.png",
 };
 
-export default function Square({ prop, onClickFunction, number = 0, selected = -1, boardwidth = 0, boardheight = 0 }) {
+export default function Square({ prop, onClickFunction, number = 0, selected = -1, lastMove = null }) {
     const [imageError, setImageError] = useState(false);
 
     let bgColor;
@@ -41,17 +41,10 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     var black = "#353535";
     var white = "#f6f6f6";
 
-    if (number === selected) {
-        bgColor = "yellow";
-        textColour = black
-    } else {
-        bgColor = white;
-        if(prop == ""){
-            textColour = white
-        }else{
-            textColour = black
-        }
-    }
+    const isSelected = number === selected;
+    const isLastMove = lastMove && (number === lastMove.from || number === lastMove.to);
+    bgColor = isSelected ? "#f5c84b" : white;
+    textColour = prop == "" ? white : black;
 
     const buttonStyle = {
         backgroundColor: bgColor,
@@ -62,7 +55,13 @@ export default function Square({ prop, onClickFunction, number = 0, selected = -
     const pieceHeight = 50;
     
     return (
-        <button onClick={onClickFunction} style={buttonStyle} className="square">
+        <button
+            onClick={onClickFunction}
+            style={buttonStyle}
+            className={`square${isLastMove ? " last-move" : ""}${isSelected ? " selected" : ""}`}
+            type="button"
+            aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
+        >
             {imageSrc && !imageError ? (
                 <Image
                     src={imageSrc}

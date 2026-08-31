@@ -4,7 +4,7 @@ import Square from "./square"
 import { useEffect, useState } from "react";
 
 export default function Chess() {
-  const [board, setBoard] = useState([
+  const initialBoard = [
     'BR','BN','BB','BK','BQ','BB','BN','BR',
     'BP','BP','BP','BP','BP','BP','BP','BP',
     '','','','','','','','',
@@ -13,7 +13,9 @@ export default function Chess() {
     '','','','','','','','',
     'WP','WP','WP','WP','WP','WP','WP','WP',
     'WR','WN','WB','WK','WQ','WB','WN','WR'
-  ]);
+  ];
+
+  const [board, setBoard] = useState(initialBoard);
 
   const boardLenght = 8
   const boardHeight = 8
@@ -24,6 +26,9 @@ export default function Chess() {
   const [selectedSquare2, setSelectedSquare2] = useState(boardSquareCount);
   const [enpassent, setEnpassent] = useState(-2)//Stores the square where enpassent can occur, -2 default for uninteractable
   const [gameStatus, setGameStatus] = useState("playing"); // "playing", "check", "checkmate", "stalemate"
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [lastMove, setLastMove] = useState(null);
+  const [feedback, setFeedback] = useState("Select a piece to begin");
 
   useEffect(() => {
     //console.log("Square 2 selected");
@@ -44,10 +49,6 @@ export default function Chess() {
       ineligableMoveClear()
     }
   }, [selectedSquare2]);
-  
-  useEffect(() => {
-    //console.log("Updated selectedSquare1:", selectedSquare1);
-  }, [selectedSquare1]);
 
   useEffect(() => {
     //alert("Enpassent square set to: " + enpassent);
@@ -77,18 +78,17 @@ export default function Chess() {
   }, [turn]);
 
   const selectSquare = (id) => {
-    console.log(id);
-    console.log(board[id][0]);
-    console.log(board[id][0] === turn);
-    console.log(selectedSquare1 !== boardSquareCount);
-    console.log(selectedSquare1);
-  
     if (selectedSquare1 !== boardSquareCount) {
+      const selectingCastlingRook = board[selectedSquare1]?.[1] === "K" && board[id]?.[1] === "R" && board[selectedSquare1][0] === board[id][0];
+      if (board[id] && board[id][0] === turn && !selectingCastlingRook) {
+        setSelectedSquare1(id);
+        setFeedback("Choose a destination square");
+        return;
+      }
       setSelectedSquare2(id);
-      console.log("Square selected", id);
-    } else if (board[id][0] === turn) {
-      console.log("Square selected", id);
+    } else if (board[id] && board[id][0] === turn) {
       setSelectedSquare1(id);
+      setFeedback("Choose a destination square");
     }
   };
 
@@ -314,6 +314,8 @@ export default function Chess() {
   };
 
   const checkIfPossibleMove = () => {
+    console.log("Checking if possible")
+
     // Check if the move would leave own king in check
     if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
       console.log("Move would leave king in check!");
@@ -355,11 +357,12 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
+      //console.log("Can castle?" + checkCastle())
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else if(checkCastle() && noGhostingHorizontal()){
-        return checkCastle()
-      } else{
+      } else if(checkCastle()){
+        return checkCastle();
+      } else {
         return ineligableMoveClear()
       }
     }
@@ -371,24 +374,26 @@ export default function Chess() {
   const ineligableMoveClear = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
+    setFeedback("That move is not legal");
     return false;
   }
 
   const reset = () => {
     setSelectedSquare1(boardSquareCount);
     setSelectedSquare2(boardSquareCount);
-    //console.log(board)
-    //alert("Can next move be enpassent: " + enpassentNextMove)
-    //alert("Enpassent square: " + enpassent)
-    /*
-    if(enpassentNextMove){//If true, set it to false, and let the next move occur, it may be enpassent
-      setEnpassentNextMove(false)
-    }else{//Mean false, so that the next move should not be enpassent, clear data from enpassent
-      setEnpassent(-2)
-    }
-    */
-    return false   
+    return false;
   }
+
+  const resetGame = () => {
+    setBoard(initialBoard);
+    setTurn("W");
+    setEnpassent(-2);
+    setGameStatus("playing");
+    setMoveHistory([]);
+    setLastMove(null);
+    setFeedback("Select a piece to begin");
+    reset();
+  };
   
   //Make sure the 2 selected squares make a valid rook move
   const horizontallyConnecting = () => {
@@ -582,57 +587,74 @@ export default function Chess() {
   }  
 
   const checkCastle = () => {
-    console.log("Checking if possible castle")
-    //Get the row and columns of the 2 pieces
-    let initial = selectedSquare1;
-    let initial2 = selectedSquare2
-    let square = selectedSquare1;
-    let row = 0;
-    let square2 = selectedSquare2;
-    let row2 = 0;
+    const king = board[selectedSquare1];
+    const rook = board[selectedSquare2];
+    if (!king || !rook || king[1] !== "K" || rook[1] !== "R" || king[0] !== rook[0]) {
+      console.log("Not king and or rook")
+      return false;
+    }
+
+    const color = king[0];
+    const homeRow = color === "W" ? 7 : 0;
+    const kingHome = homeRow * boardLenght + 3;
     
-    while (square >= boardLenght) {
-      row += 1;
-      square -= boardLenght;
-    }
-    while (square2 >= boardLenght) {
-      row2 += 1;
-      square2 -= boardLenght;
+    if (selectedSquare1 !== kingHome) {
+      console.log("Not original king square")
+      return false;
     }
 
-    //The king and rook have to be on the same square
-    if(row != row2){
-      console.log("Different rows")
-      return false
+    const kingsideRookHome = homeRow * boardLenght + 7;
+    const queensideRookHome = homeRow * boardLenght;
+
+    const isKingsideCastle = selectedSquare2 === kingsideRookHome;
+    const isQueensideCastle = selectedSquare2 === queensideRookHome;
+    if (!isKingsideCastle && !isQueensideCastle) {
+      return false;
     }
 
-    if(square == square2){
-      console.log("Same columns")
-      return false
+    const rookHome = isKingsideCastle ? kingsideRookHome : queensideRookHome;
+    if (moveHistory.some((move) => move.from === kingHome || move.from === rookHome)) {
+      return false;
     }
 
-    //Make sure it is the first king and that rooks move and no repeating castling
+    const kingDestination = isKingsideCastle ? kingHome + 2 : kingHome - 2;
+    const rookDestination = isKingsideCastle ? kingHome + 1 : kingHome - 1;
+    const pathSquares = isKingsideCastle
+      ? [kingHome + 1, kingHome + 2]
+      : [kingHome - 1, kingHome - 2];
 
-    //Add check for no check
+    if (pathSquares.some((square) => board[square] !== "")) {
+      console.log("Something in the way")
+      return false;
+    }
 
-    //Add check for not moving though check
-    if(board[selectedSquare1][1] == "K" && board[selectedSquare2][1] == "R" && board[selectedSquare1][0] == board[selectedSquare2][0]){
-      console.log("Possible valid castle")
-      if(square < square2){
-        let newKingLocation = "K" + String(initial+2)
-        let newRookLocation = "R" + String(initial+1)
-        return newKingLocation + newRookLocation
+    const opponentColor = color === "W" ? "B" : "W";
+    if (isInCheck(color)) {
+      console.log("Can not castle out of check")
+      return false;
+    }
+
+    const squaresKingMustNotCross = [...pathSquares];
+
+    for (const square of squaresKingMustNotCross) {
+      const simulatedBoard = [...board];
+      simulatedBoard[kingHome] = "";
+      simulatedBoard[square] = king;
+      if (isSquareAttackedByColor(square, opponentColor, simulatedBoard)) {
+        return false;
       }
-
-      if(square > square2){
-        let newKingLocation = "K" + String(initial-2)
-        let newRookLocation = "R" + String(initial-1)
-        return newKingLocation + newRookLocation
-      }
-      return false
     }
 
-    return false
+    const finalBoard = [...board];
+    finalBoard[kingHome] = "";
+    finalBoard[rookHome] = "";
+    finalBoard[kingDestination] = king;
+    finalBoard[rookDestination] = rook;
+    if (isSquareAttackedByColor(kingDestination, opponentColor, finalBoard)) {
+      return false;
+    }
+
+    return "K" + String(kingDestination) + "R" + String(rookDestination);
   }
   
   const makeMove = (specialSquare = -2) => {
@@ -640,26 +662,32 @@ export default function Chess() {
 
     let oldPiece = newBoard[selectedSquare1]
     let oldPiece2 = newBoard[selectedSquare2]
+    const wasCapture = Boolean(oldPiece2) || (typeof specialSquare === "number" && specialSquare !== -2 && newBoard[specialSquare]);
 
-    newBoard[selectedSquare2] = newBoard[selectedSquare1];
-    newBoard[selectedSquare1] = "";
     if(typeof specialSquare === "string") {
       if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
-        newBoard[selectedSquare2] = "";
-        const newSquares = specialSquare.replace("K", "").split("R")
+        const [kingTargetText, rookTargetText] = specialSquare.replace("K", "").split("R");
+        const kingTarget = Number(kingTargetText);
+        const rookTarget = Number(rookTargetText);
 
-        newBoard[newSquares[0]] = oldPiece
-        newBoard[newSquares[1]] = oldPiece2
+        newBoard[selectedSquare1] = "";
+        newBoard[selectedSquare2] = "";
+        newBoard[kingTarget] = oldPiece;
+        newBoard[rookTarget] = oldPiece2;
       }
-    }else if(specialSquare != -2){
-      if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
-        setEnpassent(specialSquare);
-      }else{//Otherwise, remove the piece
-        console.log("Piece removed at square: " + specialSquare)
-        newBoard[specialSquare] = "";
+    } else {
+      newBoard[selectedSquare2] = newBoard[selectedSquare1];
+      newBoard[selectedSquare1] = "";
+      if(specialSquare != -2){
+        if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
+          setEnpassent(specialSquare);
+        }else{//Otherwise, remove the piece
+          console.log("Piece removed at square: " + specialSquare)
+          newBoard[specialSquare] = "";
+        }
+      }else{
+        setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
       }
-    }else{
-      setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
     }
 
     //Move the pawn promote to queen if it reaches the end
@@ -676,6 +704,12 @@ export default function Chess() {
     }
 
     setBoard(newBoard);
+    setLastMove({ from: selectedSquare1, to: selectedSquare2 });
+    setMoveHistory((history) => [
+      ...history,
+      { piece: oldPiece, from: selectedSquare1, to: selectedSquare2, captured: Boolean(wasCapture) },
+    ]);
+    setFeedback(wasCapture ? "Capture made" : "Move made");
   
     reset()
   };
@@ -684,43 +718,83 @@ export default function Chess() {
     setTurn(turn === "W" ? "B" : "W");
   };
 
+  const statusMessage = gameStatus === "checkmate"
+    ? `${turn === "W" ? "Black" : "White"} wins the match.`
+    : gameStatus === "check"
+      ? `${turn === "W" ? "White" : "Black"} king is under attack.`
+      : gameStatus === "stalemate"
+        ? "No legal moves remain."
+        : "Checkmate the opposing king to win.";
+
   return (
-    <div id="chess">
-      <span>
-        Chess
-        <button className="majorButton" onClick={() =>{ setBoard([
-          'BR','BN','BB','BK','BQ','BB','BN','BR',
-          'BP','BP','BP','BP','BP','BP','BP','BP',
-          '','','','','','','','',
-          '','','','','','','','',
-          '','','','','','','','',
-          '','','','','','','','',
-          'WP','WP','WP','WP','WP','WP','WP','WP',
-          'WR','WN','WB','WK','WQ','WB','WN','WR'
-        ]);
-          setTurn("W");
-          setGameStatus("playing");
-        }}>Reset</button>
+    <main className="xiangqi-shell chess-shell">
+      <header className="game-header">
         <div>
-          <p>It is {turn} turn</p>
-          {gameStatus === "checkmate" && <p style={{color: "red", fontWeight: "bold"}}>CHECKMATE! {turn === "W" ? "Black" : "White"} wins!</p>}
-          {gameStatus === "check" && <p style={{color: "orange", fontWeight: "bold"}}>CHECK!</p>}
-          {gameStatus === "stalemate" && <p style={{color: "blue", fontWeight: "bold"}}>STALEMATE!</p>}
+          <p className="eyebrow">Two-player board game</p>
+          <h1>Chess</h1>
+          <p className="subtitle">Classic chess on an 8 x 8 board</p>
         </div>
-        {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => (
-              <Square
-                key={rowIndex * boardLenght + index}
-                number={rowIndex * boardLenght + index}
-                onClickFunction={() => selectSquare(rowIndex * boardLenght + index)}
-                prop={item}
-                selected={selectedSquare1}
-                row={rowIndex}
-              />
-            ))}
+        <button className="majorButton" onClick={resetGame} type="button">New game</button>
+      </header>
+
+      <div className="game-layout">
+        <section className="board-panel" aria-label="Chess board">
+          <div className={`turn-bar turn-bar-${gameStatus}`}>
+            <span className={`turn-marker ${turn === "W" ? "red" : "black"}`} />
+            <div>
+              <strong>{turn === "W" ? "White" : "Black"} to move</strong>
+              <span className="feedback">{feedback}</span>
+            </div>
+            <span className={`status status-${gameStatus}`}>{gameStatus}</span>
           </div>
-        ))}
-      </span>
-    </div>
+          <div className="board-frame chess-board-frame">
+            <div className="board-grid chess-board-grid">
+              {Array.from({ length: Math.ceil(board.length / boardLenght) }, (_, rowIndex) => (
+                <div key={rowIndex} className="row">
+                  {board.slice(rowIndex * boardLenght, rowIndex * boardLenght + boardLenght).map((item, index) => {
+                    const squareNumber = rowIndex * boardLenght + index;
+                    return (
+                      <Square
+                        key={squareNumber}
+                        number={squareNumber}
+                        onClickFunction={() => selectSquare(squareNumber)}
+                        prop={item}
+                        selected={selectedSquare1}
+                        row={rowIndex}
+                        lastMove={lastMove}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <aside className="game-sidebar">
+          <div className={`rules-panel status-panel status-panel-${gameStatus}`} role="status" aria-live="polite">
+            <p className="eyebrow">Match status</p>
+            <h2 className="status-title">
+              {gameStatus === "playing" ? "In play" : gameStatus === "check" ? "Check" : gameStatus === "checkmate" ? "Checkmate" : "Stalemate"}
+            </h2>
+            <p className="status-message">{statusMessage}</p>
+          </div>
+          <div className="history-panel">
+            <div className="history-heading"><h2>Move history</h2><span>{moveHistory.length}</span></div>
+            {moveHistory.length === 0 ? (
+              <p className="empty-history">Moves will appear here.</p>
+            ) : (
+              <ol className="move-list">
+                {moveHistory.slice(-8).map((move, index) => (
+                  <li key={`${move.from}-${move.to}-${index}`}>
+                    <span>{Math.floor(move.from / boardLenght) + 1}.{move.piece}</span>
+                    <span>{Math.floor(move.to / boardLenght) + 1}-{(move.to % boardLenght) + 1}{move.captured ? " x" : ""}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </aside>
+      </div>
+    </main>
   )}
