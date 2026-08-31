@@ -570,37 +570,36 @@ export default function Chess() {
   
   const makeMove = (specialSquare = -2) => {
     const newBoard = [...board];
+    const fromSquare = selectedSquare1;
+    const toSquare = typeof specialSquare === "number" && specialSquare !== -2 ? specialSquare : selectedSquare2;
+    const movingPiece = newBoard[fromSquare];
+    const capturedPiece = newBoard[toSquare];
 
-    let oldPiece = newBoard[selectedSquare1]
-    let oldPiece2 = newBoard[selectedSquare2]
-    const wasCapture = Boolean(oldPiece2) || (typeof specialSquare === "number" && specialSquare !== -2 && newBoard[specialSquare]);
-
-    if(typeof specialSquare === "string") {
-      //Preform special move
+    if (!movingPiece) {
+      reset();
+      return;
     }
 
-    //Move the pawn promote to queen if it reaches the end
-    let column2 = selectedSquare2;
-    let row2 = 0;
-    while (column2 - boardLenght >= 0) {
-      row2 += 1;
-      column2 -= boardLenght;
-    }
-    if(newBoard[selectedSquare2] == "WP" && row2 == 0){
-      newBoard[selectedSquare2] = "WQ"
-    }else if(newBoard[selectedSquare2] == "BP" && row2 == 7){
-      newBoard[selectedSquare2] = "BQ"
+    newBoard[toSquare] = movingPiece;
+    newBoard[fromSquare] = '';
+
+    const pieceType = movingPiece[1];
+    const pieceColor = movingPiece[0];
+    const destinationRow = Math.floor(toSquare / boardLenght);
+
+    if (pieceType === 'P' && ((pieceColor === 'W' && destinationRow === 0) || (pieceColor === 'B' && destinationRow === boardHeight - 1))) {
+      newBoard[toSquare] = pieceColor === 'W' ? 'WQ' : 'BQ';
     }
 
     setBoard(newBoard);
-    setLastMove({ from: selectedSquare1, to: selectedSquare2 });
+    setLastMove({ from: fromSquare, to: toSquare });
     setMoveHistory((history) => [
       ...history,
-      { piece: oldPiece, from: selectedSquare1, to: selectedSquare2, captured: Boolean(wasCapture) },
+      { piece: movingPiece, from: fromSquare, to: toSquare, captured: Boolean(capturedPiece) },
     ]);
-    setFeedback(wasCapture ? "Capture made" : "Move made");
-  
-    reset()
+    setFeedback(capturedPiece ? "Capture made" : "Move made");
+
+    reset();
   };
 
   const turnChange = () => {
