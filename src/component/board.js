@@ -357,11 +357,11 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
-      console.log("Can castle?" + checkCastle())
+      //console.log("Can castle?" + checkCastle())
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
       } else if(checkCastle()){
-        return true;
+        return checkCastle();
       } else {
         return ineligableMoveClear()
       }
@@ -617,9 +617,11 @@ export default function Chess() {
       return false;
     }
 
+    const kingDestination = isKingsideCastle ? kingHome + 2 : kingHome - 2;
+    const rookDestination = isKingsideCastle ? kingHome + 1 : kingHome - 1;
     const pathSquares = isKingsideCastle
-      ? [homeRow * boardLenght + 4, homeRow * boardLenght + 5, homeRow * boardLenght + 6]
-      : [homeRow * boardLenght + 1, homeRow * boardLenght + 2];
+      ? [kingHome + 1, kingHome + 2]
+      : [kingHome - 1, kingHome - 2];
 
     if (pathSquares.some((square) => board[square] !== "")) {
       console.log("Something in the way")
@@ -632,11 +634,7 @@ export default function Chess() {
       return false;
     }
 
-    const kingDestination = isKingsideCastle ? kingHome + 2 : kingHome - 2;
-    const rookDestination = isKingsideCastle ? kingHome + 1 : kingHome - 1;
-    const squaresKingMustNotCross = isKingsideCastle
-      ? [kingHome + 1, kingHome + 2]
-      : [kingHome - 1, kingHome - 2];
+    const squaresKingMustNotCross = [...pathSquares];
 
     for (const square of squaresKingMustNotCross) {
       const simulatedBoard = [...board];
@@ -666,25 +664,30 @@ export default function Chess() {
     let oldPiece2 = newBoard[selectedSquare2]
     const wasCapture = Boolean(oldPiece2) || (typeof specialSquare === "number" && specialSquare !== -2 && newBoard[specialSquare]);
 
-    newBoard[selectedSquare2] = newBoard[selectedSquare1];
-    newBoard[selectedSquare1] = "";
     if(typeof specialSquare === "string") {
       if(specialSquare && specialSquare.includes("K") && specialSquare.includes("R")){
-        newBoard[selectedSquare2] = "";
-        const newSquares = specialSquare.replace("K", "").split("R")
+        const [kingTargetText, rookTargetText] = specialSquare.replace("K", "").split("R");
+        const kingTarget = Number(kingTargetText);
+        const rookTarget = Number(rookTargetText);
 
-        newBoard[newSquares[0]] = oldPiece
-        newBoard[newSquares[1]] = oldPiece2
+        newBoard[selectedSquare1] = "";
+        newBoard[selectedSquare2] = "";
+        newBoard[kingTarget] = oldPiece;
+        newBoard[rookTarget] = oldPiece2;
       }
-    }else if(specialSquare != -2){
-      if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
-        setEnpassent(specialSquare);
-      }else{//Otherwise, remove the piece
-        console.log("Piece removed at square: " + specialSquare)
-        newBoard[specialSquare] = "";
+    } else {
+      newBoard[selectedSquare2] = newBoard[selectedSquare1];
+      newBoard[selectedSquare1] = "";
+      if(specialSquare != -2){
+        if(newBoard[specialSquare] == ""){//If the square is empty, then save it for enpassent
+          setEnpassent(specialSquare);
+        }else{//Otherwise, remove the piece
+          console.log("Piece removed at square: " + specialSquare)
+          newBoard[specialSquare] = "";
+        }
+      }else{
+        setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
       }
-    }else{
-      setEnpassent(-2)//Because the next move can not be enpassent, set it to -2
     }
 
     //Move the pawn promote to queen if it reaches the end
