@@ -136,7 +136,7 @@ export default function Chess() {
       
       // Check each piece type for possible attack
       if (pieceName === 'P') {
-        if (canPawnAttack(i, targetSquare, attackingColor, boardToCheck)) return true;
+        if (connectPawn(i, targetSquare, boardToCheck, true)) return true;
       } else if (pieceName === 'R') {
         if (canRookAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'B') {
@@ -150,17 +150,6 @@ export default function Chess() {
       }
     }
     return false;
-  };
-
-  // Pawn attack check
-  const canPawnAttack = (fromSquare, toSquare, color, boardToCheck) => {
-    const direction = color === 'W' ? -1 : 1;
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    return toRow === fromRow + direction && Math.abs(toCol - fromCol) === 1;
   };
 
   // Rook attack check
@@ -217,6 +206,8 @@ export default function Chess() {
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
     const toCol = toSquare % boardLenght;
+
+    const direction = color === fromSquare[0] ? -2 : 2;
     
     const rowDiff = Math.abs(fromRow - toRow);
     const colDiff = Math.abs(fromCol - toCol);
@@ -294,39 +285,6 @@ export default function Chess() {
     return true;
   };
 
-  // Check if pawn move is valid
-  const canPawnMove = (from, to, boardToCheck, color) => {
-    if (!isSimpleMove(from, to, boardToCheck, color)) return false;
-    
-    const fromRow = Math.floor(from / boardLenght);
-    const fromCol = from % boardLenght;
-    const toRow = Math.floor(to / boardLenght);
-    const toCol = to % boardLenght;
-    
-    const direction = color === 'W' ? -1 : 1;
-    const startRow = color === 'W' ? 6 : 1;
-    const deltaRow = toRow - fromRow;
-    const deltaCol = toCol - fromCol;
-    
-    // Single forward move
-    if (deltaRow === direction && deltaCol === 0 && !boardToCheck[to]) {
-      return true;
-    }
-    
-    // Double forward move from start
-    if (fromRow === startRow && toRow === fromRow + 2 * direction && deltaCol === 0 && !boardToCheck[to]) {
-      const middleSquare = from + boardLenght * direction;
-      return !boardToCheck[middleSquare];
-    }
-    
-    // Diagonal capture
-    if (deltaRow === direction && Math.abs(deltaCol) === 1 && boardToCheck[to] && boardToCheck[to][0] !== color) {
-      return true;
-    }
-    
-    return false;
-  };
-
   // Check if piece move is valid
   const isValidPieceMove = (from, to, boardToCheck, color) => {
     const piece = boardToCheck[from];
@@ -337,7 +295,7 @@ export default function Chess() {
     
     const pieceName = piece[1];
     
-    if (pieceName === 'P') return canPawnMove(from, to, boardToCheck, color);
+    if (pieceName === 'P') return connectPawn(from, to, boardToCheck);
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
     if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
     if (pieceName === 'N') return canKnightAttack(from, to);
@@ -489,26 +447,23 @@ export default function Chess() {
     return (Math.abs(square-square2)==Math.abs(row-row2))
   };
 
-  //See if it is a legal pawn move
-  const connectPawn = () => {
-    const piece = board[selectedSquare1];
+  //See if it is a legal pawn move or attack
+  const connectPawn = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
+    const piece = boardToCheck[from];
     if (!piece || piece[1] !== 'P') return false;
   
     const type = piece[0]; // 'W' or 'B'
     const isWhite = type === 'W';
     const direction = isWhite ? -1 : 1;
   
-    // Calculate row and col from square index
     const getCoords = (index) => [Math.floor(index / boardLenght), index % boardLenght];
-    const [row1, col1] = getCoords(selectedSquare1);
-    const [row2, col2] = getCoords(selectedSquare2);
+    const [row1, col1] = getCoords(from);
+    const [row2, col2] = getCoords(to);
   
     const deltaRow = row2 - row1;
     const deltaCol = col2 - col1;
-  
-    const targetPiece = board[selectedSquare2];
-  
-    // 1. Regular single forward move
+    const targetPiece = boardToCheck[to];
+
     if (deltaRow === direction && deltaCol === 0 && !targetPiece) {
       return true;
     }
