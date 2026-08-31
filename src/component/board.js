@@ -79,7 +79,7 @@ export default function Chess() {
 
   const selectSquare = (id) => {
     if (selectedSquare1 !== boardSquareCount) {
-      const selectingCastlingRook = board[selectedSquare1]?.[1] === "K" && board[id]?.[1] === "R";
+      const selectingCastlingRook = board[selectedSquare1]?.[1] === "K" && board[id]?.[1] === "R" && board[selectedSquare1][0] === board[id][0];
       if (board[id] && board[id][0] === turn && !selectingCastlingRook) {
         setSelectedSquare1(id);
         setFeedback("Choose a destination square");
@@ -315,11 +315,6 @@ export default function Chess() {
 
   const checkIfPossibleMove = () => {
     console.log("Checking if possible")
-    const castle = board[selectedSquare1]?.[1] === 'K' ? checkCastle() : false;
-    if (castle) {
-      "Can castle"
-      return castle;
-    }
 
     // Check if the move would leave own king in check
     if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
@@ -362,9 +357,12 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
+      console.log("Can castle?" + checkCastle())
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
-      } else{
+      } else if(checkCastle()){
+        return true;
+      } else {
         return ineligableMoveClear()
       }
     }
@@ -599,24 +597,31 @@ export default function Chess() {
     const color = king[0];
     const homeRow = color === "W" ? 7 : 0;
     const kingHome = homeRow * boardLenght + 4;
-    const rookHome = selectedSquare2 === homeRow * boardLenght ? homeRow * boardLenght : homeRow * boardLenght + 7;
-    if (selectedSquare1 !== kingHome || selectedSquare2 !== rookHome) {
+    const kingsideRookHome = homeRow * boardLenght + 7;
+    const queensideRookHome = homeRow * boardLenght;
+
+    if (selectedSquare1 !== kingHome) {
+      console.log("Not original king square")
       return false;
     }
 
+    const isKingsideCastle = selectedSquare2 === kingsideRookHome;
+    const isQueensideCastle = selectedSquare2 === queensideRookHome;
+    if (!isKingsideCastle && !isQueensideCastle) {
+      return false;
+    }
+
+    const rookHome = isKingsideCastle ? kingsideRookHome : queensideRookHome;
     if (moveHistory.some((move) => move.from === kingHome || move.from === rookHome)) {
       return false;
     }
 
-    const direction = selectedSquare2 > selectedSquare1 ? 1 : -1;
-    const kingDestination = selectedSquare1 + direction * 2;
-    const rookDestination = selectedSquare1 + direction;
-    const betweenStart = Math.min(selectedSquare1, selectedSquare2) + 1;
-    const betweenEnd = Math.max(selectedSquare1, selectedSquare2);
-    for (let square = betweenStart; square < betweenEnd; square++) {
-      if (board[square] !== "") {
-        return false;
-      }
+    const pathSquares = isKingsideCastle
+      ? [homeRow * boardLenght + 5, homeRow * boardLenght + 6]
+      : [homeRow * boardLenght + 1, homeRow * boardLenght + 2, homeRow * boardLenght + 3];
+
+    if (pathSquares.some((square) => board[square] !== "")) {
+      return false;
     }
 
     const opponentColor = color === "W" ? "B" : "W";
@@ -624,19 +629,27 @@ export default function Chess() {
       return false;
     }
 
-    const transitBoard = [...board];
-    transitBoard[selectedSquare1] = "";
-    transitBoard[rookDestination] = king;
-    if (isSquareAttackedByColor(rookDestination, opponentColor, transitBoard)) {
-      return false;
+    const kingDestination = isKingsideCastle ? kingHome + 2 : kingHome - 2;
+    const rookDestination = isKingsideCastle ? kingHome + 1 : kingHome - 1;
+    const squaresKingMustNotCross = isKingsideCastle
+      ? [kingHome + 1, kingHome + 2]
+      : [kingHome - 1, kingHome - 2];
+
+    for (const square of squaresKingMustNotCross) {
+      const simulatedBoard = [...board];
+      simulatedBoard[kingHome] = "";
+      simulatedBoard[square] = king;
+      if (isSquareAttackedByColor(square, opponentColor, simulatedBoard)) {
+        return false;
+      }
     }
 
-    const castleBoard = [...board];
-    castleBoard[selectedSquare1] = "";
-    castleBoard[selectedSquare2] = "";
-    castleBoard[kingDestination] = king;
-    castleBoard[rookDestination] = rook;
-    if (isSquareAttackedByColor(kingDestination, opponentColor, castleBoard)) {
+    const finalBoard = [...board];
+    finalBoard[kingHome] = "";
+    finalBoard[rookHome] = "";
+    finalBoard[kingDestination] = king;
+    finalBoard[rookDestination] = rook;
+    if (isSquareAttackedByColor(kingDestination, opponentColor, finalBoard)) {
       return false;
     }
 
