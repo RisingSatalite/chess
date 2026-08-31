@@ -637,7 +637,7 @@ export default function XiangqiChess() {
         <div>
           <p className="eyebrow">Two-player board game</p>
           <h1>Xiangqi</h1>
-          <p className="subtitle">Chinese chess on a 9 x 10 river board</p>
+          <p className="subtitle">Chinese chess on a river board</p>
         </div>
         <button className="majorButton" onClick={resetGame} type="button">New game</button>
       </header>
