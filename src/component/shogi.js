@@ -17,6 +17,8 @@ export default function Chess() {
   ];
 
   const [board, setBoard] = useState(initialBoard);
+  const initialCaptured = { W: ['P'], B: ['P'] };
+  const [capturedPieces, setCapturedPieces] = useState(initialCaptured);
 
   const boardLenght = 9
   const boardHeight = 9
@@ -100,8 +102,67 @@ export default function Chess() {
     setFeedback("Drag to a destination square");
   };
 
+  const normalizeCapturedPiece = (pieceCode) => {
+    if (!pieceCode) return null;
+    return pieceCode[1] || pieceCode;
+  };
+
+  const isValidCapturedDrop = (pieceType, targetIndex) => {
+    if (!pieceType || board[targetIndex]) return false;
+
+    const playerColor = turn;
+    const targetRow = Math.floor(targetIndex / boardLenght);
+    const targetCol = targetIndex % boardLenght;
+
+    if (pieceType === 'P') {
+      const sameFilePawnExists = board.some((square, index) => square === `${playerColor}P` && index % boardLenght === targetCol);
+      if (sameFilePawnExists) return false;
+      if (playerColor === 'W' && targetRow === 0) return false;
+      if (playerColor === 'B' && targetRow === boardHeight - 1) return false;
+    }
+
+    return true;
+  };
+
+  const handleCapturedDragStart = (event, pieceType) => {
+    event.dataTransfer.effectAllowed = 'copy';
+    event.dataTransfer.setData('application/x-shogi-drop', JSON.stringify({ pieceType }));
+    setFeedback(`Drag ${pieceType} onto the board`);
+  };
+
   const handleDrop = (event, targetIndex) => {
     event.preventDefault();
+
+    const droppedPieceData = event.dataTransfer.getData('application/x-shogi-drop');
+    if (droppedPieceData) {
+      try {
+        const { pieceType } = JSON.parse(droppedPieceData);
+        if (!pieceType) {
+          return;
+        }
+
+        if (!isValidCapturedDrop(pieceType, targetIndex)) {
+          setFeedback('That drop is not legal');
+          return;
+        }
+
+        const nextBoard = [...board];
+        const droppedPieceCode = `${turn}${pieceType}`;
+        nextBoard[targetIndex] = droppedPieceCode;
+        setBoard(nextBoard);
+        setCapturedPieces((previous) => ({
+          ...previous,
+          [turn]: previous[turn].filter((piece) => piece !== pieceType),
+        }));
+        setFeedback(`${pieceType} dropped`);
+        setSelectedSquare1(boardSquareCount);
+        setSelectedSquare2(boardSquareCount);
+        setTurn(turn === 'W' ? 'B' : 'W');
+        return;
+      } catch (error) {
+        console.error('Failed to parse captured drop payload', error);
+      }
+    }
 
     const draggedFrom = Number(event.dataTransfer.getData("text/plain"));
     if (!Number.isInteger(draggedFrom)) {
@@ -207,8 +268,6 @@ export default function Chess() {
     const toRow = Math.floor(toSquare / boardLenght);
     const toCol = toSquare % boardLenght;
 
-    const direction = color === fromSquare[0] ? -2 : 2;
-    
     const rowDiff = Math.abs(fromRow - toRow);
     const colDiff = Math.abs(fromCol - toCol);
     
@@ -374,6 +433,7 @@ export default function Chess() {
 
   const resetGame = () => {
     setBoard(initialBoard);
+    setCapturedPieces(initialCaptured);
     setTurn("W");
     setGameStatus("playing");
     setMoveHistory([]);
@@ -574,6 +634,16 @@ export default function Chess() {
       return;
     }
 
+    if (capturedPiece) {
+      const normalizedCapture = normalizeCapturedPiece(capturedPiece);
+      if (normalizedCapture) {
+        setCapturedPieces((previous) => ({
+          ...previous,
+          [movingPiece[0]]: [...(previous[movingPiece[0]] || []), normalizedCapture],
+        }));
+      }
+    }
+
     newBoard[toSquare] = movingPiece;
     newBoard[fromSquare] = '';
 
@@ -647,6 +717,7 @@ export default function Chess() {
                         selected={selectedSquare1}
                         row={rowIndex}
                         lastMove={lastMove}
+                        dataTestId={`board-square-${squareNumber}`}
                       />
                     );
                   })}
@@ -678,6 +749,45 @@ export default function Chess() {
                 ))}
               </ol>
             )}
+          </div>
+          <div className="history-panel" style={{ marginTop: '1rem' }}>
+            <div className="history-heading"><h2>Captured pieces</h2><span>{Object.values(capturedPieces).flat().length}</span></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.75rem' }}>
+              {(['W', 'B']).map((player) => (
+                <div key={player} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', minWidth: '100%' }}>
+                  <strong style={{ width: '100%', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.7 }}>
+                    {player === 'W' ? 'White' : 'Black'}
+                  </strong>
+                  {capturedPieces[player].length === 0 ? (
+                    <span style={{ opacity: 0.6 }}>None</span>
+                  ) : (
+                    capturedPieces[player].map((pieceCode, index) => (
+                      <button
+                        key={`${player}-${pieceCode}-${index}`}
+                        type="button"
+                        draggable={player === turn}
+                        data-testid={`captured-piece-${player}-${pieceCode}`}
+                        onDragStart={(event) => handleCapturedDragStart(event, pieceCode)}
+                        onDragOver={(event) => event.preventDefault()}
+                        style={{
+                          minWidth: '2.5rem',
+                          minHeight: '2.5rem',
+                          borderRadius: '0.5rem',
+                          border: '1px solid #cbd5e1',
+                          background: '#fff',
+                          fontSize: '1.1rem',
+                          cursor: player === turn ? 'grab' : 'not-allowed',
+                          opacity: player === turn ? 1 : 0.7,
+                        }}
+                        aria-label={`${player === 'W' ? 'White' : 'Black'} captured ${pieceCode}`}
+                      >
+                        {pieceCode}
+                      </button>
+                    ))
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </aside>
       </div>
