@@ -203,7 +203,7 @@ export default function Chess() {
       } else if (pieceName === 'B') {
         if (canBishopAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'N') {
-        if (canKnightAttack(i, targetSquare)) return true;
+        if (canKnightAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'Q') {
         if (canQueenAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'K') {
@@ -262,17 +262,17 @@ export default function Chess() {
   };
 
   // Knight attack check
-  const canKnightAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2) => {
+  const canKnightAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
     const toCol = toSquare % boardLenght;
 
-    const type = fromSquare[0]; // 'W' or 'B'
+    const type = boardToCheck[fromSquare]?.[0]; // 'W' or 'B'
     const isWhite = type === 'W';
     const direction = isWhite ? -1 : 1;
 
-    const rowDiff = (fromRow - toRow);
+    const rowDiff = (toRow - fromRow);
     const colDiff = Math.abs(fromCol - toCol);
     
     return (rowDiff === (2 * direction) && colDiff === 1);
@@ -361,7 +361,7 @@ export default function Chess() {
     if (pieceName === 'P') return connectPawn(from, to, boardToCheck);
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
     if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
-    if (pieceName === 'N') return canKnightAttack(from, to);
+    if (pieceName === 'N') return canKnightAttack(from, to, boardToCheck);
     if (pieceName === 'Q') return canQueenAttack(from, to, boardToCheck);
     if (pieceName === 'K') return canKingAttack(from, to);
     
