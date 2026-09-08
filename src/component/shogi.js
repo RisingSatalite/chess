@@ -268,10 +268,14 @@ export default function Chess() {
     const toRow = Math.floor(toSquare / boardLenght);
     const toCol = toSquare % boardLenght;
 
-    const rowDiff = Math.abs(fromRow - toRow);
+    const type = fromSquare[0]; // 'W' or 'B'
+    const isWhite = type === 'W';
+    const direction = isWhite ? -1 : 1;
+
+    const rowDiff = (fromRow - toRow);
     const colDiff = Math.abs(fromCol - toCol);
     
-    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+    return (rowDiff === (2 * direction) && colDiff === 1);
   };
 
   // Queen attack check
