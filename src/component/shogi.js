@@ -483,8 +483,20 @@ export default function Chess() {
       } else {
         return ineligableMoveClear()
       }
+    }else if(board[selectedSquare1][2] === 'R') {//DR
+      if (canDragonRookAttack() && noFriendlyFire()) {
+        return true;
+      } else {
+        return ineligableMoveClear()
+      }
     }else if(board[selectedSquare1][1] === 'B') {
       if (canBishopAttack() && noFriendlyFire()) {
+        return true;
+      } else {
+        return ineligableMoveClear()
+      }
+    }else if(board[selectedSquare1][2] === 'B') {//DB
+      if (canDragonBishopAttack() && noFriendlyFire()) {
         return true;
       } else {
         return ineligableMoveClear()
