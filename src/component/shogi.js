@@ -647,17 +647,6 @@ export default function Chess() {
     return row === row2 || square === square2;
   };
 
-  const connectingBishop = () => {
-    if(diagonalConnecting()){
-      if(noFriendlyFire()){
-        return true
-      }
-    }else{
-      return false
-    }
-    return false
-  }
-
   const noFriendlyFire = () => {
     if(board[selectedSquare1][0] == "W" && (board[selectedSquare2][0] == "B" || board[selectedSquare2][0] == undefined)){
       return true
@@ -667,27 +656,6 @@ export default function Chess() {
     console.log("No friendly fire allowed")
     return false
   }
-
-  const diagonalConnecting = () => {
-    let square = selectedSquare1;
-    let row = 0;
-
-    let square2 = selectedSquare2;
-    let row2 = 0;
-    
-    while (square - boardLenght >= 0) {
-      row += 1;
-      square -= boardLenght;
-    }
-  
-    while (square2 - boardLenght >= 0) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-  
-    console.log(Math.abs(square-square2)==Math.abs(row-row2))
-    return (Math.abs(square-square2)==Math.abs(row-row2))
-  };
 
   //See if it is a legal pawn move or attack
   const connectPawn = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
