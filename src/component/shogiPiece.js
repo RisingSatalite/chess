@@ -51,11 +51,7 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
         textColour = black
     } else {
         bgColor = yellow;
-        if(prop == ""){
-            textColour = black
-        }else{
-            textColour = white
-        }
+        textColour = black
     }
 
     const buttonStyle = {
