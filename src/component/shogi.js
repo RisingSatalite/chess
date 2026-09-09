@@ -538,7 +538,7 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'L') {
-      if (connectLance() && noFriendlyFire() && noGhostingHorizontal()) { //Check if promoting
+      if (connectLance() && noFriendlyFire()) { //Check if promoting
         return true
       } else {
         return ineligableMoveClear()
@@ -724,12 +724,13 @@ export default function Chess() {
   
     // Rush attack
     if (deltaRow < 0 && direction == -1 && deltaCol === 0) {
-      return true;
+      return noGhostingHorizontal();
     }
     if (deltaRow > 0 && direction == 1 && deltaCol === 0) {
-      return true;
+      return noGhostingHorizontal();
     }
   
+    //Doesn't do anything else
     return false;
   };
   
