@@ -318,7 +318,24 @@ export default function Chess() {
     return false
   };
 
+  const canSliverGeneralAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
 
+    const rowDiff = Math.abs(toRow - fromRow);
+    const colDiff = Math.abs(fromCol - toCol);
+    if(rowDiff == 1 && colDiff == 1){
+      return true
+    }
+
+    const type = boardToCheck[fromSquare]?.[0]; // 'W' or 'B'
+    const isWhite = type === 'W';
+    const direction = isWhite ? -1 : 1;
+    
+    return (((toRow - fromRow) == direction) && (colDiff == 0))
+  };
 
   // Find king position
   const findKing = (color, boardToCheck = board) => {
@@ -432,6 +449,12 @@ export default function Chess() {
       }
     }else if(board[selectedSquare1][1] === 'G') {
       if (canGoldGeneralAttack() && noFriendlyFire()) { //Check if promoting
+        return true
+      } else {
+        return ineligableMoveClear()
+      }
+    }else if(board[selectedSquare1][1] === 'S') {
+      if (canSliverGeneralAttack() && noFriendlyFire()) { //Check if promoting
         return true
       } else {
         return ineligableMoveClear()
