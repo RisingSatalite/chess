@@ -40,26 +40,21 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
 
     var black = "#353535";
     var white = "#f6f6f6";
+    var selected = "ffffbb";
+    var yellow = "#ffdaa4";
 
     const isSelected = number === selected;
     const isLastMove = lastMove && (number === lastMove.from || number === lastMove.to);
 
     if (isSelected) {
-        bgColor = "yellow";
+        bgColor = selected;
         textColour = black
-    } else if ((number + row) % 2 === 0) {
-        bgColor = black;
-        if(prop == ""){
-            textColour = black
-        }else{
-            textColour = white
-        }
     } else {
-        bgColor = white;
+        bgColor = yellow;
         if(prop == ""){
-            textColour = white
-        }else{
             textColour = black
+        }else{
+            textColour = white
         }
     }
 
