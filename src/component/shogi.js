@@ -17,7 +17,7 @@ export default function Chess() {
   ];
 
   const [board, setBoard] = useState(initialBoard);
-  const initialCaptured = { W: ['P'], B: ['P'] };
+  const initialCaptured = { W: [], B: [] };
   const [capturedPieces, setCapturedPieces] = useState(initialCaptured);
 
   const boardLenght = 9
