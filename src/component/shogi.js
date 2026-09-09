@@ -204,8 +204,6 @@ export default function Chess() {
         if (canBishopAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'N') {
         if (canKnightAttack(i, targetSquare, boardToCheck)) return true;
-      } else if (pieceName === 'Q') {
-        if (canQueenAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'K') {
         if (canKingAttack(i, targetSquare)) return true;
       }
@@ -276,11 +274,6 @@ export default function Chess() {
     const colDiff = Math.abs(fromCol - toCol);
     
     return (rowDiff === (2 * direction) && colDiff === 1);
-  };
-
-  // Queen attack check
-  const canQueenAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
-    return canRookAttack(fromSquare, toSquare, boardToCheck) || canBishopAttack(fromSquare, toSquare, boardToCheck);
   };
 
   // King attack check
@@ -406,7 +399,6 @@ export default function Chess() {
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
     if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
     if (pieceName === 'N') return canKnightAttack(from, to, boardToCheck);
-    if (pieceName === 'Q') return canQueenAttack(from, to, boardToCheck);
     if (pieceName === 'K') return canKingAttack(from, to);
     
     return false;
