@@ -586,7 +586,13 @@ export default function Chess() {
 
     const color = piece[0];
     const pieceType = piece[1];
-    const promotedType = pieceType === 'R' ? 'DR' : pieceType === 'B' ? 'DB' : 'G';
+    const promotedType = pieceType === 'R' ? 'DR' :
+                         pieceType === 'B' ? 'DB' :
+                         pieceType === 'S' ? 'GS' :
+                         pieceType === 'L' ? 'GL' :
+                         pieceType === 'N' ? 'GN' :
+                         pieceType === 'P' ? 'GP' :
+                         'NA';
     return color + promotedType;
   };
 
