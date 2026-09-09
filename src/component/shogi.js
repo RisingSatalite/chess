@@ -120,10 +120,9 @@ export default function Chess() {
     return pieceCode[1] || pieceCode;
   };
 
-  const isValidCapturedDrop = (pieceType, targetIndex) => {
+  const isValidCapturedDrop = (pieceType, playerColor, targetIndex) => {
     if (!pieceType || board[targetIndex]) return false;
 
-    const playerColor = turn;
     const targetRow = Math.floor(targetIndex / boardLenght);
     const targetCol = targetIndex % boardLenght;
 
@@ -137,9 +136,9 @@ export default function Chess() {
     return true;
   };
 
-  const handleCapturedDragStart = (event, pieceType) => {
+  const handleCapturedDragStart = (event, pieceType, playerColor, pieceIndex) => {
     event.dataTransfer.effectAllowed = 'copy';
-    event.dataTransfer.setData('application/x-shogi-drop', JSON.stringify({ pieceType }));
+    event.dataTransfer.setData('application/x-shogi-drop', JSON.stringify({ pieceType, playerColor, pieceIndex }));
     setFeedback(`Drag ${pieceType} onto the board`);
   };
 
@@ -149,28 +148,28 @@ export default function Chess() {
     const droppedPieceData = event.dataTransfer.getData('application/x-shogi-drop');
     if (droppedPieceData) {
       try {
-        const { pieceType } = JSON.parse(droppedPieceData);
-        if (!pieceType) {
+        const { pieceType, playerColor, pieceIndex } = JSON.parse(droppedPieceData);
+        if (!pieceType || !playerColor || playerColor !== turn || !Number.isInteger(pieceIndex)) {
           return;
         }
 
-        if (!isValidCapturedDrop(pieceType, targetIndex)) {
+        if (!isValidCapturedDrop(pieceType, playerColor, targetIndex)) {
           setFeedback('That drop is not legal');
           return;
         }
 
         const nextBoard = [...board];
-        const droppedPieceCode = `${turn}${pieceType}`;
+        const droppedPieceCode = `${playerColor}${pieceType}`;
         nextBoard[targetIndex] = droppedPieceCode;
         setBoard(nextBoard);
         setCapturedPieces((previous) => ({
           ...previous,
-          [turn]: previous[turn].filter((piece) => piece !== pieceType),
+          [playerColor]: previous[playerColor].filter((piece, index) => index !== pieceIndex),
         }));
         setFeedback(`${pieceType} dropped`);
         setSelectedSquare1(boardSquareCount);
         setSelectedSquare2(boardSquareCount);
-        setTurn(turn === 'W' ? 'B' : 'W');
+        setTurn(playerColor === 'W' ? 'B' : 'W');
         return;
       } catch (error) {
         console.error('Failed to parse captured drop payload', error);
@@ -897,9 +896,9 @@ export default function Chess() {
                   <button
                     key={`B-${pieceCode}-${index}`}
                     type="button"
-                    draggable={false}
-                    data-testid={`captured-piece-B-${pieceCode}`}
-                    onDragStart={(event) => handleCapturedDragStart(event, pieceCode)}
+                    draggable={turn === 'B'}
+                    data-testid={`captured-piece-B-${pieceCode}-${index}`}
+                    onDragStart={(event) => handleCapturedDragStart(event, pieceCode, 'B', index)}
                     onDragOver={(event) => event.preventDefault()}
                     style={{
                       minWidth: '2.5rem',
@@ -908,7 +907,8 @@ export default function Chess() {
                       border: '1px solid #cbd5e1',
                       background: '#fff',
                       fontSize: '1.1rem',
-                      cursor: 'grab',
+                      cursor: turn === 'B' ? 'grab' : 'not-allowed',
+                      opacity: turn === 'B' ? 1 : 0.7,
                     }}
                     aria-label={`Black captured ${pieceCode}`}
                   >
@@ -953,8 +953,8 @@ export default function Chess() {
                     key={`W-${pieceCode}-${index}`}
                     type="button"
                     draggable={turn === 'W'}
-                    data-testid={`captured-piece-W-${pieceCode}`}
-                    onDragStart={(event) => handleCapturedDragStart(event, pieceCode)}
+                    data-testid={`captured-piece-W-${pieceCode}-${index}`}
+                    onDragStart={(event) => handleCapturedDragStart(event, pieceCode, 'W', index)}
                     onDragOver={(event) => event.preventDefault()}
                     style={{
                       minWidth: '2.5rem',

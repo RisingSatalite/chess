@@ -11,7 +11,7 @@ test('captured shogi pieces can be dragged back onto the board', async ({ page }
 
   await expect(page.getByText('Captured pieces')).toBeVisible();
 
-  const trayPiece = page.locator('[data-testid="captured-piece-W-P"]');
+  const trayPiece = page.locator('[data-testid="captured-piece-W-P-0"]');
   const targetSquare = page.locator('[data-testid="board-square-0"]');
 
   await expect(trayPiece).toHaveCount(1);
