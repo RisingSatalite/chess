@@ -133,12 +133,21 @@ export default function Chess() {
 
     const targetRow = Math.floor(targetIndex / boardLenght);
     const targetCol = targetIndex % boardLenght;
+    const lastRow = playerColor === 'W' ? 0 : boardHeight - 1;
+    const secondLastRow = playerColor === 'W' ? 1 : boardHeight - 2;
 
+    //Can not control 2 unpromoted pawns in the same column
     if (pieceType === 'P') {
       const sameFilePawnExists = board.some((square, index) => square === `${playerColor}P` && index % boardLenght === targetCol);
       if (sameFilePawnExists) return false;
-      if (playerColor === 'W' && targetRow === 0) return false;
-      if (playerColor === 'B' && targetRow === boardHeight - 1) return false;
+    }
+
+    if ((pieceType === 'P' || pieceType === 'L') && targetRow === lastRow) {
+      return false;
+    }
+
+    if (pieceType === 'N' && (targetRow === lastRow || targetRow === secondLastRow)) {
+      return false;
     }
 
     return true;
