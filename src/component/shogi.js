@@ -117,7 +117,15 @@ export default function Chess() {
 
   const normalizeCapturedPiece = (pieceCode) => {
     if (!pieceCode) return null;
-    return pieceCode[1] || pieceCode;
+    const capturedPiece = pieceCode.slice(1)
+    const unpromoted  = capturedPiece === 'DR' ? 'R' :
+                        capturedPiece === 'DB' ? 'B' :
+                        capturedPiece === 'GS' ? 'S' :
+                        capturedPiece === 'GL' ? 'L' :
+                        capturedPiece === 'GN' ? 'N' :
+                        capturedPiece === 'GP' ? 'P' :
+                        capturedPiece;
+    return unpromoted;
   };
 
   const isValidCapturedDrop = (pieceType, playerColor, targetIndex) => {
