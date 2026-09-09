@@ -237,12 +237,74 @@ export default function Chess() {
     }
   };
 
+  const canDragonRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
+
+    //The kingish movement
+    const rowDiff = Math.abs(toRow - fromRow);
+    const colDiff = Math.abs(fromCol - toCol);
+    if(rowDiff == 1 && colDiff == 1){
+      return true
+    }
+    
+    if (fromRow !== toRow && fromCol !== toCol) return false;
+    
+    if (fromRow === toRow) {
+      const start = Math.min(fromCol, toCol) + 1;
+      const end = Math.max(fromCol, toCol);
+      for (let col = start; col < end; col++) {
+        if (boardToCheck[fromRow * boardLenght + col] !== '') return false;
+      }
+      return true;
+    } else {
+      const start = Math.min(fromRow, toRow) + 1;
+      const end = Math.max(fromRow, toRow);
+      for (let row = start; row < end; row++) {
+        if (boardToCheck[row * boardLenght + fromCol] !== '') return false;
+      }
+      return true;
+    }
+  };
+
   // Bishop attack check
   const canBishopAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
     const fromRow = Math.floor(fromSquare / boardLenght);
     const fromCol = fromSquare % boardLenght;
     const toRow = Math.floor(toSquare / boardLenght);
     const toCol = toSquare % boardLenght;
+    
+    if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol)) return false;
+    
+    const rowStep = toRow > fromRow ? 1 : -1;
+    const colStep = toCol > fromCol ? 1 : -1;
+    let r = fromRow + rowStep;
+    let c = fromCol + colStep;
+    
+    while (r !== toRow) {
+      if (boardToCheck[r * boardLenght + c] !== '') return false;
+      r += rowStep;
+      c += colStep;
+    }
+    return true;
+  };
+
+  const canDragonBishopAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
+
+    const rowDiff = Math.abs(toRow - fromRow);
+    const colDiff = Math.abs(fromCol - toCol);
+    if(rowDiff == 1 && colDiff == 0){
+      return true
+    }
+    if(rowDiff == 0 && colDiff == 1){
+      return true
+    }
     
     if (Math.abs(fromRow - toRow) !== Math.abs(fromCol - toCol)) return false;
     
