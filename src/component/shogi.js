@@ -293,6 +293,33 @@ export default function Chess() {
     return Math.abs(fromRow - toRow) <= 1 && Math.abs(fromCol - toCol) <= 1;
   };
 
+  const canGoldGeneralAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
+    const fromRow = Math.floor(fromSquare / boardLenght);
+    const fromCol = fromSquare % boardLenght;
+    const toRow = Math.floor(toSquare / boardLenght);
+    const toCol = toSquare % boardLenght;
+
+    const type = boardToCheck[fromSquare]?.[0]; // 'W' or 'B'
+    const isWhite = type === 'W';
+    const direction = isWhite ? -1 : 1;
+
+    const rowDiff = Math.abs(toRow - fromRow);
+    const colDiff = Math.abs(fromCol - toCol);
+    if(rowDiff == 1 && colDiff == 0){
+      return true
+    }
+    if(rowDiff == 0 && colDiff == 1){
+      return true
+    }
+
+    if(direction == (toRow - fromRow) && colDiff == 1){
+      return true
+    }
+    return false
+  };
+
+
+
   // Find king position
   const findKing = (color, boardToCheck = board) => {
     for (let i = 0; i < boardSquareCount; i++) {
@@ -399,6 +426,12 @@ export default function Chess() {
       }
     }else if(board[selectedSquare1][1] === 'P') {
       if (connectPawn() && noFriendlyFire()) { //Check if promoting
+        return true
+      } else {
+        return ineligableMoveClear()
+      }
+    }else if(board[selectedSquare1][1] === 'G') {
+      if (canGoldGeneralAttack() && noFriendlyFire()) { //Check if promoting
         return true
       } else {
         return ineligableMoveClear()
@@ -526,9 +559,8 @@ export default function Chess() {
   
     const deltaRow = row2 - row1;
     const deltaCol = col2 - col1;
-    const targetPiece = boardToCheck[to];
 
-    if (deltaRow === direction && deltaCol === 0 && !targetPiece) {
+    if (deltaRow === direction && deltaCol === 0) {
       return true;
     }
   
