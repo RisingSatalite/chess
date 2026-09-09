@@ -31,6 +31,7 @@ export default function Chess() {
   const [moveHistory, setMoveHistory] = useState([]);
   const [lastMove, setLastMove] = useState(null);
   const [feedback, setFeedback] = useState("Select a piece to begin");
+  const [pendingPromotion, setPendingPromotion] = useState(null);
 
   useEffect(() => {
     //console.log("Square 2 selected");
@@ -42,11 +43,23 @@ export default function Chess() {
     var possibleMove = checkIfPossibleMove();
     console.log("Possible move: " + possibleMove);
     if (possibleMove === true) {
-      makeMove();
-      turnChange();
+      if (canPromote(selectedSquare1, selectedSquare2)) {
+        setPendingPromotion({ from: selectedSquare1, to: selectedSquare2 });
+        reset();
+        setFeedback("Choose whether to promote");
+      } else {
+        makeMove();
+        turnChange();
+      }
     } else if (possibleMove) {
-      makeMove(possibleMove);
-      turnChange();
+      if (canPromote(selectedSquare1, possibleMove)) {
+        setPendingPromotion({ from: selectedSquare1, to: possibleMove });
+        reset();
+        setFeedback("Choose whether to promote");
+      } else {
+        makeMove(possibleMove);
+        turnChange();
+      }
     }else {
       ineligableMoveClear()
     }
@@ -565,7 +578,45 @@ export default function Chess() {
     setMoveHistory([]);
     setLastMove(null);
     setFeedback("Select a piece to begin");
+    setPendingPromotion(null);
     reset();
+  };
+
+  const getPromotionCode = (piece, promote) => {
+    if (!promote) return piece;
+
+    const color = piece[0];
+    const pieceType = piece[1];
+    const promotedType = pieceType === 'R' ? 'DR' : pieceType === 'B' ? 'DB' : 'G';
+    return color + promotedType;
+  };
+
+  const isPromotionZone = (square, color) => {
+    const row = Math.floor(square / boardLenght);
+    return color === 'W' ? row <= 2 : row >= boardHeight - 3;
+  };
+
+  const canPromote = (fromSquare, toSquare) => {
+    const piece = board[fromSquare];
+    if (!piece || !['P', 'L', 'N', 'S', 'R', 'B'].includes(piece[1])) return false;
+    return isPromotionZone(fromSquare, piece[0]) || isPromotionZone(toSquare, piece[0]);
+  };
+
+  const mustPromote = (piece, toSquare) => {
+    const row = Math.floor(toSquare / boardLenght);
+    return (piece[1] === 'P' || piece[1] === 'L')
+      ? (piece[0] === 'W' ? row === 0 : row === boardHeight - 1)
+      : piece[1] === 'N' && (piece[0] === 'W' ? row <= 1 : row >= boardHeight - 2);
+  };
+
+  const finishPromotion = (promote) => {
+    if (!pendingPromotion) return;
+    const { from, to } = pendingPromotion;
+    const movingPiece = board[from];
+    const shouldPromote = promote || mustPromote(movingPiece, to);
+    setPendingPromotion(null);
+    makeMove(to, shouldPromote, from);
+    turnChange();
   };
   
   //Make sure the 2 selected squares make a valid rook move
@@ -747,9 +798,9 @@ export default function Chess() {
     return true;
   }
   
-  const makeMove = (specialSquare = -2) => {
+  const makeMove = (specialSquare = -2, promote = false, fromOverride = null) => {
     const newBoard = [...board];
-    const fromSquare = selectedSquare1;
+    const fromSquare = fromOverride ?? selectedSquare1;
     const toSquare = typeof specialSquare === "number" && specialSquare !== -2 ? specialSquare : selectedSquare2;
     const movingPiece = newBoard[fromSquare];
     const capturedPiece = newBoard[toSquare];
@@ -772,19 +823,13 @@ export default function Chess() {
     newBoard[toSquare] = movingPiece;
     newBoard[fromSquare] = '';
 
-    const pieceType = movingPiece[1];
-    const pieceColor = movingPiece[0];
-    const destinationRow = Math.floor(toSquare / boardLenght);
-
-    if (pieceType === 'P' && ((pieceColor === 'W' && destinationRow === 0) || (pieceColor === 'B' && destinationRow === boardHeight - 1))) {
-      newBoard[toSquare] = pieceColor === 'W' ? 'WQ' : 'BQ';
-    }
+    newBoard[toSquare] = getPromotionCode(movingPiece, promote);
 
     setBoard(newBoard);
     setLastMove({ from: fromSquare, to: toSquare });
     setMoveHistory((history) => [
       ...history,
-      { piece: movingPiece, from: fromSquare, to: toSquare, captured: Boolean(capturedPiece) },
+      { piece: newBoard[toSquare], from: fromSquare, to: toSquare, captured: Boolean(capturedPiece) },
     ]);
     setFeedback(capturedPiece ? "Capture made" : "Move made");
 
@@ -811,6 +856,26 @@ export default function Chess() {
         </div>
         <button className="majorButton" onClick={resetGame} type="button">New game</button>
       </header>
+
+      {pendingPromotion && (
+        <div className="promotion-dialog" role="dialog" aria-modal="true" aria-labelledby="promotion-title">
+          <h2 id="promotion-title">Promote this piece?</h2>
+          <p>Choose whether the moved piece should promote.</p>
+          <div className="promotion-actions">
+            <button type="button" onClick={() => finishPromotion(true)} data-testid="promote-piece">
+              Promote
+            </button>
+            <button
+              type="button"
+              onClick={() => finishPromotion(false)}
+              disabled={mustPromote(board[pendingPromotion.from], pendingPromotion.to)}
+              data-testid="keep-piece"
+            >
+              Keep
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="game-layout">
         <section className="board-panel" aria-label="Chess board">
