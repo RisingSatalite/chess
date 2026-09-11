@@ -5,13 +5,11 @@ import { useState } from "react";
 
 const pieceImages = {
     WK: "/WhiteKing.png",
-    WQ: "/WhiteQueen.png",
     WB: "/WhiteBishop.png",
     WR: "/WhiteRook.png",
     WN: "/WhiteKnight.png",
     WP: "/WhitePawn.png",
     BK: "/BlackKing.png",
-    BQ: "/BlackQueen.png",
     BB: "/BlackBishop.png",
     BR: "/BlackRook.png",
     BN: "/BlackKnight.png",
