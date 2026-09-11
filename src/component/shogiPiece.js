@@ -19,13 +19,13 @@ const pieceImages = {
 
     WS: "/WhitePawn.png",
     BS: "/BlackPawn.png",
-    WH: "/WhiteKnight.png",
-    BH: "/BlackKnight.png",
+    WL: "/WhiteRook.png",
+    BL: "/BlackRook.png",
     WG: "/WhiteKing.png",
     BG: "/BlackKing.png",
 };
 
-export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, row=0, lastMove = null }) {
+export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, row=0, lastMove = null, dataTestId = null }) {
     const [imageError, setImageError] = useState(false);
 
     let bgColor;
@@ -40,27 +40,18 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
 
     var black = "#353535";
     var white = "#f6f6f6";
+    var selected = "ffffbb";
+    var yellow = "#ffdaa4";
 
     const isSelected = number === selected;
     const isLastMove = lastMove && (number === lastMove.from || number === lastMove.to);
 
     if (isSelected) {
-        bgColor = "yellow";
+        bgColor = selected;
         textColour = black
-    } else if ((number + row) % 2 === 0) {
-        bgColor = black;
-        if(prop == ""){
-            textColour = black
-        }else{
-            textColour = white
-        }
     } else {
-        bgColor = white;
-        if(prop == ""){
-            textColour = white
-        }else{
-            textColour = black
-        }
+        bgColor = yellow;
+        textColour = black
     }
 
     const buttonStyle = {
@@ -81,6 +72,7 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
             style={buttonStyle}
             className={`square chess-square${isLastMove ? " last-move" : ""}${isSelected ? " selected" : ""}`}
             type="button"
+            data-testid={dataTestId ?? `board-square-${number}`}
             aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
         >
             {imageSrc && !imageError ? (

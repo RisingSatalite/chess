@@ -2,8 +2,8 @@ import "./globals.css";
 import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
-  title: "Chess",
-  description: "A focused chess board game.",
+  title: "Boardgames",
+  description: "Multiple boardgames.",
 };
 
 export default function RootLayout({ children }) {

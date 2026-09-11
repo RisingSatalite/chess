@@ -76,6 +76,11 @@ h2 { font-size: 1.15rem; letter-spacing: -0.02em; margin-bottom: 8px; text-trans
 .turn-marker.black { background: #25231f; }
 .turn-bar strong { display: block; font-size: .9rem; }
 .feedback { color: var(--muted); display: block; font-size: .72rem; margin-top: 2px; }
+.promotion-dialog { background: #fff8ed; border: 2px solid var(--red); box-shadow: 0 12px 28px rgba(72, 39, 20, .2); left: 50%; max-width: min(420px, calc(100vw - 24px)); padding: 18px; position: fixed; top: 16px; transform: translateX(-50%); width: calc(100% - 24px); z-index: 20; }
+.promotion-dialog p { color: var(--muted); font-size: .82rem; margin-bottom: 14px; }
+.promotion-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.promotion-actions button { background: var(--red); border: 0; color: #fff8ed; cursor: pointer; font: 700 .78rem 'Manrope', sans-serif; padding: 10px 14px; }
+.promotion-actions button:disabled { background: #c9b9a5; cursor: not-allowed; }
 .status { color: var(--muted); font: 500 .65rem 'DM Mono', monospace; margin-left: auto; text-transform: uppercase; }
 .status-check, .status-checkmate { color: var(--red); }
 .turn-bar-check { background: #f5d98a; border-left: 5px solid #c88a16; padding: 10px 10px 15px; }

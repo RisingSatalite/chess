@@ -70,6 +70,45 @@ export default function XiangqiChess() {
     }
   }, [turn]);
 
+  const attemptMove = (fromIndex, toIndex) => {
+    if (fromIndex === toIndex) {
+      setSelectedSquare1(boardSquareCount);
+      setSelectedSquare2(boardSquareCount);
+      return;
+    }
+
+    if (board[fromIndex] && board[fromIndex][0] !== turn) {
+      setFeedback("That piece does not belong to the current player");
+      return;
+    }
+
+    setSelectedSquare1(fromIndex);
+    setSelectedSquare2(toIndex);
+  };
+
+  const handleDragStart = (event, id) => {
+    if (!board[id] || board[id][0] !== turn) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(id));
+    setSelectedSquare1(id);
+    setFeedback("Drag to a destination square");
+  };
+
+  const handleDrop = (event, targetIndex) => {
+    event.preventDefault();
+
+    const draggedFrom = Number(event.dataTransfer.getData("text/plain"));
+    if (!Number.isInteger(draggedFrom)) {
+      return;
+    }
+
+    attemptMove(draggedFrom, targetIndex);
+  };
+
   const selectSquare = (id) => {
     if (selectedSquare1 !== boardSquareCount) {
       if (board[id] && board[id][0] === turn) {
@@ -78,7 +117,7 @@ export default function XiangqiChess() {
         return;
       }
       setSelectedSquare2(id);
-    } else if (board[id][0] === turn) {
+    } else if (board[id] && board[id][0] === turn) {
       setSelectedSquare1(id);
       setFeedback("Choose a destination square");
     }
@@ -663,6 +702,9 @@ export default function XiangqiChess() {
                         key={squareNumber}
                         number={squareNumber}
                         onClickFunction={() => selectSquare(squareNumber)}
+                        onDragStart={(event) => handleDragStart(event, squareNumber)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={(event) => handleDrop(event, squareNumber)}
                         prop={item}
                         selected={selectedSquare1}
                         lastMove={lastMove}
