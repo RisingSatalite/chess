@@ -23,13 +23,6 @@ const pieceImages = {
     BG: "/BlackGoldGeneral.png",
 };
 
-const rotationClasses = {
-    0: "rotate-0",
-    90: "rotate-90",
-    180: "rotate-180",
-    270: "rotate-270",
-  };
-
 export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, row=0, lastMove = null, dataTestId = null }) {
     const [imageError, setImageError] = useState(false);
 
@@ -43,11 +36,11 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
 
     const imageSrc = pieceImages[display];
 
-    var rotation = rotationClasses[0];
+    var rotation = 0;
     if(display.slice(0, 2) == "BG"){
-        rotation = rotationClasses[180];
+        rotation = 180;
     }else if(display == "BS"){
-        rotation = rotationClasses[180];
+        rotation = 180;
     }
 
     var black = "#353535";
@@ -94,7 +87,8 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
                     width={pieceWidth}
                     height={pieceHeight}
                     onError={() => setImageError(true)}
-                    className={`transition-transform ${rotationClasses[rotation]}`}
+                    className="transition-transform"
+                    style={{ transform: `rotate(${rotation}deg)` }}
                 />
             ) : (
                 <span style={{ fontSize: "20px", fontWeight: "bold" }}>
