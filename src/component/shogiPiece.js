@@ -19,8 +19,22 @@ const pieceImages = {
     BS: "/BlackPawn.png",
     WL: "/WhiteLancer.png",
     BL: "/BlackLancer.png",
-    WG: "/WhiteKing.png",
+    WG: "/WhiteGoldGeneral.png",
     BG: "/BlackGoldGeneral.png",
+
+    WDR: "/WhiteRook.png",
+    WDB: "/WhiteBishop.png",
+    WGS: "/WhiteGoldGeneral.png",
+    WGL: "/WhiteGoldGeneral.png",
+    WGN: "/WhiteGoldGeneral.png",
+    WGP: "/WhiteGoldGeneral.png",
+
+    BDR: "/BlackRook.png",
+    BDB: "/BlackBishop.png",
+    BGS: "/BlackGoldGeneral.png",
+    BGL: "/BlackGoldGeneral.png",
+    BGN: "/BlackGoldGeneral.png",
+    BGP: "/BlackGoldGeneral.png",
 };
 
 export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, row=0, lastMove = null, dataTestId = null }) {
