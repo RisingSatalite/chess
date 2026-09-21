@@ -37,6 +37,22 @@ const pieceImages = {
     BGP: "/BlackGoldGeneral.png",
 };
 
+const overlayPieceImage = {
+    WDB: "/WhiteBishop.png",
+    WDR: "/WhiteRook.png",
+    BDB: "/BlackBishop.png",
+    BDR: "/BlackRook.png",
+
+    WGN: "/WhiteKnight.png",
+    WGP: "/WhitePawn.png",
+    BGN: "/BlackKnight.png",
+    BGP: "/BlackPawn.png",
+    WGS: "/WhitePawn.png",
+    BGS: "/BlackPawn.png",
+    WGL: "/WhiteLancer.png",
+    BGL: "/BlackLancer.png",
+}
+
 export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, row=0, lastMove = null, dataTestId = null }) {
     const [imageError, setImageError] = useState(false);
 
@@ -49,6 +65,7 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
     }
 
     const imageSrc = pieceImages[display];
+    const overlay = overlayPieceImage[display];
 
     var rotation = 0;
     if(display.slice(0, 2) == "BG"){
@@ -95,6 +112,7 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
             aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
         >
             {imageSrc && !imageError ? (
+                <div>
                 <Image
                     src={imageSrc}
                     alt={display}
@@ -104,6 +122,18 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
                     className="transition-transform"
                     style={{ transform: `rotate(${rotation}deg)` }}
                 />
+                {overlay && !imageError ? (
+                    <Image
+                        src={overlay}
+                        alt={display}
+                        width={pieceWidth/2}
+                        height={pieceHeight/2}
+                        onError={() => setImageError(true)}
+                        className="transition-transform"
+                        style={{ transform: `rotate(${rotation}deg)` }}
+                    />
+                ):(<div/>)}
+                </div>
             ) : (
                 <span style={{ fontSize: "20px", fontWeight: "bold" }}>
                     {display}
