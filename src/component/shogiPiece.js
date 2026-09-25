@@ -38,10 +38,10 @@ const pieceImages = {
 };
 
 const overlayPieceImage = {
-    WDB: "/WhiteBishop.png",
-    WDR: "/WhiteRook.png",
-    BDB: "/BlackBishop.png",
-    BDR: "/BlackRook.png",
+    WDB: "/WhiteKing.png",
+    WDR: "/WhiteKing.png",
+    BDB: "/BlackKing.png",
+    BDR: "/BlackKing.png",
 
     WGN: "/WhiteKnight.png",
     WGP: "/WhitePawn.png",
