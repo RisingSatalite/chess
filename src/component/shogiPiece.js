@@ -112,15 +112,18 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
             aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
         >
             {imageSrc && !imageError ? (
-                <div>
+                <div
+                    className="shogi-piece-stack"
+                    style={{ display: "block", height: "78%", position: "relative", width: "78%" }}
+                >
                 <Image
                     src={imageSrc}
                     alt={display}
                     width={pieceWidth}
                     height={pieceHeight}
                     onError={() => setImageError(true)}
-                    className="transition-transform"
-                    style={{ transform: `rotate(${rotation}deg)` }}
+                    className="shogi-piece-gold transition-transform"
+                    style={{ height: "100%", left: 0, position: "absolute", top: 0, transform: `rotate(${rotation}deg)`, width: "100%" }}
                 />
                 {overlay && !imageError ? (
                     <Image
@@ -129,8 +132,8 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
                         width={pieceWidth/2}
                         height={pieceHeight/2}
                         onError={() => setImageError(true)}
-                        className="transition-transform"
-                        style={{ transform: `rotate(${rotation}deg)` }}
+                        className="shogi-piece-base transition-transform"
+                        style={{ height: "50%", left: "50%", position: "absolute", top: "50%", transform: `translate(-50%, -50%) rotate(${rotation}deg)`, width: "50%", zIndex: 2 }}
                     />
                 ):(<div/>)}
                 </div>
