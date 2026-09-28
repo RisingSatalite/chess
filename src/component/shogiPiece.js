@@ -15,8 +15,8 @@ const pieceImages = {
     BN: "/BlackKnight.png",
     BP: "/BlackPawn.png",
 
-    WS: "/WhitePawn.png",
-    BS: "/BlackPawn.png",
+    WS: "/WhiteSliverGeneral.png",
+    BS: "/BlackSliverGeneral.png",
     WL: "/WhiteLancer.png",
     BL: "/BlackLancer.png",
     WG: "/WhiteGoldGeneral.png",
@@ -47,8 +47,8 @@ const overlayPieceImage = {
     WGP: "/WhitePawn.png",
     BGN: "/BlackKnight.png",
     BGP: "/BlackPawn.png",
-    WGS: "/WhitePawn.png",
-    BGS: "/BlackPawn.png",
+    WGS: "/WhiteSliverGeneral.png",
+    BGS: "/BlackSliverGeneral.png",
     WGL: "/WhiteLancer.png",
     BGL: "/BlackLancer.png",
 }
