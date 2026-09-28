@@ -235,6 +235,16 @@ export default function Chess() {
         if (canKnightAttack(i, targetSquare, boardToCheck)) return true;
       } else if (pieceName === 'K') {
         if (canKingAttack(i, targetSquare)) return true;
+      } else if(boardToCheck[i][2] === 'R') {//DR
+        if (canDragonRookAttack(i, targetSquare, boardToCheck)) return true;
+      } else if(boardToCheck[i][2] === 'B') {//DB
+        if (canDragonBishopAttack(i, targetSquare, boardToCheck)) return true;
+      }else if(pieceName === 'G') {//Gold general plus all similar promotions
+        if (canGoldGeneralAttack(i, targetSquare, boardToCheck)) return true;
+      }else if(pieceName === 'S') {
+        if (canSliverGeneralAttack(i, targetSquare, boardToCheck)) return true;
+      }else if(pieceName === 'L') {
+        if (connectLance(i, targetSquare, boardToCheck)) return true;
       }
     }
     return false;
@@ -488,8 +498,12 @@ export default function Chess() {
     
     if (pieceName === 'P') return connectPawn(from, to, boardToCheck);
     if (pieceName === 'R') return canRookAttack(from, to, boardToCheck);
+    if (piece[2] === 'R') return canDragonRookAttack(from, to);
     if (pieceName === 'B') return canBishopAttack(from, to, boardToCheck);
+    if (piece[2] === 'B') return canDragonBishopAttack(from, to);
     if (pieceName === 'N') return canKnightAttack(from, to, boardToCheck);
+    if (pieceName === 'G') return canGoldGeneralAttack(from, to, boardToCheck);
+    if (pieceName === 'S') return canSliverGeneralAttack(from, to, boardToCheck);
     if (pieceName === 'K') return canKingAttack(from, to);
     
     return false;
@@ -537,31 +551,30 @@ export default function Chess() {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'P') {
-      if (connectPawn() && noFriendlyFire()) { //Check if promoting
+      if (connectPawn() && noFriendlyFire()) {
         return true
       } else {
         return ineligableMoveClear()
       }
-    }else if(board[selectedSquare1][1] === 'G') {
-      if (canGoldGeneralAttack() && noFriendlyFire()) { //Check if promoting
+    }else if(board[selectedSquare1][1] === 'G') {//Gold general plus all similar promotions
+      if (canGoldGeneralAttack() && noFriendlyFire()) {
         return true
       } else {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'S') {
-      if (canSliverGeneralAttack() && noFriendlyFire()) { //Check if promoting
+      if (canSliverGeneralAttack() && noFriendlyFire()) {
         return true
       } else {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'L') {
-      if (connectLance() && noFriendlyFire()) { //Check if promoting
+      if (connectLance() && noFriendlyFire()) {
         return true
       } else {
         return ineligableMoveClear()
       }
     }else if(board[selectedSquare1][1] === 'K') {
-      //console.log("Can castle?" + checkCastle())
       if ((canKingAttack(selectedSquare1, selectedSquare2) && noFriendlyFire())) {
         return true;
       } else {
@@ -697,8 +710,8 @@ export default function Chess() {
     return false;
   };
 
-  const connectLance = () => {
-    const piece = board[selectedSquare1];
+  const connectLance = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
+    const piece = boardToCheck[from];
     if (!piece || piece[1] !== 'L') return false;
   
     const type = piece[0]; // 'W' or 'B'
@@ -707,8 +720,8 @@ export default function Chess() {
   
     // Calculate row and col from square index
     const getCoords = (index) => [Math.floor(index / boardLenght), index % boardLenght];
-    const [row1, col1] = getCoords(selectedSquare1);
-    const [row2, col2] = getCoords(selectedSquare2);
+    const [row1, col1] = getCoords(from);
+    const [row2, col2] = getCoords(to);
   
     const deltaRow = row2 - row1;
     const deltaCol = col2 - col1;

@@ -5,25 +5,53 @@ import { useState } from "react";
 
 const pieceImages = {
     WK: "/WhiteKing.png",
-    WQ: "/WhiteQueen.png",
     WB: "/WhiteBishop.png",
     WR: "/WhiteRook.png",
     WN: "/WhiteKnight.png",
     WP: "/WhitePawn.png",
     BK: "/BlackKing.png",
-    BQ: "/BlackQueen.png",
     BB: "/BlackBishop.png",
     BR: "/BlackRook.png",
     BN: "/BlackKnight.png",
     BP: "/BlackPawn.png",
 
-    WS: "/WhitePawn.png",
-    BS: "/BlackPawn.png",
-    WL: "/WhiteRook.png",
-    BL: "/BlackRook.png",
-    WG: "/WhiteKing.png",
-    BG: "/BlackKing.png",
+    WS: "/WhiteSliverGeneral.png",
+    BS: "/BlackSliverGeneral.png",
+    WL: "/WhiteLancer.png",
+    BL: "/BlackLancer.png",
+    WG: "/WhiteGoldGeneral.png",
+    BG: "/BlackGoldGeneral.png",
+
+    WDR: "/WhiteRook.png",
+    WDB: "/WhiteBishop.png",
+    WGS: "/WhiteGoldGeneral.png",
+    WGL: "/WhiteGoldGeneral.png",
+    WGN: "/WhiteGoldGeneral.png",
+    WGP: "/WhiteGoldGeneral.png",
+
+    BDR: "/BlackRook.png",
+    BDB: "/BlackBishop.png",
+    BGS: "/BlackGoldGeneral.png",
+    BGL: "/BlackGoldGeneral.png",
+    BGN: "/BlackGoldGeneral.png",
+    BGP: "/BlackGoldGeneral.png",
 };
+
+const overlayPieceImage = {
+    WDB: "/WhiteKing.png",
+    WDR: "/WhiteKing.png",
+    BDB: "/BlackKing.png",
+    BDR: "/BlackKing.png",
+
+    WGN: "/WhiteKnight.png",
+    WGP: "/WhitePawn.png",
+    BGN: "/BlackKnight.png",
+    BGP: "/BlackPawn.png",
+    WGS: "/WhiteSliverGeneral.png",
+    BGS: "/BlackSliverGeneral.png",
+    WGL: "/WhiteLancer.png",
+    BGL: "/BlackLancer.png",
+}
 
 export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, row=0, lastMove = null, dataTestId = null }) {
     const [imageError, setImageError] = useState(false);
@@ -37,6 +65,14 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
     }
 
     const imageSrc = pieceImages[display];
+    const overlay = overlayPieceImage[display];
+
+    var rotation = 0;
+    if(display.slice(0, 2) == "BG"){
+        rotation = 180;
+    }else if(display == "BS"){
+        rotation = 180;
+    }
 
     var black = "#353535";
     var white = "#f6f6f6";
@@ -76,13 +112,31 @@ export default function Square({ prop, onClickFunction, onDragStart, onDragOver,
             aria-label={prop ? `Square ${number + 1}, ${prop}` : `Square ${number + 1}, empty`}
         >
             {imageSrc && !imageError ? (
+                <div
+                    className="shogi-piece-stack"
+                    style={{ display: "block", height: "78%", position: "relative", width: "78%" }}
+                >
                 <Image
                     src={imageSrc}
                     alt={display}
                     width={pieceWidth}
                     height={pieceHeight}
                     onError={() => setImageError(true)}
+                    className="shogi-piece-gold transition-transform"
+                    style={{ height: "100%", left: 0, position: "absolute", top: 0, transform: `rotate(${rotation}deg)`, width: "100%" }}
                 />
+                {overlay && !imageError ? (
+                    <Image
+                        src={overlay}
+                        alt={display}
+                        width={pieceWidth/2}
+                        height={pieceHeight/2}
+                        onError={() => setImageError(true)}
+                        className="shogi-piece-base transition-transform"
+                        style={{ height: "50%", left: "50%", position: "absolute", top: "50%", transform: `translate(-50%, -50%) rotate(${rotation}deg)`, width: "50%", zIndex: 2 }}
+                    />
+                ):(<div/>)}
+                </div>
             ) : (
                 <span style={{ fontSize: "20px", fontWeight: "bold" }}>
                     {display}
