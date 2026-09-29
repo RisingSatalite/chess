@@ -23,6 +23,9 @@ const pieceImages = {
     BH: "/BlackKnight.png",
     WG: "/WhiteKing.png",
     BG: "/BlackKing.png",
+
+    WA: "/WhiteAdvisor.png",
+    BA: "/BlackAdvisor.png",
 };
 
 export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, lastMove = null }) {
