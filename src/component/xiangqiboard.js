@@ -26,6 +26,10 @@ const pieceImages = {
 
     WA: "/WhiteAdvisor.png",
     BA: "/BlackAdvisor.png",
+    WC: "/WhiteCanon.png",
+    BC: "/BlackCanon.png",
+    WE: "/WhiteElephant.png",
+    BE: "/BlackElephant.png",
 };
 
 export default function Square({ prop, onClickFunction, onDragStart, onDragOver, onDrop, number = 0, selected = -1, lastMove = null }) {
