@@ -7,6 +7,9 @@ export default function Home() {
       <Link href="chess">
         <button>Go to Chess</button>
       </Link>
+      <Link href="go">
+        <button>Go to Go</button>
+      </Link>
       <Link href="xiangqi">
         <button>Go to Xiangqi</button>
       </Link>
