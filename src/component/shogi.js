@@ -1,6 +1,7 @@
 'use client'
 
 import Square from "./shogiPiece";
+import ShogiPiecePicture from "./shogiPiecePicture";
 import { useEffect, useState } from "react";
 
 export default function Chess() {
@@ -906,18 +907,24 @@ export default function Chess() {
                     onDragStart={(event) => handleCapturedDragStart(event, pieceCode, 'B', index)}
                     onDragOver={(event) => event.preventDefault()}
                     style={{
+                      alignItems: 'center',
+                      display: 'flex',
+                      justifyContent: 'center',
                       minWidth: '2.5rem',
                       minHeight: '2.5rem',
+                      padding: '0.25rem',
                       borderRadius: '0.5rem',
                       border: '1px solid #cbd5e1',
                       background: '#fff',
-                      fontSize: '1.1rem',
                       cursor: turn === 'B' ? 'grab' : 'not-allowed',
                       opacity: turn === 'B' ? 1 : 0.7,
                     }}
                     aria-label={`Black captured ${pieceCode}`}
                   >
-                    {pieceCode}
+                    <ShogiPiecePicture
+                      prop={pieceCode}
+                      colour={"B"}
+                    />
                   </button>
                 ))
               )}
@@ -962,18 +969,24 @@ export default function Chess() {
                     onDragStart={(event) => handleCapturedDragStart(event, pieceCode, 'W', index)}
                     onDragOver={(event) => event.preventDefault()}
                     style={{
+                      alignItems: 'center',
+                      display: 'flex',
+                      justifyContent: 'center',
                       minWidth: '2.5rem',
                       minHeight: '2.5rem',
+                      padding: '0.25rem',
                       borderRadius: '0.5rem',
                       border: '1px solid #cbd5e1',
                       background: '#fff',
-                      fontSize: '1.1rem',
                       cursor: turn === 'W' ? 'grab' : 'not-allowed',
                       opacity: turn === 'W' ? 1 : 0.7,
                     }}
                     aria-label={`White captured ${pieceCode}`}
                   >
-                    {pieceCode}
+                    <ShogiPiecePicture
+                      prop={pieceCode}
+                      colour={"W"}
+                    />
                   </button>
                 ))
               )}

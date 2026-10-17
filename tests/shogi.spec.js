@@ -12,3 +12,23 @@ test('captured shogi trays start empty', async ({ page }) => {
   await expect(page.locator('[data-testid^="captured-piece-W-"]')).toHaveCount(0);
   await expect(page.locator('[data-testid^="captured-piece-B-"]')).toHaveCount(0);
 });
+
+test('captured shogi pieces show their icon', async ({ page }) => {
+  await page.goto('http://127.0.0.1:3000/shogi');
+
+  await page.getByTestId('board-square-54').click();
+  await page.getByTestId('board-square-45').click();
+  await page.getByTestId('board-square-18').click();
+  await page.getByTestId('board-square-27').click();
+  await page.getByTestId('board-square-45').click();
+  await page.getByTestId('board-square-36').click();
+  await page.getByTestId('board-square-19').click();
+  await page.getByTestId('board-square-28').click();
+  await page.getByTestId('board-square-36').click();
+  await page.getByTestId('board-square-27').click();
+
+  const capturedPawn = page.getByTestId('captured-piece-W-P-0');
+  await expect(capturedPawn).toBeVisible();
+  await expect(capturedPawn.locator('img')).toHaveAttribute('src', /WhitePawn\.png/);
+  await expect(capturedPawn).toHaveText('');
+});
