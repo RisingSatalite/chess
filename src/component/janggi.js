@@ -3,7 +3,7 @@
 import Square from "./xiangqiboard";
 import { useEffect, useState } from "react";
 
-export default function XiangqiChess() {
+export default function JanggiChess() {
   const initialBoard = [
     'BR','BH','BE','BA','BG','BA','BE','BH','BR',
     '','','','','','','','','',
