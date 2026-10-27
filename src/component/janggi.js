@@ -148,34 +148,58 @@ export default function JanggiChess() {
         if (connectGeneral(i, targetSquare, boardToCheck)) return true;
       }
     }
-    if(connectFlyingGeneral(boardToCheck)) return true;//Check if the flying general can attack
-    return false;
+    return targetSquare === findGeneral(attackingColor === 'W' ? 'B' : 'W', boardToCheck)
+      && connectFlyingGeneral(boardToCheck);
   };
 
-  // Rook attack check
-  const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
-    const fromRow = Math.floor(fromSquare / boardLenght);
-    const fromCol = fromSquare % boardLenght;
-    const toRow = Math.floor(toSquare / boardLenght);
-    const toCol = toSquare % boardLenght;
-    
-    if (fromRow !== toRow && fromCol !== toCol) return false;
-    
-    if (fromRow === toRow) {
-      const start = Math.min(fromCol, toCol) + 1;
-      const end = Math.max(fromCol, toCol);
-      for (let col = start; col < end; col++) {
-        if (boardToCheck[fromRow * boardLenght + col] !== '') return false;
-      }
-      return true;
-    } else {
-      const start = Math.min(fromRow, toRow) + 1;
-      const end = Math.max(fromRow, toRow);
-      for (let row = start; row < end; row++) {
-        if (boardToCheck[row * boardLenght + fromCol] !== '') return false;
-      }
-      return true;
+  const isPalaceSquare = (row, col, color) => {
+    const firstRow = color === 'B' ? 0 : 7;
+    return row >= firstRow && row <= firstRow + 2 && col >= 3 && col <= 5;
+  };
+
+  const isPalaceDiagonal = (fromRow, fromCol, toRow, toCol, color) => (
+    Math.abs(fromRow - toRow) === Math.abs(fromCol - toCol)
+    && isPalaceSquare(fromRow, fromCol, color)
+    && isPalaceSquare(toRow, toCol, color)
+  );
+
+  const getMovePath = (from, to, boardToCheck) => {
+    if (from === to || !boardToCheck[from]) return null;
+
+    const fromRow = Math.floor(from / boardLenght);
+    const fromCol = from % boardLenght;
+    const toRow = Math.floor(to / boardLenght);
+    const toCol = to % boardLenght;
+    const isStraight = fromRow === toRow || fromCol === toCol;
+    const isPalaceDiagonalMove = isPalaceDiagonal(
+      fromRow,
+      fromCol,
+      toRow,
+      toCol,
+      boardToCheck[from][0]
+    );
+
+    if (!isStraight && !isPalaceDiagonalMove) return null;
+
+    const rowStep = Math.sign(toRow - fromRow);
+    const colStep = Math.sign(toCol - fromCol);
+    const path = [];
+    let row = fromRow + rowStep;
+    let col = fromCol + colStep;
+
+    while (row !== toRow || col !== toCol) {
+      path.push(getPositionFromRowAndColumn(row, col));
+      row += rowStep;
+      col += colStep;
     }
+
+    path.push(to);
+    return path;
+  };
+
+  const canRookAttack = (fromSquare = selectedSquare1, toSquare = selectedSquare2, boardToCheck = board) => {
+    const path = getMovePath(fromSquare, toSquare, boardToCheck);
+    return Boolean(path && path.slice(0, -1).every((square) => boardToCheck[square] === ''));
   };
 
   // Find king position
@@ -247,64 +271,15 @@ export default function JanggiChess() {
   };
 
   const checkIfPossibleMove = () => {
-    // Check if the move would leave own king in check
-    if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
-      console.log("Move would leave king in check!");
+    if (!isValidPieceMove(selectedSquare1, selectedSquare2, board, turn)) {
       return ineligableMoveClear();
     }
 
-    console.log(board[selectedSquare1][1]);
-    
-    if (board[selectedSquare1][1] === 'R') {
-      if (horizontallyConnecting() && noFriendlyFire() && noGhostingHorizontal()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
-    }else if(board[selectedSquare1][1] === 'E') {
-      if (connectingElephant() && noFriendlyFire()){
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
-    }else if(board[selectedSquare1][1] === 'H') {
-      console.log("Checking if horse can move")
-      if (connectHorse() && noFriendlyFire()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
-    }else if(board[selectedSquare1][1] === 'C') {
-      console.log("Checking if cannon can move")
-      if (connectCannon() && noFriendlyFire()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
-    }else if(board[selectedSquare1][1] === 'S') {
-      console.log("Checking if solider can move")
-      if (connectSolider() && noFriendlyFire()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
-    }else if(board[selectedSquare1][1] === 'A') {
-      console.log("Checking if advisor can move")
-      if (connectAdvisor() && noFriendlyFire()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
-    }else if(board[selectedSquare1][1] === 'G') {
-      console.log("Checking if general can move")
-      if (connectGeneral() && noFriendlyFire()) {
-        return true;
-      } else {
-        return ineligableMoveClear()
-      }
+    if (wouldMoveLeaveKingInCheck(selectedSquare1, selectedSquare2)) {
+      return ineligableMoveClear();
     }
-    
-    return ineligableMoveClear()
+
+    return true;
   };
 
   //Clear just the selected squarces, but not the enpassent
@@ -331,69 +306,12 @@ export default function JanggiChess() {
     reset();
   };
   
-  //Make sure the 2 selected squares make a valid rook move
-  const horizontallyConnecting = () => {
-    //Get the row or column
-    //Subtracts by boardLenghts to get the row, and what is left is the column
-    let square = selectedSquare1;
-    let row = 0;
-    
-    while (square - boardLenght >= 0) {
-      row += 1;
-      square -= boardLenght;
-    }
-  
-    let square2 = selectedSquare2;
-    let row2 = 0;
-  
-    while (square2 - boardLenght >= 0) {
-      row2 += 1;
-      square2 -= boardLenght;
-    }
-  
-    return row === row2 || square === square2;
-  };
-
   const connectCannon = (from = selectedSquare1, to   = selectedSquare2, boardToCheck = board) => {
-    var r  = Math.floor(from / boardLenght);
-    var c  = from % boardLenght;
-    var r2 = Math.floor(to / boardLenght);
-    var c2 = to % boardLenght;
+    const path = getMovePath(from, to, boardToCheck);
+    if (!path || boardToCheck[to]?.[1] === 'C') return false;
 
-    if(!(r === r2 || c === c2)){
-      console.log("Neithor squre is in the same file or row")
-      return false
-    }
-
-    //Preforming a rook like move, not taking
-    if(boardToCheck[to] == ""){
-      return noGhostingHorizontal(from, to, boardToCheck)//We only care that the cannon is not phasing thought another piece
-
-    //Preforming a cannon capture attack
-    }else{
-      //Math.sign return 1,0,or -1 which give the direction to change.
-      //The one with 0 is not change, but as the loop progress the other row or column is moved until it is the same as respective target 
-      const dr = Math.sign(r2 - r);
-      const dc = Math.sign(c2 - c);
-
-      //Avoid checking the initial square here
-      let curR = r + dr;
-      let curC = c + dc;
-      let piecesBetween = 0;
-
-      while (curR !== r2 || curC !== c2) {
-        if (boardToCheck[getPositionFromRowAndColumn(curR, curC)] !== '') {
-          piecesBetween++;
-          if (piecesBetween > 1) return false;
-        }
-
-        curR += dr;
-        curC += dc;
-      }
-      //Make sure there is a piece in the way, then true, or else return false
-      return piecesBetween === 1;
-    }
-    return false
+    const screens = path.slice(0, -1).filter((square) => boardToCheck[square] !== '');
+    return screens.length === 1 && boardToCheck[screens[0]][1] !== 'C';
   };
 
   const getPositionFromRowAndColumn = (rr, cc) => rr * boardLenght + cc;
@@ -429,55 +347,8 @@ export default function JanggiChess() {
     return true;
   };
 
-  const noFriendlyFire = (boardToCheck = board) => {
-    if(boardToCheck[selectedSquare1][0] == "W" && (boardToCheck[selectedSquare2][0] == "B" || boardToCheck[selectedSquare2][0] == undefined)){
-      return true
-    }else if(boardToCheck[selectedSquare1][0] == "B" && (boardToCheck[selectedSquare2][0] == "W" || boardToCheck[selectedSquare2][0] == undefined)){
-      return true
-    }
-    console.log("No friendly fire allowed")
-    return false
-  }
-
   const connectAdvisor = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
-    const r  = Math.floor(from / boardLenght);
-    const c  = from % boardLenght;
-    const r2 = Math.floor(to / boardLenght);
-    const c2 = to % boardLenght;
-
-    if(c2 == 3 || c2 == 4 || c2 == 5){
-      if(boardToCheck[from][0] == "B"){
-        if(r2 == 0 || r2 == 1 || r2 == 2){
-        }else{
-          console.log("Move goes outside of the palace row", r2)
-          return false;//Move is outside of the palace
-        }
-      }
-      if(boardToCheck[from][0] == "W"){
-        if(r2 == 7 || r2 == 8 || r2 == 9){
-        }else{
-          console.log("Move goes outside of the palace row", r2)
-          return false;//Move is outside of the palace
-        }
-      }
-
-      if (r + 1 === r2 && c - 1 === c2){
-        return true;
-      }
-      if (r + 1 === r2 && c + 1 === c2){
-        return true;
-      }
-      if (r - 1 === r2 && c + 1 === c2){
-        return true;
-      }
-      if (r - 1 === r2 && c - 1 === c2){
-        return true;
-      }
-
-    }else{
-      console.log("Move goes outside of the palace column")
-      return false;//Move is outside of the palace
-    }
+    return connectGeneral(from, to, boardToCheck);
   }
 
   const connectFlyingGeneral = (boardToCheck = board) => {
@@ -505,41 +376,13 @@ export default function JanggiChess() {
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
 
-    const generalColour = boardToCheck[from][0];
+    const color = boardToCheck[from]?.[0];
+    if (!color || !isPalaceSquare(r, c, color) || !isPalaceSquare(r2, c2, color)) return false;
 
-    if(c2 == 3 || c2 == 4 || c2 == 5){
-      if(generalColour == "B"){
-        if(r2 == 0 || r2 == 1 || r2 == 2){
-        }else{
-          console.log("Move goes outside of the palace row", r2)
-          return false;//Move is outside of the palace
-        }
-      }
-      if(generalColour == "W"){
-        if(r2 == 7 || r2 == 8 || r2 == 9){
-        }else{
-          console.log("Move goes outside of the palace row", r2)
-          return false;//Move is outside of the palace
-        }
-      }
-
-      if (r + 1 === r2 && c === c2){
-        return true;
-      }
-      if (r === r2 && c + 1 === c2){
-        return true;
-      }
-      if (r - 1 === r2 && c === c2){
-        return true;
-      }
-      if (r === r2 && c - 1 === c2){
-        return true;
-      }
-
-    }else{
-      console.log("Move goes outside of the palace column")
-      return false;//Move is outside of the palace
-    }
+    const rowDistance = Math.abs(r2 - r);
+    const colDistance = Math.abs(c2 - c);
+    return Math.max(rowDistance, colDistance) === 1
+      && (rowDistance === 0 || colDistance === 0 || isPalaceDiagonal(r, c, r2, c2, color));
   }
 
   const connectSolider = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
@@ -547,36 +390,17 @@ export default function JanggiChess() {
     const c  = from % boardLenght;
     const r2 = Math.floor(to / boardLenght);
     const c2 = to % boardLenght;
+    const color = boardToCheck[from]?.[0];
+    if (!color) return false;
 
-    
-    if(boardToCheck[from][0] == "B"){
-      if (r + 1 === r2 && c === c2){
-        return true;
-      }
-      if (r > (boardHeight/2)){
-        if (r === r2 && c + 1 === c2){
-          return true;
-        }
-        if (r === r2 && c - 1 === c2){
-          return true;
-        }
-      }
-    }
+    const forward = color === 'B' ? 1 : -1;
+    if (r + forward === r2 && c === c2) return true;
+    if (r === r2 && Math.abs(c2 - c) === 1) return true;
 
-    if(boardToCheck[from][0] == "W"){
-      if (r - 1 === r2 && c === c2){
-        return true;
-      }
-      if (r < (boardHeight/2)){
-        if (r === r2 && c + 1 === c2){
-          return true;
-        }
-        if (r === r2 && c - 1 === c2){
-          return true;
-        }
-      }
-    }
-    return false
+    const enemyPalace = color === 'B' ? 'W' : 'B';
+    return r + forward === r2
+      && Math.abs(c2 - c) === 1
+      && isPalaceDiagonal(r, c, r2, c2, enemyPalace);
   }
 
   const connectHorse = (from = selectedSquare1, to = selectedSquare2, boardToCheck = board) => {
@@ -682,7 +506,7 @@ export default function JanggiChess() {
       </header>
 
       <div className="game-layout">
-        <section className="board-panel" aria-label="Xiangqi board">
+        <section className="board-panel" aria-label="Janggi board">
           <div className={`turn-bar turn-bar-${gameStatus}`}>
             <span className={`turn-marker ${turn === "W" ? "red" : "black"}`} />
             <div>
