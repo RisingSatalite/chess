@@ -499,7 +499,7 @@ export default function JanggiChess() {
       <header className="game-header">
         <div>
           <p className="eyebrow">Two-player board game</p>
-          <h1>Xiangqi</h1>
+          <h1>Janggi</h1>
           <p className="subtitle">Chinese chess on a river board</p>
         </div>
         <button className="majorButton" onClick={resetGame} type="button">New game</button>
@@ -510,7 +510,7 @@ export default function JanggiChess() {
           <div className={`turn-bar turn-bar-${gameStatus}`}>
             <span className={`turn-marker ${turn === "W" ? "red" : "black"}`} />
             <div>
-              <strong>{turn === "W" ? "Red" : "Black"} to move</strong>
+              <strong>{turn === "W" ? "White" : "Black"} to move</strong>
               <span className="feedback">{feedback}</span>
             </div>
             <span className={`status status-${gameStatus}`}>{gameStatus}</span>
