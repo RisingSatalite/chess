@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
 
 export default function JanggiChess() {
   const initialBoard = [
-    'BR','BH','BE','BA','BG','BA','BE','BH','BR',
-    '','','','','','','','','',
+    'BR','BH','BE','BA','','BA','BE','BH','BR',
+    '','','','','BG','','','','',
     '','BC','','','','','','BC','',
     'BS','','BS','','BS','','BS','','BS',
     '','','','','','','','','',
     '','','','','','','','','',
     'WS','','WS','','WS','','WS','','WS',
     '','WC','','','','','','WC','',
-    '','','','','','','','','',
-    'WR','WH','WE','WA','WG','WA','WE','WH','WR',
+    '','','','','WG','','','','',
+    'WR','WH','WE','WA','','WA','WE','WH','WR',
   ];
 
   const [board, setBoard] = useState(initialBoard);
