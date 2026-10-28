@@ -16,6 +16,9 @@ export default function Home() {
       <Link href="shogi">
         <button>Go to Shogi</button>
       </Link>
+      <Link href="janggi">
+        <button>Go to Janggi</button>
+      </Link>
     </div>
   );
 }
